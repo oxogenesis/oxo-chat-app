@@ -8,6 +8,7 @@ import { actionType } from '../../redux/actions/actionType'
 import { WholeBulletinSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 
+import { my_styles } from '../../theme/style'
 //公告列表
 class TabBulletinScreen extends React.Component {
 
@@ -31,27 +32,32 @@ class TabBulletinScreen extends React.Component {
   render() {
     return (
       <View>
-        <FlatList
-          data={this.props.avatar.get('BulletinList')}
-          keyExtractor={item => item.Hash}
-          renderItem={
-            ({ item }) => {
-              return (
-                <View>
-                  <Text onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
-                    {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}@${timestamp_format(item.Timestamp)}`}
-                  </Text>
-                  <Text>{item.Content}</Text>
-                </View>);
+        <View style={my_styles.SearchBar}></View>
+        <View >
+          <FlatList
+            data={this.props.avatar.get('BulletinList')}
+            keyExtractor={item => item.Hash}
+            renderItem={
+              ({ item }) => {
+                return (
+                  <View style={my_styles.Bulletin}>
+                    <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
+                    </Text>
+                    <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
+                    <Text>{item.Content}</Text>
+                  </View>);
+              }
             }
-          }
-        >
-        </FlatList>
+          >
+          </FlatList>
+        </View>
       </View>
     )
   }
 }
 import { from } from 'readable-stream';
+import styles from '../../theme/style';
 
 const ReduxTabBulletinScreen = connect((state) => {
   return {

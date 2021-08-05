@@ -7,10 +7,9 @@ import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { WholeBulletinSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
 
 //公告列表
-class BulletinListScreen extends React.Component {
+class BulletinMarkScreen extends React.Component {
 
   constructor(props) {
     super(props)
@@ -37,7 +36,7 @@ class BulletinListScreen extends React.Component {
     }
   }
 
-  quoteBulletin(address, sequence, hash) {
+  quoteBulletin(address, sequence, hash){
     this.props.dispatch({
       type: actionType.avatar.addQuote,
       address: address,
@@ -49,11 +48,11 @@ class BulletinListScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadBulletinList()
-    })
+    });
   }
 
   componentWillUnmount() {
-    this._unsubscribe()
+    this._unsubscribe();
   }
 
   render() {
@@ -69,10 +68,10 @@ class BulletinListScreen extends React.Component {
               return (
                 <View>
                   <Text>{`=======================================`}</Text>
-                  <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                  <Text onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
                     {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                   </Text>
-                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
+                  <Text onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
                     {`#${item.Sequence}(${item.Hash})`}
                   </Text>
                   {
@@ -80,7 +79,7 @@ class BulletinListScreen extends React.Component {
                     <Text>{`"${item.QuoteSize}"`}</Text>
                   }
                   <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
-                  <Text style={my_styles.Link} onPress={() => this.quoteBulletin(item.Address, item.Sequence, item.Hash)}>【引用】</Text>
+                  <Text onPress={() => this.quoteBulletin(item.Address, item.Sequence, item.Hash)}>【引用】</Text>
                   <Text>{item.Content}</Text>
                 </View>);
             }
@@ -93,15 +92,15 @@ class BulletinListScreen extends React.Component {
 }
 import { from } from 'readable-stream';
 
-const ReduxBulletinListScreen = connect((state) => {
+const ReduxBulletinMarkScreen = connect((state) => {
   return {
     avatar: state.avatar
   }
-})(BulletinListScreen)
+})(BulletinMarkScreen)
 
-//export default BulletinListScreen
+//export default BulletinMarkScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()
-  return <ReduxBulletinListScreen{...props} navigation={navigation} route={route} />
+  return <ReduxBulletinMarkScreen{...props} navigation={navigation} route={route} />
 }

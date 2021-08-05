@@ -186,10 +186,25 @@ export default class Database {
     }
   }
 
-  async addAddressMark(address, name) {
-    let timestamp = Date.now()
+  async addAddressMark(address, name, timestamp) {
     let sql = `INSERT INTO ADDRESS_MARKS (address, name, created_at, updated_at)
       VALUES ('${address}', '${name}', ${timestamp}, ${timestamp})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, result]) => {
+            //console.log(`insertAddressMark=================================${result}`)
+            //console.log(result)
+            resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  async saveAddressName(address, name, timestamp) {
+    let sql = `UPDATE ADDRESS_MARKS SET name = '${name}', updated_at = ${timestamp} WHERE address = "${address}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)

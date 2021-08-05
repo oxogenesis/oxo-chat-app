@@ -3,7 +3,7 @@ import { View, Text, Button } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
-import { actionType } from '../../redux/actions/actionType';
+import { actionType } from '../../redux/actions/actionType'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 
 //地址标记
@@ -55,19 +55,22 @@ class AddressMarkScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadAddressMark()
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {
     return (
       <View>
-        <Text>name: {this.state.name}</Text>
         <Text>address: {this.state.address}</Text>
-        <Button title="删除" onPress={() => this.deleteAddressMark()} />
+        <Text>name: {this.state.name}</Text>
+        <Button
+          title="修改昵称"
+          onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.state.address })} />
+        <Button color='red' title="删除" onPress={() => this.deleteAddressMark()} />
         {
           this.props.avatar.get('Friends').includes(this.state.address) ?
             <>

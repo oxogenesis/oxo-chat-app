@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Text, TextInput, Button, FlatList, View } from 'react-native'
 
 import { connect } from 'react-redux'
-import { actionType } from '../../redux/actions/actionType';
+import { actionType } from '../../redux/actions/actionType'
 import { AddressToName } from '../../lib/Util'
 
 //登录界面

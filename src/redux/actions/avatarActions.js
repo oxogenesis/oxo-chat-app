@@ -401,14 +401,36 @@ export function* disableAvatar() {
 }
 
 export function* addAddressMark(action) {
+  let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.addAddressMark], action.address, action.name)
+  yield call([db, db.addAddressMark], action.address, action.name, timestamp)
   let address_array = yield select(state => state.avatar.get('AddressArray'))
   let address_map = yield select(state => state.avatar.get('AddressMap'))
-  let addressMark = { Address: action.address, Name: action.name }
+  let addressMark = { Address: action.address, Name: action.name, UpdatedAt: timestamp }
 
   address_map[action.address] = action.name
   address_array.push(addressMark)
+
+  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
+}
+
+export function* saveAddressName(action) {
+  let timestamp = Date.now()
+  let db = yield select(state => state.avatar.get('Database'))
+  yield call([db, db.saveAddressName], action.address, action.name, timestamp)
+  let address_array = yield select(state => state.avatar.get('AddressArray'))
+  let address_map = yield select(state => state.avatar.get('AddressMap'))
+  let addressMark = { Address: action.address, Name: action.name, UpdatedAt: timestamp }
+
+  address_map[action.address] = action.name
+  let tmp = []
+  address_array.forEach(am => {
+    if (am.Address != action.address) {
+      tmp.push(am)
+    }
+  })
+  tmp.push(addressMark)
+  address_array = tmp
 
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
 }
@@ -534,5 +556,45 @@ export function* FetchBulletin(action) {
     let msg = MessageGenerator.genBulletinRequest(action.address, action.sequence, action.to)
     console.log(msg)
     ws.send(msg)
+  }
+}
+
+export function* SaveName(action) {
+  let name = action.name
+  let bulletin_json = action.bulletin_json
+  let db = yield select(state => state.avatar.get('Database'))
+  let follows = yield select(state => state.avatar.get('Follows'))
+  let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
+  let bulletin_list = yield select(state => state.avatar.get('BulletinList'))
+
+  console.log(`=====================================================================SaveContentBulletin`)
+  console.log(quote_white_list)
+  console.log(action)
+  if (follows.includes(object_address)) {
+    //bulletin from follow
+    //save bulletin
+    yield call([db, db.doInsert], action.sql)
+    let current_BB_session = yield select(state => state.avatar.get('CurrentBBSession'))
+    if (current_BB_session == WholeBulletinSession || current_BB_session == object_address) {
+      bulletin_list.unshift({
+        "Address": object_address,
+        "Timestamp": bulletin_json.Timestamp,
+        "CreatedAt": action.created_at,
+        'Sequence': bulletin_json.Sequence,
+        "Content": bulletin_json.Content,
+        "Hash": action.hash,
+        "QuoteSize": bulletin_json.Quote.length
+      })
+      yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
+    }
+    yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+  } else if (quote_white_list.includes(action.hash)) {
+    //bulletin from quote
+    //save bulletin
+    yield call([db, db.doInsert], action.sql)
+    let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
+    if (current_bulletin == null) {
+      yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
+    }
   }
 }

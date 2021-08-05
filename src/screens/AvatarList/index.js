@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { View, Text, Button, FlatList } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { AvatarDerive } from '../../lib/OXO'
 import { connect } from 'react-redux'
-import { actionType } from '../../redux/actions/actionType';
+import { actionType } from '../../redux/actions/actionType'
+import { my_styles } from '../../theme/style'
 
 //登录界面
 class AvatarListScreen extends React.Component {
@@ -28,11 +29,11 @@ class AvatarListScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadAvatarList()
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   enableAvatar(address, name) {
@@ -65,7 +66,6 @@ class AvatarListScreen extends React.Component {
   render() {
     return (
       <View>
-        <Button title="Safe Lock" onPress={() => this.lock()} />
         <FlatList
           data={this.state.avatarList}
           keyExtractor={item => item.Name}
@@ -73,15 +73,16 @@ class AvatarListScreen extends React.Component {
             ({ item }) => {
               return (
                 <View>
-                  <Text
+                  <Text style={my_styles.Link}
                     onPress={() => this.enableAvatar(item.Address, item.Name)}>
                     {`${item.Name}:${item.Address}`}
                   </Text>
-                </View>);
+                </View>)
             }
           }
         >
         </FlatList>
+        <Button color="red" title="Safe Lock" onPress={() => this.lock()} />
         {
           this.props.master.get('MasterKey') == '' &&
           this.props.navigation.navigate('Unlock')

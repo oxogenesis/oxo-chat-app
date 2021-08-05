@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Text, TextInput, Button } from 'react-native'
 
 import { connect } from 'react-redux'
-import { actionType } from '../../redux/actions/actionType';
+import { actionType } from '../../redux/actions/actionType'
 
 //登录界面
 class AddressAddScreen extends React.Component {

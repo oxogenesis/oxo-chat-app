@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
+import { my_styles } from '../../theme/style'
 
 //公告列表
 class BulletinScreen extends React.Component {
@@ -52,14 +53,14 @@ class BulletinScreen extends React.Component {
             :
             <View>
               <Text>{`地址:${this.props.avatar.get('CurrentBulletin').Address}`}</Text>
-              <Text onPress={() => this.props.navigation.push('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
+              <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
                 {`昵称:${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
               </Text>
               <Text>
                 {`#${this.props.avatar.get('CurrentBulletin').Sequence}(${this.props.avatar.get('CurrentBulletin').Hash})`}
               </Text>
               {this.props.avatar.get('CurrentBulletin').PreHash != GenesisHash &&
-                <Text onPress={() => this.props.navigation.push('Bulletin', {
+                <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', {
                   address: this.props.avatar.get('CurrentBulletin').Address,
                   sequence: this.props.avatar.get('CurrentBulletin').Sequence - 1,
                   hash: this.props.avatar.get('CurrentBulletin').PreHash,
@@ -75,7 +76,7 @@ class BulletinScreen extends React.Component {
                     ({ item }) => {
                       return (
                         <View>
-                          <Text onPress={() => this.props.navigation.push('Bulletin', {
+                          <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', {
                             address: item.Address,
                             sequence: item.Sequence,
                             hash: item.Hash,
@@ -90,7 +91,7 @@ class BulletinScreen extends React.Component {
                 </FlatList>
               }
               <Text>{`时间：${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
-              <Text onPress={() =>
+              <Text style={my_styles.Link} onPress={() =>
                 this.quoteBulletin(this.props.avatar.get('CurrentBulletin').Address,
                   this.props.avatar.get('CurrentBulletin').Sequence,
                   this.props.avatar.get('CurrentBulletin').Hash)}>【引用】

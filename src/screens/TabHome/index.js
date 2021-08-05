@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SessionListScreen from '../TabSession'
 import TabBulletinScreen from '../TabBulletin'
 import TabAddressBookScreen from '../TabAddressBook'
-import TabMeScreen from '../TabMe'
+import TabSettingScreen from '../TabSetting'
 
 import IconAnt from 'react-native-vector-icons/AntDesign';
 
@@ -49,11 +49,11 @@ class TabHomeScreen extends React.Component {
             />
           )
         }} />
-        <Tab.Screen name="TabMe" component={TabMeScreen} options={{
-          tabBarLabel: '我',
+        <Tab.Screen name="TabSetting" component={TabSettingScreen} options={{
+          tabBarLabel: '设置',
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
-              name={'home'}
+              name={'setting'}
               size={24}
             />
           )

@@ -4,6 +4,7 @@ export const actionType = {
   },
   avatar: {
     setAvatar: 'SET_AVATAR',
+    setAvatarName: 'SET_AVATAR_NAME',
     setDatabase: 'SET_DATABASE',
 
     setHosts: 'SET_HOSTS',
@@ -19,6 +20,7 @@ export const actionType = {
     resetAvatar: 'RESET_AVATAR',
 
     addAddressMark: 'ADD_ADDRESS_MARK',
+    saveAddressName: 'SAVE_ADDRESS_NAME',
     addFriend: 'ADD_FRIEND',
     delFriend: 'DEL_FRIEND',
     addFollow: 'ADD_FOLLOW',

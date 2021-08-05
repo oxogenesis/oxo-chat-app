@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import { View, Text, TextInput, Button } from 'react-native'
 
 import { connect } from 'react-redux'
-import { actionType } from '../../redux/actions/actionType';
+import { actionType } from '../../redux/actions/actionType'
 import { MasterKeyDerive } from '../../lib/OXO'
 
 //Unlock界面

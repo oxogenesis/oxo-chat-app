@@ -30,7 +30,12 @@ import BulletinListScreen from './screens/BulletinList'
 import BulletinPublishScreen from './screens/BulletinPublish'
 import AddressMarkScreen from './screens/AddressMark'
 import AddressAddScreen from './screens/AddressAdd'
-import NetworkScreen from './screens/Network'
+import AddressEditScreen from './screens/AddressEdit'
+import SettingMeScreen from './screens/SettingMe'
+import SettingNetworkScreen from './screens/SettingNetwork'
+import SettingBulletinScreen from './screens/SettingBulletin'
+import BulletinMarkScreen from './screens/BulletinMark'
+import AvatarNameEditScreen from './screens/AvatarNameEdit'
 
 class App extends React.Component {
   render() {
@@ -131,7 +136,12 @@ class App extends React.Component {
               })
             } />
           <Stack.Screen name="AddressAdd" component={AddressAddScreen} />
-          <Stack.Screen name="Network" component={NetworkScreen} />
+          <Stack.Screen name="AddressEdit" component={AddressEditScreen} />
+          <Stack.Screen name="SettingMe" component={SettingMeScreen} />
+          <Stack.Screen name="SettingNetwork" component={SettingNetworkScreen} />
+          <Stack.Screen name="SettingBulletin" component={SettingBulletinScreen} />
+          <Stack.Screen name="BulletinMark" component={BulletinMarkScreen} />
+          <Stack.Screen name="AvatarNameEdit" component={AvatarNameEditScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     )

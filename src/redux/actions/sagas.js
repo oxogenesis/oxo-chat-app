@@ -10,6 +10,7 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.disableAvatar, avatarActions.disableAvatar)
 
   yield takeEvery(actionType.avatar.addAddressMark, avatarActions.addAddressMark)
+  yield takeEvery(actionType.avatar.saveAddressName, avatarActions.saveAddressName)
 
   yield takeEvery(actionType.avatar.addFriend, avatarActions.addFriend)
   yield takeEvery(actionType.avatar.delFriend, avatarActions.delFriend)

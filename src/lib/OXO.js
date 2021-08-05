@@ -118,6 +118,44 @@ async function AvatarCreateNew(name, password) {
   }
 }
 
+async function AvatarNameEdit(name, seed, password) {
+  let keypair = oxoKeyPairs.deriveKeypair(seed)
+  let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
+  let salt = crypto.randomBytes(16).toString('hex')
+  let key = halfSHA512(salt + password).toString('hex').slice(0, 32)
+  let iv = crypto.randomBytes(8).toString('hex')
+  let msg = { "seed": seed }
+  let crypted = encrypt(key, iv, JSON.stringify(msg))
+  let save = { "salt": salt, "iv": iv, "ct": crypted }
+  
+  console.log(name)
+  console.log(seed)
+  console.log(password)
+
+  try {
+    const result = await AsyncStorage.getItem('<#Avatars#>')
+    console.log(result)
+    let avatarList = []
+    if (result != null) {
+      avatarList = JSON.parse(result)
+      let tmp = []
+      avatarList.forEach(avatar => {
+        if (avatar.Address != address) {
+          tmp.push(avatar)
+        }
+      })
+      avatarList = tmp
+    }
+    avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
+    console.log(avatarList)
+    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 function AvatarCreateWithSeed(seed, password) {
   let keypair = oxoKeyPairs.deriveKeypair(seed)
   //let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
@@ -208,5 +246,6 @@ export {
   AvatarCreateNew,
   AvatarCreateWithSeed,
   AvatarDerive,
+  AvatarNameEdit,
   DHSequence
 }

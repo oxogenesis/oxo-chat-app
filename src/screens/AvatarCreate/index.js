@@ -20,7 +20,7 @@ class AvatarCreateScreen extends React.Component {
     AvatarCreateNew(this.state.name, this.props.master.get('MasterKey'))
       .then(result => {
         if (result) {
-          this.setState({ nick: '', error_msg: '' })
+          this.setState({ name: '', error_msg: '' })
           this.props.navigation.navigate('AvatarList')
         }
       })

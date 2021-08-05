@@ -3,6 +3,7 @@ import { View, Text, Button, FlatArray } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 
 import { connect } from 'react-redux'
+import { my_styles } from '../../theme/style'
 
 //地址薄
 class TabAddressBookScreen extends React.Component {
@@ -35,10 +36,11 @@ class TabAddressBookScreen extends React.Component {
           renderItem={
             ({ item }) => {
               return (<View>
-                <Text onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
-                  {item.Name}
+                <Text style={my_styles.Link}
+                  onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                  {`${item.Name}:${item.Address}`}
                 </Text>
-              </View>);
+              </View>)
             }
           }
         >

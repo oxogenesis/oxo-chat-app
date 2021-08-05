@@ -59,6 +59,10 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('QuoteWhiteList', [])
 }
 
+reducer.prototype[actionType.avatar.setAvatarName] = (state, action) => {
+  return state.set('Name', action.name)
+}
+
 reducer.prototype[actionType.avatar.setDatabase] = (state, action) => {
   return state.set('Database', action.db)
 }

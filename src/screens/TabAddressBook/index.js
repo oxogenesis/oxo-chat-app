@@ -9,21 +9,6 @@ import { my_styles } from '../../theme/style'
 class TabAddressBookScreen extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { addressArray: [] }
-  }
-
-  loadAddressArray() {
-    this.setState({ addressArray: this.props.avatar.get('AddressArray') })
-  }
-
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadAddressArray()
-    })
-  }
-
-  componentWillUnmount() {
-    this._unsubscribe();
   }
 
   render() {
@@ -31,7 +16,7 @@ class TabAddressBookScreen extends React.Component {
       <View>
         <Button title="标记地址" onPress={() => this.props.navigation.navigate('AddressAdd')} />
         <FlatList
-          data={this.state.addressArray}
+          data={this.props.avatar.get('AddressArray')}
           keyExtractor={item => item.Name}
           renderItem={
             ({ item }) => {

@@ -4,13 +4,11 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { timestamp_format, AddressToName } from '../../lib/Util'
 
 //地址标记
 class AddressMarkScreen extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { address: '', name: '', isFriend: false, isFollow: false }
   }
 
   deleteAddressMark() {
@@ -20,35 +18,35 @@ class AddressMarkScreen extends React.Component {
   addFriend() {
     this.props.dispatch({
       type: actionType.avatar.addFriend,
-      address: this.state.address
+      address: this.props.avatar.get('CurrentAddressMark').Address
     })
   }
 
   delFriend() {
     this.props.dispatch({
       type: actionType.avatar.delFriend,
-      address: this.state.address
+      address: this.props.avatar.get('CurrentAddressMark').Address
     })
   }
 
   addFollow() {
     this.props.dispatch({
       type: actionType.avatar.addFollow,
-      address: this.state.address
+      address: this.props.avatar.get('CurrentAddressMark').Address
     })
   }
 
   delFollow() {
     this.props.dispatch({
       type: actionType.avatar.delFollow,
-      address: this.state.address
+      address: this.props.avatar.get('CurrentAddressMark').Address
     })
   }
 
   loadAddressMark() {
-    this.setState({
-      address: this.props.route.params.address,
-      name: AddressToName(this.props.avatar.get('AddressMap'), this.props.route.params.address)
+    this.props.dispatch({
+      type: actionType.avatar.setCurrentAddressMark,
+      address: this.props.route.params.address
     })
   }
 
@@ -64,34 +62,47 @@ class AddressMarkScreen extends React.Component {
 
   render() {
     return (
-      <View>
-        <Text>address: {this.state.address}</Text>
-        <Text>name: {this.state.name}</Text>
-        <Button
-          title="修改昵称"
-          onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.state.address })} />
-        <Button color='red' title="删除" onPress={() => this.deleteAddressMark()} />
+      <>
         {
-          this.props.avatar.get('Friends').includes(this.state.address) ?
-            <>
-              <Button title="聊天" onPress={() =>
-                this.props.navigation.push('Session', { address: this.state.address })} />
-              <Button title="解除好友" onPress={() => this.delFriend()} />
-            </>
-            :
-            <Button title="加为好友-WTF" onPress={() => this.addFriend()} />
+          this.props.avatar.get('CurrentAddressMark') &&
+          <View>
+            <Text>地址: {this.props.avatar.get('CurrentAddressMark').Address}</Text>
+            <Text>昵称: {this.props.avatar.get('CurrentAddressMark').Name}</Text>
+            {
+              this.props.avatar.get('CurrentAddressMark').IsMark ?
+                <>
+                  <Button
+                    title="修改昵称"
+                    onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
+                  <Button color='red' title="删除" onPress={() => this.deleteAddressMark()} />
+                </>
+                :
+                <>
+                </>
+            }
+            {
+              this.props.avatar.get('CurrentAddressMark').IsFriend ?
+                <>
+                  <Button title="开始聊天" onPress={() =>
+                    this.props.navigation.push('Session', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
+                  <Button color='orange' title="解除好友" onPress={() => this.delFriend()} />
+                </>
+                :
+                <Button title="加为好友" onPress={() => this.addFriend()} />
+            }
+            {
+              this.props.avatar.get('CurrentAddressMark').IsFollow ?
+                <>
+                  <Button title="查看公告" onPress={() =>
+                    this.props.navigation.push('BulletinList', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
+                  <Button color='orange' title="取消关注" onPress={() => this.delFollow()} />
+                </>
+                :
+                <Button title="关注公告" onPress={() => this.addFollow()} />
+            }
+          </View>
         }
-        {
-          this.props.avatar.get('Follows').includes(this.state.address) ?
-            <>
-              <Button title="公告" onPress={() =>
-                this.props.navigation.push('BulletinList', { address: this.state.address })} />
-              <Button title="取消关注" onPress={() => this.delFollow()} />
-            </>
-            :
-            <Button title="关注-WTF" onPress={() => this.addFollow()} />
-        }
-      </View>
+      </>
     )
   }
 }

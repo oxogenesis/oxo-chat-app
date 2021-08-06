@@ -29,7 +29,7 @@ class AvatarCreateScreen extends React.Component {
     return (
       <>
         <TextInput
-          placeholder="name"
+          placeholder="昵称"
           value={this.state.name}
           onChangeText={text => this.setState({ name: text })}
         />

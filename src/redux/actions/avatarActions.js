@@ -282,6 +282,11 @@ export function* addFriend(action) {
   let friends = yield select(state => state.avatar.get('Friends'))
   friends.push(action.address)
   yield put({ type: actionType.avatar.setFriends, friends: friends })
+
+  let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
+  if (current_address_mark || action.address == current_address_mark.Address) {
+    yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
+  }
 }
 
 export function* delFriend(action) {
@@ -290,6 +295,11 @@ export function* delFriend(action) {
   let friends = yield select(state => state.avatar.get('Friends'))
   friends = friends.filter((item) => item != action.address)
   yield put({ type: actionType.avatar.setFriends, friends: friends })
+
+  let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
+  if (current_address_mark || action.address == current_address_mark.Address) {
+    yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
+  }
 }
 
 // Follow
@@ -299,6 +309,11 @@ export function* addFollow(action) {
   let follows = yield select(state => state.avatar.get('Follows'))
   follows.push(action.address)
   yield put({ type: actionType.avatar.setFollows, follows: follows })
+
+  let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
+  if (current_address_mark || action.address == current_address_mark.Address) {
+    yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
+  }
 }
 
 export function* delFollow(action) {
@@ -307,6 +322,11 @@ export function* delFollow(action) {
   let follows = yield select(state => state.avatar.get('Follows'))
   follows = follows.filter((item) => item != action.address)
   yield put({ type: actionType.avatar.setFollows, follows: follows })
+
+  let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
+  if (current_address_mark || action.address == current_address_mark.Address) {
+    yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
+  }
 }
 
 // Host

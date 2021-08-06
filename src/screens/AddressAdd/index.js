@@ -15,7 +15,10 @@ class AddressAddScreen extends React.Component {
     let address = this.state.address.trim()
     let name = this.state.name.trim()
     if (address == '' || name == '') {
-      this.setState({ error_msg: 'address or name could not be blank...' })
+      this.setState({ error_msg: '地址或昵称不能为空...' })
+      return
+    } else if (address == this.props.avatar.get('Address')) {
+      this.setState({ error_msg: '不能标记自己...' })
       return
     }
     this.props.dispatch({
@@ -30,12 +33,12 @@ class AddressAddScreen extends React.Component {
     return (
       <>
         <TextInput
-          placeholder="address"
+          placeholder="地址"
           value={this.state.address}
           onChangeText={text => this.setState({ address: text })}
         />
         <TextInput
-          placeholder="name"
+          placeholder="昵称"
           value={this.state.name}
           onChangeText={text => this.setState({ name: text })}
         />
@@ -44,7 +47,7 @@ class AddressAddScreen extends React.Component {
           <Text>{this.state.error_msg}</Text>
         }
         <Button
-          title="Add"
+          title="标记"
           onPress={() => this.addAddressMark()}
         />
       </>

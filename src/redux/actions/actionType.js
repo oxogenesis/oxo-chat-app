@@ -19,6 +19,7 @@ export const actionType = {
     disableAvatar: 'DISABLE_AVATAR',
     resetAvatar: 'RESET_AVATAR',
 
+    setCurrentAddressMark: 'SET_CURRENT_ADDRESS_MARK',
     addAddressMark: 'ADD_ADDRESS_MARK',
     saveAddressName: 'SAVE_ADDRESS_NAME',
     addFriend: 'ADD_FRIEND',

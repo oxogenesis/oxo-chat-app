@@ -1,5 +1,6 @@
 import { actionType } from '../actions/actionType'
 import { fromJS, set } from 'immutable'
+import { AddressToName } from '../../lib/Util'
 
 function initialState() {
   return fromJS(
@@ -18,6 +19,7 @@ function initialState() {
 
       AddressMap: {},
       AddressArray: [],
+      CurrentAddressMark: null,
 
       Friends: [],
       Follows: [],
@@ -52,6 +54,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('CurrentBulletin', null)
     .set('AddressMap', {})
     .set('AddressArray', [])
+    .set('CurrentAddressMark', null)
     .set('Friends', [])
     .set('Follows', [])
     .set('BulletinList', [])
@@ -80,6 +83,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('CurrentBulletin', null)
     .set('AddressMap', {})
     .set('AddressArray', [])
+    .set('CurrentAddressMark', null)
     .set('Friends', [])
     .set('Follows', [])
     .set('BulletinList', [])
@@ -90,6 +94,16 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
 reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {
   return state.set('AddressMap', action.address_map)
     .set('AddressArray', action.address_array)
+}
+
+reducer.prototype[actionType.avatar.setCurrentAddressMark] = (state, action) => {
+  let tmp = {}
+  tmp.Address = action.address
+  tmp.Name = AddressToName(state.get('AddressMap'), action.address)
+  tmp.IsMark = (tmp.Address != tmp.Name)
+  tmp.IsFollow = state.get('Follows').includes(tmp.Address)
+  tmp.IsFriend = state.get('Friends').includes(tmp.Address)
+  return state.set('CurrentAddressMark', tmp)
 }
 
 reducer.prototype[actionType.avatar.setFriends] = (state, action) => {

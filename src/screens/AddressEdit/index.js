@@ -50,7 +50,7 @@ class AddressEditScreen extends React.Component {
       <View>
         <Text>address: {this.state.address}</Text>
         <TextInput
-          placeholder="name"
+          placeholder="昵称"
           value={this.state.name}
           multiline={false}
           onChangeText={text => this.setState({ name: text })}

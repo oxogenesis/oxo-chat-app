@@ -31,7 +31,7 @@ class BulletinPublishScreen extends React.Component {
     return (
       <>
         <TextInput
-          placeholder="content"
+          placeholder="内容"
           value={this.state.content}
           multiline={true}
           onChangeText={text => this.setState({ content: text })}

@@ -59,7 +59,6 @@ class BulletinMarkScreen extends React.Component {
   render() {
     return (
       <View style={[my_styles.container, {
-        // Try setting `flexDirection` to `"row"`.
         flexDirection: "column"
       }]}>
         <View style={{ flex: 1, backgroundColor: "red" }} />

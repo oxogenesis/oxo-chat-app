@@ -84,7 +84,10 @@ export default class Database {
           is_file BOOLEAN DEFAULT FALSE,
           file_saved BOOLEAN DEFAULT FALSE,
           file_sha1 VARCHAR(40),
-          relay_address VARCHAR(35)
+          relay_address VARCHAR(35),
+          view_at INTEGER,
+          is_mark BOOLEAN DEFAULT FALSE,
+          is_follow BOOLEAN DEFAULT FALSE
           )`)
 
       //group
@@ -360,13 +363,16 @@ export default class Database {
             for (let i = 0; i < len; i++) {
               let bulletin = results.rows.item(i)
               bulletins.push({
-                "Address": bulletin.address,
+                'Address': bulletin.address,
                 'Timestamp': bulletin.timestamp,
                 'CreateAt': bulletin.created_at,
                 'Sequence': bulletin.sequence,
                 'Content': bulletin.content,
                 'Hash': bulletin.hash,
-                'QuoteSize': bulletin.quote_size
+                'QuoteSize': bulletin.quote_size,
+                'ViewAt': bulletin.view_at,
+                'IsFollow': bulletin.is_follow,
+                'IsMark': bulletin.is_mark
               })
             }
             resolve(bulletins)
@@ -449,24 +455,59 @@ export default class Database {
             if (len != 0) {
               let item = results.rows.item(0)
               let bulletin = {
-                Hash: item.hash,
-                Address: item.address,
-                Sequence: item.sequence,
-                PreHash: item.pre_hash,
-                QuoteSize: item.quote_size,
-                Content: item.content,
-                Timestamp: item.timestamp,
-                CreatedAt: item.created_at,
-                QuoteList: []
+                'Address': item.address,
+                'Timestamp': item.timestamp,
+                'CreateAt': item.created_at,
+                'Sequence': item.sequence,
+                'Content': item.content,
+                'Hash': item.hash,
+                'QuoteSize': item.quote_size,
+                'ViewAt': item.view_at,
+                'IsFollow': item.is_follow,
+                'IsMark': item.is_mark,
+
+                'PreHash': item.pre_hash,
+                'QuoteList': []
               }
               if (item.QuoteSize != 0) {
                 let json = JSON.parse(item.json)
                 bulletin.QuoteList = json.Quote
               }
+              console.log(bulletin)
               resolve(bulletin)
             } else {
               resolve(null)
             }
+          })
+      })
+    })
+  }
+
+  markBulletin(hash){
+    let sql = `UPDATE BULLETINS SET is_mark = "TRUE" WHERE hash = "${hash}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            console.log("===========================update completed")
+            console.log(tx)
+            console.log(results)
+            resolve(results)
+          })
+      })
+    })
+  }
+
+  unmarkBulletin(hash){
+    let sql = `UPDATE BULLETINS SET is_mark = "FALSE" WHERE hash = "${hash}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            console.log("===========================update completed")
+            console.log(tx)
+            console.log(results)
+            resolve(results)
           })
       })
     })

@@ -3,29 +3,13 @@ import { View, Text, TextInput, Button, FlatList } from 'react-native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
+import { my_styles } from '../../theme/style'
 
 //登录界面
 class SettingNetworkScreen extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { host_input: '', current_host: '', hosts: [], error_msg: '' }
-  }
-
-  loadHosts() {
-    this.setState({
-      hosts: this.props.avatar.get('Hosts'),
-      current_host: this.props.avatar.get('CurrentHost')
-    })
-  }
-
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadHosts()
-    });
-  }
-
-  componentWillUnmount() {
-    this._unsubscribe();
+    this.state = { host_input: '', error_msg: '' }
   }
 
   addHost() {
@@ -53,7 +37,7 @@ class SettingNetworkScreen extends React.Component {
   render() {
     return (
       <>
-        <Text>{`在用服务器：${this.state.current_host}`}</Text>
+        <Text>{`在用服务器：${this.props.avatar.get('CurrentHost')}`}</Text>
         <TextInput
           placeholder="ws:// or wss://"
           value={this.state.host_input}
@@ -65,15 +49,15 @@ class SettingNetworkScreen extends React.Component {
         }
         <Button title="设置" onPress={() => this.addHost()} />
         <FlatList
-          data={this.state.hosts}
+          data={this.props.avatar.get('Hosts')}
           keyExtractor={item => item.Address}
           renderItem={
             ({ item }) => {
               return (
                 <View>
-                  <Text
+                  <Text style={my_styles.Link}
                     onPress={() => this.changeCurrentHost(item.Address)}>
-                    {`${item.UpdatedAt}<==${item.Address}`}
+                    {`使用${item.Address}`}
                   </Text>
                 </View>);
             }

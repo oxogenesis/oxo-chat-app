@@ -31,4 +31,6 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.FetchBulletin, avatarActions.FetchBulletin)
   yield takeEvery(actionType.avatar.PublishBulletin, avatarActions.PublishBulletin)
   yield takeEvery(actionType.avatar.LoadCurrentBulletin, avatarActions.LoadCurrentBulletin)
+  yield takeEvery(actionType.avatar.MarkBulletin, avatarActions.MarkBulletin)
+  yield takeEvery(actionType.avatar.UnmarkBulletin, avatarActions.UnmarkBulletin)
 }

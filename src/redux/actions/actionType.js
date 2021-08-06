@@ -43,6 +43,8 @@ export const actionType = {
 
     LoadBulletinList: 'LOAD_BULLETIN_LIST',
     LoadCurrentBulletin: 'LOAD_CURRENT_BULLETIN',
+    MarkBulletin: "MARK_BULLETIN",
+    UnmarkBulletin: "UNMARK_BULLETIN",
 
     HandleBulletinRequest: 'HANDLE_BULLETIN_REQUEST',
     SaveBulletin: 'SAVE_BULLETIN',

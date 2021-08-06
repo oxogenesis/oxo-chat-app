@@ -8,12 +8,28 @@ import { actionType } from '../../redux/actions/actionType'
 import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
+import IconFontisto from 'react-native-vector-icons/Fontisto'
+import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 //公告列表
 class BulletinScreen extends React.Component {
 
   constructor(props) {
     super(props)
+  }
+
+  markBulletin(hash) {
+    this.props.dispatch({
+      type: actionType.avatar.MarkBulletin,
+      hash: hash
+    })
+  }
+
+  unmarkBulletin(hash) {
+    this.props.dispatch({
+      type: actionType.avatar.UnmarkBulletin,
+      hash: hash
+    })
   }
 
   quoteBulletin(address, sequence, hash) {
@@ -44,29 +60,68 @@ class BulletinScreen extends React.Component {
 
   render() {
     return (
-      <View>
-        <Text>{`哈希:${this.props.route.params.hash}`}</Text>
-        <Text>{`=======================================`}</Text>
+      <View style={[my_styles.container, {
+        flexDirection: "column"
+      }]}>
         {
           this.props.avatar.get('CurrentBulletin') == null ?
             <Text>not found...</Text>
             :
-            <View>
-              <Text>{`地址:${this.props.avatar.get('CurrentBulletin').Address}`}</Text>
-              <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
-                {`昵称:${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
-              </Text>
-              <Text>
-                {`#${this.props.avatar.get('CurrentBulletin').Sequence}(${this.props.avatar.get('CurrentBulletin').Hash})`}
-              </Text>
-              {this.props.avatar.get('CurrentBulletin').PreHash != GenesisHash &&
-                <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', {
-                  address: this.props.avatar.get('CurrentBulletin').Address,
-                  sequence: this.props.avatar.get('CurrentBulletin').Sequence - 1,
-                  hash: this.props.avatar.get('CurrentBulletin').PreHash,
-                  to: this.props.avatar.get('CurrentBulletin').Address
-                })}>上一篇</Text>
-              }
+            <>
+              <View style={{ flexDirection: "row", }} >
+                <View style={{ backgroundColor: "yellow", flex: 0.9 }} >
+                  <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
+                    {`${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
+                  </Text>
+                </View>
+                <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: this.props.avatar.get('CurrentBulletin').Hash })}>
+                    {`#${this.props.avatar.get('CurrentBulletin').Sequence}`}
+                  </Text>
+                </View>
+              </View>
+              <Text>{`@${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
+              <View style={{ flexDirection: "row", }} >
+                {
+                  this.props.avatar.get('CurrentBulletin').IsMark == "TRUE" ?
+                    <IconFontisto
+                      name={'bookmark-alt'}
+                      size={24}
+                      color='red'
+                      onPress={() => this.unmarkBulletin(this.props.avatar.get('CurrentBulletin').Hash)}
+                    />
+                    :
+                    <IconFontisto
+                      name={'bookmark'}
+                      size={24}
+                      onPress={() => this.markBulletin(this.props.avatar.get('CurrentBulletin').Hash)}
+                    />
+                }
+                {
+                  this.props.avatar.get('CurrentBulletin').PreHash != GenesisHash &&
+                  <IconMaterialIcons
+                    name={'skip-previous'}
+                    size={24}
+                    color='blue'
+                    onPress={() => this.props.navigation.push('Bulletin', {
+                      address: this.props.avatar.get('CurrentBulletin').Address,
+                      sequence: this.props.avatar.get('CurrentBulletin').Sequence - 1,
+                      hash: this.props.avatar.get('CurrentBulletin').PreHash,
+                      to: this.props.avatar.get('CurrentBulletin').Address
+                    })}
+                  />
+                }
+                <IconMaterialIcons
+                  name={'format-quote'}
+                  size={24}
+                  color='blue'
+                  onPress={() =>
+                    this.quoteBulletin(this.props.avatar.get('CurrentBulletin').Address,
+                      this.props.avatar.get('CurrentBulletin').Sequence,
+                      this.props.avatar.get('CurrentBulletin').Hash)}
+                />
+              </View>
+              <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
               {
                 this.props.avatar.get('CurrentBulletin').QuoteSize != 0 &&
                 <FlatList
@@ -82,7 +137,7 @@ class BulletinScreen extends React.Component {
                             hash: item.Hash,
                             to: this.props.avatar.get('CurrentBulletin').Address
                           })}>
-                            {`【${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}】`}
+                            {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
                           </Text>
                         </View>)
                     }
@@ -90,15 +145,7 @@ class BulletinScreen extends React.Component {
                 >
                 </FlatList>
               }
-              <Text>{`时间：${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
-              <Text style={my_styles.Link} onPress={() =>
-                this.quoteBulletin(this.props.avatar.get('CurrentBulletin').Address,
-                  this.props.avatar.get('CurrentBulletin').Sequence,
-                  this.props.avatar.get('CurrentBulletin').Hash)}>【引用】
-                </Text>
-              <Text>{`=======================================`}</Text>
-              <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
-            </View>
+            </>
         }
       </View>
     )

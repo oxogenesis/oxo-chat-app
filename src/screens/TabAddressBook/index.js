@@ -29,7 +29,7 @@ class TabAddressBookScreen extends React.Component {
   render() {
     return (
       <View>
-        <Button title="标记新地址" onPress={() => this.props.navigation.navigate('AddressAdd')} />
+        <Button title="标记地址" onPress={() => this.props.navigation.navigate('AddressAdd')} />
         <FlatList
           data={this.state.addressArray}
           keyExtractor={item => item.Name}

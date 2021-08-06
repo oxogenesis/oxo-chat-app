@@ -46,7 +46,7 @@ class UnlockScreen extends React.Component {
       <>
         <TextInput
           secureTextEntry={true}
-          placeholder="MasterKey"
+          placeholder="口令"
           value={this.state.master_key}
           onChangeText={text => this.setState({ master_key: text })}
         />
@@ -54,7 +54,7 @@ class UnlockScreen extends React.Component {
           this.state.error_msg.length > 0 &&
           <Text>{this.state.error_msg}</Text>
         }
-        <Button title="Unlock" onPress={() => this.unlock()} />
+        <Button title="解锁" onPress={() => this.unlock()} />
       </>
     )
   }

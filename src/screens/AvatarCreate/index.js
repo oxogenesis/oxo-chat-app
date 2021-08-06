@@ -37,9 +37,9 @@ class AvatarCreateScreen extends React.Component {
           this.state.error_msg.length > 0 &&
           <Text>{this.state.error_msg}</Text>
         }
-        <Button title="Create" onPress={() => this.createAvatar()}
+        <Button title="生成" onPress={() => this.createAvatar()}
         />
-        <Button title="Cancel" onPress={() => this.props.navigation.navigate('AvatarList')} />
+        <Button title="取消" onPress={() => this.props.navigation.navigate('AvatarList')} />
       </>
     )
   }

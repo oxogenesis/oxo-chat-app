@@ -82,7 +82,7 @@ class AvatarListScreen extends React.Component {
           }
         >
         </FlatList>
-        <Button color="red" title="Safe Lock" onPress={() => this.lock()} />
+        <Button color="red" title="安全退出" onPress={() => this.lock()} />
         {
           this.props.master.get('MasterKey') == '' &&
           this.props.navigation.navigate('Unlock')

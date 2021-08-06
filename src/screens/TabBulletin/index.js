@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, Button, FlatList } from 'react-native';
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
@@ -32,7 +32,7 @@ class TabBulletinScreen extends React.Component {
   render() {
     return (
       <View>
-        <View style={my_styles.SearchBar}></View>
+        <Button title="发布公告" onPress={() => this.props.navigation.push('BulletinPublish')} />
         <View >
           <FlatList
             data={this.props.avatar.get('BulletinList')}
@@ -40,13 +40,22 @@ class TabBulletinScreen extends React.Component {
             renderItem={
               ({ item }) => {
                 return (
-                  <View style={my_styles.Bulletin}>
-                    <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
-                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
-                    </Text>
+                  <View>
+                    <View style={{ flexDirection: "row", }} >
+                      <View style={{ backgroundColor: "yellow", flex: 0.9 }} >
+                        <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
+                        </Text>
+                      </View>
+                      <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                        <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
+                          {`#${item.Sequence}`}
+                        </Text>
+                      </View>
+                    </View>
                     <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
-                    <Text>{item.Content}</Text>
-                  </View>);
+                    <Text style={my_styles.BulletinContentHeader} ellipsizeMode={"tail"} numberOfLines={2}>{item.Content}</Text>
+                  </View>)
               }
             }
           >

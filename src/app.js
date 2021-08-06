@@ -6,16 +6,16 @@
  * @flow strict-local
  */
 
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import IconAnt from 'react-native-vector-icons/AntDesign';
-import IconFeather from 'react-native-vector-icons/Feather';
-//import IconEntypo from 'react-native-vector-icons/Entypo';
-import IconMaterial from 'react-native-vector-icons/MaterialIcons';
+import * as React from 'react'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import IconAnt from 'react-native-vector-icons/AntDesign'
+import IconFeather from 'react-native-vector-icons/Feather'
+//import IconEntypo from 'react-native-vector-icons/Entypo'
+import IconMaterial from 'react-native-vector-icons/MaterialIcons'
+import IconFontisto from 'react-native-vector-icons/Fontisto'
 
 import { connect } from 'react-redux'
-//import { SearchBar, Button, ThemeProvider } from 'react-native-elements';
 
 const Stack = createStackNavigator();
 
@@ -25,6 +25,7 @@ import AvatarListScreen from './screens/AvatarList'
 import AvatarCreateScreen from './screens/AvatarCreate'
 import TabHomeScreen from './screens/TabHome'
 import BulletinScreen from './screens/Bulletin'
+import BulletinInfoScreen from './screens/BulletinInfo'
 import SessionScreen from './screens/Session'
 import BulletinListScreen from './screens/BulletinList'
 import BulletinPublishScreen from './screens/BulletinPublish'
@@ -36,6 +37,7 @@ import SettingNetworkScreen from './screens/SettingNetwork'
 import SettingBulletinScreen from './screens/SettingBulletin'
 import BulletinMarkScreen from './screens/BulletinMark'
 import AvatarNameEditScreen from './screens/AvatarNameEdit'
+import AvatarSeedScreen from './screens/AvatarSeed'
 
 class App extends React.Component {
   render() {
@@ -50,7 +52,7 @@ class App extends React.Component {
             component={AvatarListScreen}
             options={
               ({ route, navigation }) => ({
-                title: 'AvatarList',
+                title: "账户列表",
                 headerRight: () => (
                   <IconAnt
                     name={'adduser'}
@@ -65,7 +67,7 @@ class App extends React.Component {
             component={AvatarCreateScreen}
             options={
               ({ route, navigation }) => ({
-                title: 'Create Avatar',
+                title: "创建账户",
                 headerRight: () => (
                   <IconAnt
                     name={'qrcode'}
@@ -80,12 +82,12 @@ class App extends React.Component {
             component={BulletinScreen}
             options={
               ({ route, navigation }) => ({
-                title: route.params.address,
+                title: "公告",
                 headerRight: () => (
-                  <IconMaterial
-                    name={'post-add'}
+                  <IconFontisto
+                    name={'info'}
                     size={24}
-                    onPress={() => navigation.push('BulletinPublish')}
+                    onPress={() => navigation.push('BulletinInfo', { hash: route.params.hash })}
                   />)
               })
             } />
@@ -94,7 +96,7 @@ class App extends React.Component {
             component={SessionScreen}
             options={
               ({ route, navigation }) => ({
-                title: route.params.AddressMark,
+                title: "会话",
                 headerRight: () => (
                   <IconFeather
                     name={'more-horizontal'}
@@ -110,7 +112,7 @@ class App extends React.Component {
             component={BulletinListScreen}
             options={
               ({ route, navigation }) => ({
-                title: route.params.AddressMark,
+                title: "公告列表",
                 headerRight: () => (
                   <IconMaterial
                     name={'post-add'}
@@ -124,7 +126,7 @@ class App extends React.Component {
             component={BulletinPublishScreen}
             options={
               ({ route, navigation }) => ({
-                title: "发布新公告"
+                title: "发布公告"
               })
             } />
           <Stack.Screen
@@ -132,16 +134,81 @@ class App extends React.Component {
             component={AddressMarkScreen}
             options={
               ({ route, navigation }) => ({
-                title: route.params.AddressMark
+                title: '用户信息'
               })
             } />
-          <Stack.Screen name="AddressAdd" component={AddressAddScreen} />
-          <Stack.Screen name="AddressEdit" component={AddressEditScreen} />
-          <Stack.Screen name="SettingMe" component={SettingMeScreen} />
-          <Stack.Screen name="SettingNetwork" component={SettingNetworkScreen} />
-          <Stack.Screen name="SettingBulletin" component={SettingBulletinScreen} />
-          <Stack.Screen name="BulletinMark" component={BulletinMarkScreen} />
-          <Stack.Screen name="AvatarNameEdit" component={AvatarNameEditScreen} />
+          <Stack.Screen
+            name="AddressAdd"
+            component={AddressAddScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '标记用户'
+              })
+            } />
+          <Stack.Screen
+            name="AddressEdit"
+            component={AddressEditScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '编辑用户标记'
+              })
+            } />
+          <Stack.Screen
+            name="BulletinMark"
+            component={BulletinMarkScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '收藏公告'
+              })
+            } />
+          <Stack.Screen
+            name="BulletinInfo"
+            component={BulletinInfoScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '公告信息'
+              })
+            } />
+          <Stack.Screen
+            name="AvatarNameEdit"
+            component={AvatarNameEditScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '编辑昵称'
+              })
+            } />
+          <Stack.Screen
+            name="AvatarSeed"
+            component={AvatarSeedScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '！！！查看种子！！！'
+              })
+            } />
+          <Stack.Screen
+            name="SettingMe"
+            component={SettingMeScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '账户设置'
+              })
+            } />
+          <Stack.Screen
+            name="SettingNetwork"
+            component={SettingNetworkScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '网络设置'
+              })
+            } />
+          <Stack.Screen
+            name="SettingBulletin"
+            component={SettingBulletinScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '公告设置'
+              })
+            } />
         </Stack.Navigator>
       </NavigationContainer>
     )

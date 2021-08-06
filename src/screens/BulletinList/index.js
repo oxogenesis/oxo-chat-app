@@ -80,7 +80,7 @@ class BulletinListScreen extends React.Component {
                     <Text>{`"${item.QuoteSize}"`}</Text>
                   }
                   <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
-                  <Text style={my_styles.Link} onPress={() => this.quoteBulletin(item.Address, item.Sequence, item.Hash)}>【引用】</Text>
+                  <Text style={my_styles.Link} onPress={() => this.quoteBulletin(item.Address, item.Sequence, item.Hash)}>引用</Text>
                   <Text>{item.Content}</Text>
                 </View>);
             }

@@ -4,6 +4,7 @@ import { Text, TextInput, Button, FlatList, View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { AddressToName } from '../../lib/Util'
+import { my_styles } from '../../theme/style'
 
 //登录界面
 class BulletinPublishScreen extends React.Component {
@@ -40,7 +41,7 @@ class BulletinPublishScreen extends React.Component {
           <Text>{this.state.error_msg}</Text>
         }
         <Button
-          title="Publish"
+          title="发布"
           onPress={() => this.publishBulletin()}
         />
         <FlatList
@@ -50,8 +51,8 @@ class BulletinPublishScreen extends React.Component {
             ({ item }) => {
               return (
                 <View>
-                  <Text onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
-                    {`【${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}】`}
+                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
+                    {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
                   </Text>
                   <Text onPress={() => this.props.dispatch({
                     type: actionType.avatar.delQuote,

@@ -40,7 +40,7 @@ class SettingMeScreen extends React.Component {
       <View>
         <Text>地址：{this.state.address}</Text>
         <Text>昵称：{this.state.name}</Text>
-        <View>
+        <View style={{ alignItems: 'center' }}>
           <QRCode
             value={this.state.address}
             size={350}
@@ -50,8 +50,8 @@ class SettingMeScreen extends React.Component {
           />
         </View>
         <Button title="修改昵称" onPress={() => { this.props.navigation.push('AvatarNameEdit') }} />
-        <Button color="red" title="查看种子" onPress={() => { this.props.navigation.push('AvatarNameEdit') }} />
-        <Button title="切换账号" onPress={() => {
+        <Button color="red" title="查看种子" onPress={() => { this.props.navigation.push('AvatarSeed') }} />
+        <Button title="切换账户" onPress={() => {
           this.props.dispatch({
             type: actionType.avatar.disableAvatar
           })

@@ -36,7 +36,8 @@ class SettingBulletinScreen extends React.Component {
     return (
       <View>
         <Button title="我的公告" onPress={() => { this.props.navigation.push('BulletinList', { address: this.props.avatar.get('Address') }) }} />
-        <Button title="我的收藏" onPress={() => { this.props.navigation.push('BulletinMark') }} />
+        <Button title="收藏公告" onPress={() => { this.props.navigation.push('BulletinMark') }} />
+        <Button title="浏览历史" onPress={() => { this.props.navigation.push('BulletinHistory') }} />
       </View >
     )
   }

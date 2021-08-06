@@ -12,9 +12,16 @@ const my_styles = StyleSheet.create({
   Bulletin: {
     borderStyle: 'solid'
   },
-  FatalButton: {
-    color: 'red'
-  }
+  BulletinContentHeader: {
+    //lineHeight: 5
+  },
+  SeperateLine: {
+    textAlign: 'center'
+  },
+  container: {
+    flex: 1,
+    padding: 5,
+  },
 })
 
 export { my_styles }

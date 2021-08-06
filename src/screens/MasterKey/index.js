@@ -51,16 +51,15 @@ class MasterKeyScreen extends React.Component {
   render() {
     return (
       <>
-        <Text>{'Set MasterKey'}</Text>
         <TextInput
           secureTextEntry={true}
-          placeholder="MasterKey"
+          placeholder="口令"
           value={this.state.masterKey}
           onChangeText={text => this.setState({ masterKey: text })}
         />
         <TextInput
           secureTextEntry={true}
-          placeholder="confirm MasterKey"
+          placeholder="口令确认"
           value={this.state.confirm}
           onChangeText={text => this.setState({ confirm: text })}
         />
@@ -69,9 +68,13 @@ class MasterKeyScreen extends React.Component {
           <Text>{this.state.error_msg}</Text>
         }
         <Button
-          title="Set"
+          title="设置"
           onPress={() => this.setMasterKey()}
         />
+        <Text>{`说明：
+1、口令用于在本设备上加密/解密账户的种子。
+2、账户的种子是账户的唯一凭证，不可泄漏、灭失，应做好备份。
+3、本地存储的聊天和公告，未进行加密，如需销毁，请删除应用或相关数据。`}</Text>
       </>
     )
   }

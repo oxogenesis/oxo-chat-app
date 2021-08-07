@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import * as React from 'react'
+import { View, Text, FlatList } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
@@ -27,11 +27,11 @@ class BulletinInfoScreen extends React.Component {
         hash: this.props.route.params.hash,
         to: this.props.route.params.to
       })
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {
@@ -60,7 +60,7 @@ class BulletinInfoScreen extends React.Component {
                   renderItem={
                     ({ item }) => {
                       return (
-                        <View style={{ backgroundColor: 'green' }}>
+                        <View>
                           <Text style={my_styles.Link} onPress={() =>
                             this.props.navigation.push('Bulletin', {
                               address: item.Address,
@@ -82,7 +82,7 @@ class BulletinInfoScreen extends React.Component {
     )
   }
 }
-import { from } from 'readable-stream';
+import { from } from 'readable-stream'
 
 const ReduxBulletinInfoScreen = connect((state) => {
   return {

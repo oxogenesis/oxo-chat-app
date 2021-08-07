@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { View, Text, Button } from 'react-native';
+import * as React from 'react'
+import { View, Text, Button } from 'react-native'
 
 import { connect } from 'react-redux'
 
@@ -25,11 +25,11 @@ class TabSettingScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadState()
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {

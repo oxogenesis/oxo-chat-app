@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as React from 'react'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import SessionListScreen from '../TabSession'
 import TabBulletinScreen from '../TabBulletin'
 import TabAddressBookScreen from '../TabAddressBook'
 import TabSettingScreen from '../TabSetting'
 
-import IconAnt from 'react-native-vector-icons/AntDesign';
+import IconAnt from 'react-native-vector-icons/AntDesign'
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator()
 
 //登录后界面
 class TabHomeScreen extends React.Component {

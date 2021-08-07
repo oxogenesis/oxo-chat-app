@@ -34,12 +34,19 @@ class SettingNetworkScreen extends React.Component {
     })
   }
 
+  delHost(host) {
+    this.props.dispatch({
+      type: actionType.avatar.delHost,
+      host: host
+    })
+  }
+
   render() {
     return (
       <>
         <Text>{`在用服务器：${this.props.avatar.get('CurrentHost')}`}</Text>
         <TextInput
-          placeholder="ws:// or wss://"
+          placeholder="ws://或者wss://"
           value={this.state.host_input}
           onChangeText={text => this.setState({ host_input: text })}
         />
@@ -54,12 +61,24 @@ class SettingNetworkScreen extends React.Component {
           renderItem={
             ({ item }) => {
               return (
-                <View>
-                  <Text style={my_styles.Link}
-                    onPress={() => this.changeCurrentHost(item.Address)}>
-                    {`使用${item.Address}`}
-                  </Text>
-                </View>);
+                <View style={{ flexDirection: "row", }} >
+                  <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
+                    <Text>{item.Address}</Text>
+                  </View>
+                  <View style={{ backgroundColor: "orange", flex: 0.1 }} >
+                    <Text style={my_styles.Link}
+                      onPress={() => this.changeCurrentHost(item.Address)}>
+                      {`使用`}
+                    </Text>
+                  </View>
+                  <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                    <Text style={my_styles.Link}
+                      onPress={() => this.delHost(item.Address)}>
+                      {`删除`}
+                    </Text>
+                  </View>
+                </View>
+              )
             }
           }
         >

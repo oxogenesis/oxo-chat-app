@@ -194,17 +194,17 @@ function DHSequence(division, timestamp, address1, address2) {
 }
 
 function Sign(msg, sk) {
-  let msgHexStr = strToHex(msg);
-  let sig = oxoKeyPairs.sign(msgHexStr, sk);
-  return sig;
+  let msgHexStr = strToHex(msg)
+  let sig = oxoKeyPairs.sign(msgHexStr, sk)
+  return sig
 }
 
 function verifySignature(msg, sig, pk) {
-  let hexStrMsg = strToHex(msg);
+  let hexStrMsg = strToHex(msg)
   try {
-    return oxoKeyPairs.verify(hexStrMsg, sig, pk);
+    return oxoKeyPairs.verify(hexStrMsg, sig, pk)
   } catch (e) {
-    return false;
+    return false
   }
 }
 

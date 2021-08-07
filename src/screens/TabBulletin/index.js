@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { View, Text, Button, FlatList } from 'react-native';
+import * as React from 'react'
+import { View, Text, Button, FlatList } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
@@ -7,8 +7,8 @@ import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { WholeBulletinSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-
 import { my_styles } from '../../theme/style'
+
 //公告列表
 class TabBulletinScreen extends React.Component {
 
@@ -22,11 +22,11 @@ class TabBulletinScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadBulletinList()
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {
@@ -42,20 +42,27 @@ class TabBulletinScreen extends React.Component {
                 return (
                   <View>
                     <View style={{ flexDirection: "row", }} >
-                      <View style={{ backgroundColor: "yellow", flex: 0.9 }} >
+                      <View style={{ backgroundColor: "yellow", flex: 0.7 }} >
                         <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
                           {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                         </Text>
                       </View>
-                      <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                      <View style={{ backgroundColor: "red", flex: 0.2 }} >
                         <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
                           {`#${item.Sequence}`}
                         </Text>
                       </View>
+                      {
+                        item.QuoteSize != 0 &&
+                        <View style={{ backgroundColor: "orange", flex: 0.1 }} >
+                          <Text>{`◀${item.QuoteSize}`}</Text>
+                        </View>
+                      }
                     </View>
                     <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
                     <Text style={my_styles.BulletinContentHeader} ellipsizeMode={"tail"} numberOfLines={2}>{item.Content}</Text>
-                  </View>)
+                  </View>
+                )
               }
             }
           >
@@ -65,8 +72,6 @@ class TabBulletinScreen extends React.Component {
     )
   }
 }
-import { from } from 'readable-stream';
-import styles from '../../theme/style';
 
 const ReduxTabBulletinScreen = connect((state) => {
   return {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, Button, TextInput } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { MasterKeySet } from '../../lib/OXO'
 

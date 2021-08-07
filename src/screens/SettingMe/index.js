@@ -51,7 +51,7 @@ class SettingMeScreen extends React.Component {
         </View>
         <Button title="修改昵称" onPress={() => { this.props.navigation.push('AvatarNameEdit') }} />
         <Button color="red" title="查看种子" onPress={() => { this.props.navigation.push('AvatarSeed') }} />
-        <Button title="切换账户" onPress={() => {
+        <Button color="orange" title="切换账户" onPress={() => {
           this.props.dispatch({
             type: actionType.avatar.disableAvatar
           })

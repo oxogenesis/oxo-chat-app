@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from 'react'
 import { View, Text, TextInput, Button } from 'react-native'
 
 import { connect } from 'react-redux'
@@ -30,9 +30,9 @@ class UnlockScreen extends React.Component {
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      if (this.props.master.get('MasterKey') != null) {
-        this.props.navigation.navigate('AvatarList')
-      }
+      // if (this.props.master.get('MasterKey') != null) {
+      //   this.props.navigation.navigate('AvatarList')
+      // }
       this.setState({ error_msg: '' })
     })
   }

@@ -206,6 +206,18 @@ export default class Database {
     })
   }
 
+  async delAddressMark(address) {
+    let sql = `DELETE FROM ADDRESS_MARKS WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      })
+    })
+  }
+
   async saveAddressName(address, name, timestamp) {
     let sql = `UPDATE ADDRESS_MARKS SET name = '${name}', updated_at = ${timestamp} WHERE address = "${address}"`
     return new Promise((resolve, reject) => {
@@ -483,7 +495,7 @@ export default class Database {
     })
   }
 
-  markBulletin(hash){
+  markBulletin(hash) {
     let sql = `UPDATE BULLETINS SET is_mark = "TRUE" WHERE hash = "${hash}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
@@ -498,7 +510,7 @@ export default class Database {
     })
   }
 
-  unmarkBulletin(hash){
+  unmarkBulletin(hash) {
     let sql = `UPDATE BULLETINS SET is_mark = "FALSE" WHERE hash = "${hash}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
@@ -537,7 +549,7 @@ export default class Database {
     })
   }
 
-  delHost(address) {
+  async delHost(address) {
     let sql = `DELETE FROM HOSTS WHERE address = "${address}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {

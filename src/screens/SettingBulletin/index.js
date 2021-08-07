@@ -1,7 +1,8 @@
-import * as React from 'react';
-import { View, Text, Button } from 'react-native';
+import * as React from 'react'
+import { View, Text, Button } from 'react-native'
 
 import { connect } from 'react-redux'
+import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
 
 import { actionType } from '../../redux/actions/actionType'
 
@@ -25,19 +26,19 @@ class SettingBulletinScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadState()
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {
     return (
       <View>
-        <Button title="我的公告" onPress={() => { this.props.navigation.push('BulletinList', { address: this.props.avatar.get('Address') }) }} />
-        <Button title="收藏公告" onPress={() => { this.props.navigation.push('BulletinMark') }} />
-        <Button title="浏览历史" onPress={() => { this.props.navigation.push('BulletinHistory') }} />
+        <Button title="我的公告" onPress={() => { this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('Address') }) }} />
+        <Button title="收藏公告" onPress={() => { this.props.navigation.push('BulletinList', { session: BulletinMarkSession }) }} />
+        <Button title="浏览历史" onPress={() => { this.props.navigation.push('BulletinHistory'), { session: BulletinHistorySession } }} />
       </View >
     )
   }

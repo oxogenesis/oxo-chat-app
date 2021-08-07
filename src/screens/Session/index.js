@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { View, Text } from 'react-native';
+import * as React from 'react'
+import { View, Text } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
@@ -19,11 +19,11 @@ class SessionScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadSessionList()
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {

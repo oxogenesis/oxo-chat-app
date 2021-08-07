@@ -11,7 +11,7 @@ import MessageGenerator from '../../lib/MessageGenerator'
 
 function DelayExec(ms) {
   return new Promise(resolve => {
-    setTimeout(resolve, ms);
+    setTimeout(resolve, ms)
   })
 }
 
@@ -105,7 +105,7 @@ export function* Conn(action) {
           switch (json.Action) {
             // case ActionCode.ChatDH:
             //   console.log('HandleChatDH(json)')
-            //   break;
+            //   break
             // case ActionCode.ChatMessage:
             //   console.log('HandleChatMessage(json)')
             //   break
@@ -155,7 +155,7 @@ export function* Conn(action) {
             //   console.log('HandleGroupMessageSync(json)')
             //   break
             default:
-              break;
+              break
           }
         }
       } else {
@@ -254,6 +254,25 @@ export function* addAddressMark(action) {
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
 }
 
+
+export function* delAddressMark(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  yield call([db, db.delAddressMark], action.address)
+  let address_array = yield select(state => state.avatar.get('AddressArray'))
+  let address_map = yield select(state => state.avatar.get('AddressMap'))
+
+  address_map[action.address] = null
+  let tmp = []
+  address_array.forEach(am => {
+    if (am.Address != action.address) {
+      tmp.push(am)
+    }
+  })
+  address_array = tmp
+
+  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
+}
+
 export function* saveAddressName(action) {
   let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
@@ -283,6 +302,7 @@ export function* addFriend(action) {
   friends.push(action.address)
   yield put({ type: actionType.avatar.setFriends, friends: friends })
 
+  //刷新当前AddressMark
   let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
   if (current_address_mark || action.address == current_address_mark.Address) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
@@ -296,6 +316,7 @@ export function* delFriend(action) {
   friends = friends.filter((item) => item != action.address)
   yield put({ type: actionType.avatar.setFriends, friends: friends })
 
+  //刷新当前AddressMark
   let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
   if (current_address_mark || action.address == current_address_mark.Address) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
@@ -310,6 +331,7 @@ export function* addFollow(action) {
   follows.push(action.address)
   yield put({ type: actionType.avatar.setFollows, follows: follows })
 
+  //刷新当前AddressMark
   let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
   if (current_address_mark || action.address == current_address_mark.Address) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
@@ -323,6 +345,7 @@ export function* delFollow(action) {
   follows = follows.filter((item) => item != action.address)
   yield put({ type: actionType.avatar.setFollows, follows: follows })
 
+  //刷新当前AddressMark
   let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
   if (current_address_mark || action.address == current_address_mark.Address) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })

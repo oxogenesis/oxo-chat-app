@@ -17,7 +17,7 @@ import IconFontisto from 'react-native-vector-icons/Fontisto'
 
 import { connect } from 'react-redux'
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 import MasterKeyScreen from './screens/MasterKey'
 import UnlockScreen from './screens/Unlock'
@@ -35,7 +35,6 @@ import AddressEditScreen from './screens/AddressEdit'
 import SettingMeScreen from './screens/SettingMe'
 import SettingNetworkScreen from './screens/SettingNetwork'
 import SettingBulletinScreen from './screens/SettingBulletin'
-import BulletinMarkScreen from './screens/BulletinMark'
 import AvatarNameEditScreen from './screens/AvatarNameEdit'
 import AvatarSeedScreen from './screens/AvatarSeed'
 
@@ -154,14 +153,6 @@ class App extends React.Component {
               })
             } />
           <Stack.Screen
-            name="BulletinMark"
-            component={BulletinMarkScreen}
-            options={
-              ({ route, navigation }) => ({
-                title: '收藏公告'
-              })
-            } />
-          <Stack.Screen
             name="BulletinInfo"
             component={BulletinInfoScreen}
             options={
@@ -220,4 +211,4 @@ export default connect((state) => {
     master: state.master,
     avatar: state.avatar
   }
-})(App);
+})(App)

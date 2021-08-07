@@ -11,8 +11,16 @@ class AddressMarkScreen extends React.Component {
     super(props)
   }
 
-  deleteAddressMark() {
-
+  delAddressMark() {
+    if (this.props.avatar.get('CurrentAddressMark').IsFollow || this.props.avatar.get('CurrentAddressMark').IsFriend) {
+      console.log(`...`)
+    } else {
+      this.props.dispatch({
+        type: actionType.avatar.delAddressMark,
+        address: this.props.avatar.get('CurrentAddressMark').Address
+      })
+      this.props.navigation.goBack()
+    }
   }
 
   addFriend() {
@@ -74,10 +82,13 @@ class AddressMarkScreen extends React.Component {
                   <Button
                     title="修改昵称"
                     onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                  <Button color='red' title="删除" onPress={() => this.deleteAddressMark()} />
+                  <Button color='red' title="删除" onPress={() => this.delAddressMark()} />
                 </>
                 :
                 <>
+                  <Button
+                    title="标记地址"
+                    onPress={() => this.props.navigation.navigate('AddressAdd', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
                 </>
             }
             {

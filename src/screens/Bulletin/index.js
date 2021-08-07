@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import * as React from 'react'
+import { View, ScrollView, Text, FlatList } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
@@ -51,11 +51,11 @@ class BulletinScreen extends React.Component {
         hash: this.props.route.params.hash,
         to: this.props.route.params.to
       })
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
+    this._unsubscribe()
   }
 
   render() {
@@ -121,7 +121,9 @@ class BulletinScreen extends React.Component {
                       this.props.avatar.get('CurrentBulletin').Hash)}
                 />
               </View>
-              <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
+              <ScrollView>
+                <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
+              </ScrollView>
               {
                 this.props.avatar.get('CurrentBulletin').QuoteSize != 0 &&
                 <FlatList
@@ -151,7 +153,7 @@ class BulletinScreen extends React.Component {
     )
   }
 }
-import { from } from 'readable-stream';
+import { from } from 'readable-stream'
 
 const ReduxBulletinScreen = connect((state) => {
   return {

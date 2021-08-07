@@ -29,6 +29,18 @@ class AddressAddScreen extends React.Component {
     this.props.navigation.navigate('TabAddressBook')
   }
 
+  componentDidMount() {
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      if (this.props.route.params && this.props.route.params.address) {
+        this.state.address = this.props.route.params.address
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe()
+  }
+
   render() {
     return (
       <>

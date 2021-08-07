@@ -21,6 +21,7 @@ export const actionType = {
 
     setCurrentAddressMark: 'SET_CURRENT_ADDRESS_MARK',
     addAddressMark: 'ADD_ADDRESS_MARK',
+    delAddressMark: 'DEL_ADDRESS_MARK',
     saveAddressName: 'SAVE_ADDRESS_NAME',
     addFriend: 'ADD_FRIEND',
     delFriend: 'DEL_FRIEND',
@@ -28,6 +29,7 @@ export const actionType = {
     delFollow: 'DEL_FOLLOW',
 
     addHost: 'ADD_HOST',
+    delHost: 'DEL_HOST',
     setCurrentHost: 'SET_CURRENT_HOST',
     changeCurrentHost: 'CHANGE_CURRENT_HOST',
     delHost: 'DEL_HOST',

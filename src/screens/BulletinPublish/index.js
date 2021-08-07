@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
+import { BulletinAddressSession } from '../../lib/Const'
 
 //登录界面
 class BulletinPublishScreen extends React.Component {
@@ -24,7 +25,7 @@ class BulletinPublishScreen extends React.Component {
       content: content
     })
     this.setState({ content: '', error_msg: '' })
-    this.props.navigation.push('BulletinList', { address: this.props.avatar.get('Address') })
+    this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('Address') })
   }
 
   render() {

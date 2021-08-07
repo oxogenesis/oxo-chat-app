@@ -58,10 +58,13 @@ class SettingNetworkScreen extends React.Component {
         <FlatList
           data={this.props.avatar.get('Hosts')}
           keyExtractor={item => item.Address}
+          ListEmptyComponent={
+            <Text>暂未设置服务器地址...</Text>
+          }
           renderItem={
             ({ item }) => {
               return (
-                <View style={{ flexDirection: "row", }} >
+                <View style={{ flexDirection: "row" }} >
                   <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
                     <Text>{item.Address}</Text>
                   </View>

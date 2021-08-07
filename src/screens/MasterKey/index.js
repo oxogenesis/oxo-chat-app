@@ -33,10 +33,10 @@ class MasterKeyScreen extends React.Component {
 
   setMasterKey() {
     if (this.state.masterKey != this.state.confirm) {
-      this.setState({ error_msg: 'confirm not match...' })
+      this.setState({ error_msg: '口令确认不符...' })
       return
     } else if (this.state.masterKey.trim() == '') {
-      this.setState({ error_msg: 'MasterKey could not be null...' })
+      this.setState({ error_msg: '口令不能为空...' })
       return
     }
 

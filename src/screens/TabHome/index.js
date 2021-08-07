@@ -19,7 +19,8 @@ class TabHomeScreen extends React.Component {
           activeTintColor: 'red',
           inactiveTintColor: 'white',
           activeBackgroundColor: 'pink',
-          inactiveBackgroundColor: 'grey'
+          inactiveBackgroundColor: 'grey',
+          style: { height: 50 }
         }}>
         <Tab.Screen name="SessionList" component={SessionListScreen} options={{
           tabBarLabel: '聊天',
@@ -27,7 +28,7 @@ class TabHomeScreen extends React.Component {
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'message1'}
-              size={24}
+              size={32}
             />
           )
         }} />
@@ -36,7 +37,7 @@ class TabHomeScreen extends React.Component {
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'notification'}
-              size={24}
+              size={32}
             />
           )
         }} />
@@ -45,7 +46,7 @@ class TabHomeScreen extends React.Component {
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'contacts'}
-              size={24}
+              size={32}
             />
           )
         }} />
@@ -54,7 +55,7 @@ class TabHomeScreen extends React.Component {
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'setting'}
-              size={24}
+              size={32}
             />
           )
         }} />

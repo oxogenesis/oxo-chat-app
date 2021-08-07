@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
+import { BulletinAddressSession } from '../../lib/Const'
 
 //地址标记
 class AddressMarkScreen extends React.Component {
@@ -105,7 +106,7 @@ class AddressMarkScreen extends React.Component {
               this.props.avatar.get('CurrentAddressMark').IsFollow ?
                 <>
                   <Button title="查看公告" onPress={() =>
-                    this.props.navigation.push('BulletinList', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
+                    this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('CurrentAddressMark').Address })} />
                   <Button color='orange' title="取消关注" onPress={() => this.delFollow()} />
                 </>
                 :

@@ -69,6 +69,9 @@ class AvatarListScreen extends React.Component {
         <FlatList
           data={this.state.avatarList}
           keyExtractor={item => item.Name}
+          ListEmptyComponent={
+            <Text>暂无账号...</Text>
+          }
           renderItem={
             ({ item }) => {
               return (

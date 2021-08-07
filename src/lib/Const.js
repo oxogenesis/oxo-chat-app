@@ -67,6 +67,7 @@ const SessionType = {
 }
 
 //Bulletin
+const BulletinPageSize = 10
 const BulletinTabSession = '<BT>'
 const BulletinMarkSession = '<BM>'
 const BulletinHistorySession = '<BH>'
@@ -84,6 +85,7 @@ export {
   GroupMemberShip,
   ObjectType,
   SessionType,
+  BulletinPageSize,
   BulletinTabSession,
   BulletinMarkSession,
   BulletinHistorySession,

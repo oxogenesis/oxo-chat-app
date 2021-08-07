@@ -52,6 +52,7 @@ class App extends React.Component {
             options={
               ({ route, navigation }) => ({
                 title: "账户列表",
+                headerLeft: false,
                 headerRight: () => (
                   <IconAnt
                     name={'adduser'}

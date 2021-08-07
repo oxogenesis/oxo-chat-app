@@ -4,14 +4,6 @@ import { DefaultHost } from './Const'
 
 SQLite.enablePromise(true)
 
-function Array2Str(array) {
-  let tmpArray = []
-  for (let i = array.length - 1; i >= 0; i--) {
-    tmpArray.push(`'${array[i]}'`)
-  }
-  return tmpArray.join(',')
-}
-
 export default class Database {
   constructor() {
     this.db = null
@@ -86,6 +78,7 @@ export default class Database {
           file_sha1 VARCHAR(40),
           relay_address VARCHAR(35),
           view_at INTEGER,
+          mark_at INTEGER,
           is_mark BOOLEAN DEFAULT FALSE,
           is_follow BOOLEAN DEFAULT FALSE
           )`)
@@ -214,6 +207,8 @@ export default class Database {
           .then(([tx, results]) => {
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -298,6 +293,8 @@ export default class Database {
             }
             resolve([addressMap, addressArray])
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -316,6 +313,8 @@ export default class Database {
             }
             resolve(friends)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -334,6 +333,8 @@ export default class Database {
             }
             resolve(follows)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -355,6 +356,8 @@ export default class Database {
             }
             resolve(hosts)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -383,40 +386,8 @@ export default class Database {
             }
             resolve(bulletins)
           })
-      })
-    })
-  }
-
-  loadBulletinList(address_list) {
-    let sql = ''
-    if (address_list.length == 1) {
-      sql = `SELECT * FROM BULLETINS WHERE address = '${address_list[0]}' ORDER BY created_at DESC LIMIT 20`
-    } else {
-      sql = `SELECT * FROM BULLETINS WHERE address in (${Array2Str(address_list)}) ORDER BY created_at DESC LIMIT 20`
-    }
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            let bulletins = []
-            let len = results.rows.length
-            for (let i = 0; i < len; i++) {
-              let bulletin = results.rows.item(i)
-              bulletins.push({
-                'Address': bulletin.address,
-                'Timestamp': bulletin.timestamp,
-                'CreateAt': bulletin.created_at,
-                'Sequence': bulletin.sequence,
-                'Content': bulletin.content,
-                'Hash': bulletin.hash,
-                'QuoteSize': bulletin.quote_size,
-                'ViewAt': bulletin.view_at,
-                'IsFollow': bulletin.is_follow,
-                'IsMark': bulletin.is_mark
-              })
-            }
-            resolve(bulletins)
-          })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -434,6 +405,8 @@ export default class Database {
               resolve(null)
             }
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -448,10 +421,15 @@ export default class Database {
             let len = results.rows.length
             for (let i = 0; i < len; i++) {
               let bulletin = results.rows.item(i)
-              bulletins.push({ "address": bulletin.address, 'timestamp': bulletin.timestamp, 'created_at': bulletin.created_at, 'sequence': bulletin.sequence, 'content': bulletin.content, 'hash': bulletin.hash, 'quote_size': bulletin.quote_size })
+              bulletins.push({
+                "Address": bulletin.address,
+                'Sequence': bulletin.sequence
+              })
             }
             resolve(bulletins)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -464,6 +442,8 @@ export default class Database {
           .then(([tx, results]) => {
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -481,6 +461,8 @@ export default class Database {
               resolve(null)
             }
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -519,6 +501,8 @@ export default class Database {
               resolve(null)
             }
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -534,12 +518,14 @@ export default class Database {
             console.log(results)
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
 
   markBulletin(hash) {
-    let sql = `UPDATE BULLETINS SET is_mark = "TRUE" WHERE hash = "${hash}"`
+    let sql = `UPDATE BULLETINS SET is_mark = "TRUE", mark_at = ${Date.now()} WHERE hash = "${hash}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -549,6 +535,8 @@ export default class Database {
             console.log(results)
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -564,6 +552,8 @@ export default class Database {
             console.log(results)
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -576,6 +566,8 @@ export default class Database {
           .then(([tx, results]) => {
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -588,6 +580,8 @@ export default class Database {
           .then(([tx, results]) => {
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -603,6 +597,8 @@ export default class Database {
             console.log(results)
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }
@@ -618,6 +614,8 @@ export default class Database {
             console.log(results)
             resolve(results)
           })
+      }).catch((err) => {
+        console.log(err)
       })
     })
   }

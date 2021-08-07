@@ -60,12 +60,15 @@ class BulletinListScreen extends React.Component {
         <FlatList
           data={this.props.avatar.get('BulletinList')}
           keyExtractor={item => item.Hash}
+          ListEmptyComponent={
+            <Text>暂无公告...</Text>
+          }
           renderItem={
             ({ item }) => {
               return (
                 <View>
-                  <View style={{ flexDirection: "row", }} >
-                    <View style={{ backgroundColor: "yellow", flex: 0.7 }} >
+                  <View style={{ flexDirection: "row" }} >
+                    <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
                       <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
                         {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                       </Text>
@@ -75,14 +78,18 @@ class BulletinListScreen extends React.Component {
                         {`#${item.Sequence}`}
                       </Text>
                     </View>
+                  </View>
+                  <View style={{ flexDirection: "row" }} >
+                    <View style={{ backgroundColor: "green", flex: 0.8 }} >
+                      <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
+                    </View>
                     {
                       item.QuoteSize != 0 &&
-                      <View style={{ backgroundColor: "orange", flex: 0.1 }} >
+                      <View style={{ backgroundColor: "orange", flex: 0.2 }} >
                         <Text>{`◀${item.QuoteSize}`}</Text>
                       </View>
                     }
                   </View>
-                  <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
                   <Text style={my_styles.BulletinContentHeader} ellipsizeMode={"tail"} numberOfLines={2}>{item.Content}</Text>
                 </View>
               )

@@ -1,14 +1,12 @@
 import * as React from 'react'
-import { View, Text, FlatList } from 'react-native'
+import { View, ScrollView, Text, FlatList } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
-import IconFontisto from 'react-native-vector-icons/Fontisto'
 
 //公告列表
 class BulletinInfoScreen extends React.Component {
@@ -51,38 +49,36 @@ class BulletinInfoScreen extends React.Component {
               <Text>{`时间：${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
               <Text>{`引用：${this.props.avatar.get('CurrentBulletin').QuoteSize}`}</Text>
               <Text style={my_styles.SeperateLine}>{`<-------------------------------->`}</Text>
-              <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
-              {
-                this.props.avatar.get('CurrentBulletin').QuoteSize != 0 &&
-                <FlatList
-                  data={this.props.avatar.get('CurrentBulletin').QuoteList}
-                  keyExtractor={item => item.Hash}
-                  renderItem={
-                    ({ item }) => {
-                      return (
-                        <View>
-                          <Text style={my_styles.Link} onPress={() =>
-                            this.props.navigation.push('Bulletin', {
-                              address: item.Address,
-                              sequence: item.Sequence,
-                              hash: item.Hash,
-                              to: this.props.avatar.get('CurrentBulletin').Address
-                            })}>
-                            {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                          </Text>
-                        </View>)
-                    }
+              <ScrollView>
+                <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
+              </ScrollView>
+              <FlatList
+                data={this.props.avatar.get('CurrentBulletin').QuoteList}
+                keyExtractor={item => item.Hash}
+                renderItem={
+                  ({ item }) => {
+                    return (
+                      <View>
+                        <Text style={my_styles.Link} onPress={() =>
+                          this.props.navigation.push('Bulletin', {
+                            address: item.Address,
+                            sequence: item.Sequence,
+                            hash: item.Hash,
+                            to: this.props.avatar.get('CurrentBulletin').Address
+                          })}>
+                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                        </Text>
+                      </View>)
                   }
-                >
-                </FlatList>
-              }
+                }
+              >
+              </FlatList>
             </>
         }
       </View>
     )
   }
 }
-import { from } from 'readable-stream'
 
 const ReduxBulletinInfoScreen = connect((state) => {
   return {

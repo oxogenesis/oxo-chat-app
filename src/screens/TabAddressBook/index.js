@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { View, Text, Button, FlatArray } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler'
+import { View, Text, Button, FlatList } from 'react-native'
 
 import { connect } from 'react-redux'
 import { my_styles } from '../../theme/style'
@@ -13,11 +12,14 @@ class TabAddressBookScreen extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={my_styles.TabSheet}>
         <Button title="标记地址" onPress={() => this.props.navigation.navigate('AddressAdd')} />
         <FlatList
           data={this.props.avatar.get('AddressArray')}
           keyExtractor={item => item.Name}
+          ListEmptyComponent={
+            <Text>暂未标记地址...</Text>
+          }
           renderItem={
             ({ item }) => {
               return (<View>

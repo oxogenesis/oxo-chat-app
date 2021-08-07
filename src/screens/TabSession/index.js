@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View, Text, FlatList } from 'react-native'
 import { connect } from 'react-redux'
+import { my_styles } from '../../theme/style'
 
 //聊天对象列表
 class TabSessionScreen extends React.Component {
@@ -25,10 +26,13 @@ class TabSessionScreen extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={my_styles.TabSheet}>
         <FlatList
           data={this.state.session_list}
           keyExtractor={item => item.Address}
+          ListEmptyComponent={
+            <Text>暂未设置好友...</Text>
+          }
           renderItem={
             ({ item }) => {
               return (<View>

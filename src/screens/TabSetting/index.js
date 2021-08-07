@@ -4,6 +4,7 @@ import { View, Text, Button } from 'react-native'
 import { connect } from 'react-redux'
 
 import { actionType } from '../../redux/actions/actionType'
+import { my_styles } from '../../theme/style'
 
 //设置
 class TabSettingScreen extends React.Component {
@@ -34,7 +35,7 @@ class TabSettingScreen extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={my_styles.TabSheet}>
         <Button title="我" onPress={() => { this.props.navigation.navigate('SettingMe') }} />
         <Button title="网络设置" onPress={() => { this.props.navigation.navigate('SettingNetwork') }} />
         <Button title="公告设置" onPress={() => { this.props.navigation.push('SettingBulletin') }} />

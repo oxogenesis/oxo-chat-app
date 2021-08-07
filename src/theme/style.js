@@ -1,6 +1,9 @@
 import { StyleSheet } from 'react-native'
 
 const my_styles = StyleSheet.create({
+  TabSheet: {
+    paddingBottom: 70
+  },
   SearchBar: {
     height: 50,
     backgroundColor: 'powderblue'

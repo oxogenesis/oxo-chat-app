@@ -68,7 +68,7 @@ class BulletinScreen extends React.Component {
             <Text>not found...</Text>
             :
             <>
-              <View style={{ flexDirection: "row", }} >
+              <View style={{ flexDirection: "row" }} >
                 <View style={{ backgroundColor: "yellow", flex: 0.9 }} >
                   <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
                     {`${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
@@ -81,7 +81,7 @@ class BulletinScreen extends React.Component {
                 </View>
               </View>
               <Text>{`@${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
-              <View style={{ flexDirection: "row", }} >
+              <View style={{ flexDirection: "row" }} >
                 {
                   this.props.avatar.get('CurrentBulletin').IsMark == "TRUE" ?
                     <IconFontisto
@@ -124,29 +124,26 @@ class BulletinScreen extends React.Component {
               <ScrollView>
                 <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
               </ScrollView>
-              {
-                this.props.avatar.get('CurrentBulletin').QuoteSize != 0 &&
-                <FlatList
-                  data={this.props.avatar.get('CurrentBulletin').QuoteList}
-                  keyExtractor={item => item.Hash}
-                  renderItem={
-                    ({ item }) => {
-                      return (
-                        <View>
-                          <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', {
-                            address: item.Address,
-                            sequence: item.Sequence,
-                            hash: item.Hash,
-                            to: this.props.avatar.get('CurrentBulletin').Address
-                          })}>
-                            {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                          </Text>
-                        </View>)
-                    }
+              <FlatList
+                data={this.props.avatar.get('CurrentBulletin').QuoteList}
+                keyExtractor={item => item.Hash}
+                renderItem={
+                  ({ item }) => {
+                    return (
+                      <View>
+                        <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', {
+                          address: item.Address,
+                          sequence: item.Sequence,
+                          hash: item.Hash,
+                          to: this.props.avatar.get('CurrentBulletin').Address
+                        })}>
+                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                        </Text>
+                      </View>)
                   }
-                >
-                </FlatList>
-              }
+                }
+              >
+              </FlatList>
             </>
         }
       </View>

@@ -2,7 +2,7 @@ import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
-import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinTabSession, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
+import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinTabSession, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileChunkSchema, checkGroupManageSchema, checkGroupRequestSchema, checkGroupMessageSchema, checkFileSchema } from '../../lib/MessageSchemaVerifier'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
@@ -57,8 +57,8 @@ export function* Conn(action) {
 
   // Get some basics together
   const state = yield select()
-  const CurrentHost = state.avatar.get('CurrentHost')
   const MessageGenerator = state.avatar.get('MessageGenerator')
+  const CurrentHost = state.avatar.get('CurrentHost')
   const Address = state.avatar.get('Address')
 
   if (CurrentHost == null) {
@@ -206,6 +206,7 @@ export function* enableAvatar(action) {
   let address = DeriveAddress(keypair.publicKey)
   yield put({ type: actionType.avatar.setAvatar, seed: action.seed, name: action.name, address: address, public_key: keypair.publicKey, private_key: keypair.privateKey })
 
+
   let db = new Database()
 
   yield call([db, db.initDB], address, '0.0.1', address, 0)
@@ -231,6 +232,8 @@ export function* enableAvatar(action) {
   yield put({ type: actionType.avatar.setMessageGenerator, message_generator: mg })
 
   yield put({ type: actionType.avatar.Conn })
+
+  yield put({ type: actionType.avatar.UpdateFollowBulletin })
 }
 
 export function* disableAvatar() {
@@ -574,13 +577,13 @@ export function* LoadBulletinList(action) {
   if (action.session == BulletinTabSession) {
     address_list = yield select(state => state.avatar.get('Follows'))
     address_list.push(self_address)
-    sql = `SELECT * FROM BULLETINS WHERE address in (${Array2Str(address_list)}) ORDER BY created_at DESC LIMIT 20`
+    sql = `SELECT * FROM BULLETINS WHERE address in (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize}`
   } else if (action.session == BulletinAddressSession) {
-    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY created_at DESC LIMIT 20`
+    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize}`
   } else if (action.session == BulletinHistorySession) {
-    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT 20`
+    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT ${BulletinPageSize}`
   } else if (action.session == BulletinMarkSession) {
-    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY created_at DESC LIMIT 20`
+    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY mark_at DESC LIMIT ${BulletinPageSize}`
   }
 
   let bulletin_list = yield call([db, db.loadBulletinBySql], sql)
@@ -588,29 +591,33 @@ export function* LoadBulletinList(action) {
 
   // 获取更新
   if (action.session == BulletinTabSession) {
-    bulletin_list = yield call([db, db.loadRecentBulletin], address_list)
-    let address_next_sequence = {}
-    //set next sequence to 1
-    address_list.pop()
-    for (let i = address_list.length - 1; i >= 0; i--) {
-      address_next_sequence[address_list[i]] = 1
-    }
-    //update next sequenece by db
-    for (let i = bulletin_list.length - 1; i >= 0; i--) {
-      if (address_next_sequence[bulletin_list[i].Address]) {
-        address_next_sequence[bulletin_list[i].Address] = bulletin_list[i].Sequence + 1
-      }
-    }
-    //fetch next bulletin
-    for (let i = address_list.length - 1; i >= 0; i--) {
-      yield put({ type: actionType.avatar.FetchBulletin, address: address_list[i], sequence: address_next_sequence[address_list[i]], to: address_list[i] })
-    }
+    yield put({ type: actionType.avatar.UpdateFollowBulletin })
   } else if (action.session == BulletinAddressSession && action.address != self_address) {
     let next_sequence = 1
     if (bulletin_list.length != 0) {
       next_sequence = bulletin_list[0].Sequence + 1
     }
     yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: action.address })
+  }
+}
+
+export function* UpdateFollowBulletin(action) {
+  let address_list = yield select(state => state.avatar.get('Follows'))
+  let bulletin_list = yield call([db, db.loadRecentBulletin], address_list)
+  let address_next_sequence = {}
+  //set next sequence to 1
+  for (let i = address_list.length - 1; i >= 0; i--) {
+    address_next_sequence[address_list[i]] = 1
+  }
+  //update next sequenece by db
+  for (let i = bulletin_list.length - 1; i >= 0; i--) {
+    if (address_next_sequence[bulletin_list[i].Address] <= bulletin_list[i].Sequence) {
+      address_next_sequence[bulletin_list[i].Address] = bulletin_list[i].Sequence + 1
+    }
+  }
+  //fetch next bulletin
+  for (let i = address_list.length - 1; i >= 0; i--) {
+    yield put({ type: actionType.avatar.FetchBulletin, address: address_list[i], sequence: address_next_sequence[address_list[i]], to: address_list[i] })
   }
 }
 

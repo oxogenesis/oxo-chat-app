@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { WholeBulletinSession } from '../../lib/Const'
+import { BulletinTabSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
 
@@ -15,7 +15,7 @@ class TabBulletinScreen extends React.Component {
   loadBulletinList() {
     this.props.dispatch({
       type: actionType.avatar.LoadBulletinList,
-      address: WholeBulletinSession
+      session: BulletinTabSession
     })
   }
 

@@ -67,7 +67,7 @@ const SessionType = {
 }
 
 //Bulletin
-const WholeBulletinSession = '<B*>'
+const BulletinTabSession = '<BT>'
 const BulletinMarkSession = '<BM>'
 const BulletinHistorySession = '<BH>'
 const BulletinAddressSession = '<BA>'
@@ -84,7 +84,7 @@ export {
   GroupMemberShip,
   ObjectType,
   SessionType,
-  WholeBulletinSession,
+  BulletinTabSession,
   BulletinMarkSession,
   BulletinHistorySession,
   BulletinAddressSession

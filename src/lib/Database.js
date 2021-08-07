@@ -359,6 +359,34 @@ export default class Database {
     })
   }
 
+  loadBulletinBySql(sql) {
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let bulletins = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let bulletin = results.rows.item(i)
+              bulletins.push({
+                'Address': bulletin.address,
+                'Timestamp': bulletin.timestamp,
+                'CreateAt': bulletin.created_at,
+                'Sequence': bulletin.sequence,
+                'Content': bulletin.content,
+                'Hash': bulletin.hash,
+                'QuoteSize': bulletin.quote_size,
+                'ViewAt': bulletin.view_at,
+                'IsFollow': bulletin.is_follow,
+                'IsMark': bulletin.is_mark
+              })
+            }
+            resolve(bulletins)
+          })
+      })
+    })
+  }
+
   loadBulletinList(address_list) {
     let sql = ''
     if (address_list.length == 1) {
@@ -490,6 +518,21 @@ export default class Database {
             } else {
               resolve(null)
             }
+          })
+      })
+    })
+  }
+
+  updateBulletinViewAt(hash) {
+    let sql = `UPDATE BULLETINS SET view_at = ${Date.now()} WHERE hash = "${hash}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            console.log("===========================update completed")
+            console.log(tx)
+            console.log(results)
+            resolve(results)
           })
       })
     })

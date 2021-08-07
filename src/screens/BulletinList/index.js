@@ -19,10 +19,8 @@ class BulletinListScreen extends React.Component {
   loadBulletinList() {
     if (this.props.route.params.session == BulletinMarkSession) {
       this.props.navigation.setOptions({ title: '收藏公告' })
-
     } else if (this.props.route.params.session == BulletinHistorySession) {
       this.props.navigation.setOptions({ title: '公告浏览历史' })
-
     } else if (this.props.route.params.session == BulletinAddressSession) {
       if (this.props.route.params.address == this.props.avatar.get('Address')) {
         this.props.navigation.setOptions({ title: '我的公告' })
@@ -96,7 +94,6 @@ class BulletinListScreen extends React.Component {
     )
   }
 }
-import { from } from 'readable-stream'
 
 const ReduxBulletinListScreen = connect((state) => {
   return {

@@ -4,8 +4,6 @@ import { View, Text, Button } from 'react-native'
 import { connect } from 'react-redux'
 import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
 
-import { actionType } from '../../redux/actions/actionType'
-
 //设置
 class SettingBulletinScreen extends React.Component {
   constructor(props) {
@@ -38,7 +36,7 @@ class SettingBulletinScreen extends React.Component {
       <View>
         <Button title="我的公告" onPress={() => { this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('Address') }) }} />
         <Button title="收藏公告" onPress={() => { this.props.navigation.push('BulletinList', { session: BulletinMarkSession }) }} />
-        <Button title="浏览历史" onPress={() => { this.props.navigation.push('BulletinHistory'), { session: BulletinHistorySession } }} />
+        <Button title="浏览历史" onPress={() => { this.props.navigation.push('BulletinList', { session: BulletinHistorySession }) }} />
       </View >
     )
   }

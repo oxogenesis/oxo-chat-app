@@ -2,7 +2,7 @@ import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
-import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, WholeBulletinSession } from '../../lib/Const'
+import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinTabSession, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileChunkSchema, checkGroupManageSchema, checkGroupRequestSchema, checkGroupMessageSchema, checkFileSchema } from '../../lib/MessageSchemaVerifier'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
@@ -414,6 +414,7 @@ export function* LoadCurrentBulletin(action) {
   let bulletin = yield call([db, db.loadBulletinFromHash], action.hash)
   console.log(`=================================================LoadCurrentBulletin`)
   yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin })
+  yield call([db, db.updateBulletinViewAt], action.hash)
 
   if (bulletin != null) {
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
@@ -530,7 +531,7 @@ export function* SaveContentBulletin(action) {
     //save bulletin
     yield call([db, db.doInsert], action.sql)
     let current_BB_session = yield select(state => state.avatar.get('CurrentBBSession'))
-    if (current_BB_session == WholeBulletinSession || current_BB_session == object_address) {
+    if (current_BB_session == BulletinTabSession || current_BB_session == object_address) {
       bulletin_list.unshift({
         "Address": object_address,
         "Timestamp": bulletin_json.Timestamp,
@@ -554,24 +555,39 @@ export function* SaveContentBulletin(action) {
   }
 }
 
+function Array2Str(array) {
+  let tmpArray = []
+  for (let i = array.length - 1; i >= 0; i--) {
+    tmpArray.push(`'${array[i]}'`)
+  }
+  return tmpArray.join(',')
+}
+
 export function* LoadBulletinList(action) {
   let self_address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
   let address_list = []
+  let sql = ''
 
-  yield put({ type: actionType.avatar.setCurrentBBSession, bulletin_list: action.address })
+  yield put({ type: actionType.avatar.setCurrentBBSession, current_BB_session: action.address })
 
-  if (action.address == WholeBulletinSession) {
+  if (action.session == BulletinTabSession) {
     address_list = yield select(state => state.avatar.get('Follows'))
     address_list.push(self_address)
-  } else {
-    address_list.push(action.address)
+    sql = `SELECT * FROM BULLETINS WHERE address in (${Array2Str(address_list)}) ORDER BY created_at DESC LIMIT 20`
+  } else if (action.session == BulletinAddressSession) {
+    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY created_at DESC LIMIT 20`
+  } else if (action.session == BulletinHistorySession) {
+    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT 20`
+  } else if (action.session == BulletinMarkSession) {
+    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY created_at DESC LIMIT 20`
   }
 
-  let bulletin_list = yield call([db, db.loadBulletinList], address_list)
+  let bulletin_list = yield call([db, db.loadBulletinBySql], sql)
   yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
 
-  if (action.address == WholeBulletinSession) {
+  // 获取更新
+  if (action.session == BulletinTabSession) {
     bulletin_list = yield call([db, db.loadRecentBulletin], address_list)
     let address_next_sequence = {}
     //set next sequence to 1
@@ -589,7 +605,7 @@ export function* LoadBulletinList(action) {
     for (let i = address_list.length - 1; i >= 0; i--) {
       yield put({ type: actionType.avatar.FetchBulletin, address: address_list[i], sequence: address_next_sequence[address_list[i]], to: address_list[i] })
     }
-  } else if (action.address != self_address) {
+  } else if (action.session == BulletinAddressSession && action.address != self_address) {
     let next_sequence = 1
     if (bulletin_list.length != 0) {
       next_sequence = bulletin_list[0].Sequence + 1

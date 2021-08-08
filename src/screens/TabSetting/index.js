@@ -38,7 +38,13 @@ class TabSettingScreen extends React.Component {
       <View style={my_styles.TabSheet}>
         <Button title="我" onPress={() => { this.props.navigation.navigate('SettingMe') }} />
         <Button title="网络设置" onPress={() => { this.props.navigation.navigate('SettingNetwork') }} />
-        <Button title="公告设置" onPress={() => { this.props.navigation.push('SettingBulletin') }} />
+        <Button title="公告设置" onPress={() => { this.props.navigation.navigate('SettingBulletin') }} />
+        <Button color="orange" title="切换账户" onPress={() => {
+          this.props.dispatch({
+            type: actionType.avatar.disableAvatar
+          })
+          this.props.navigation.navigate('AvatarList')
+        }} />
       </View >
     )
   }

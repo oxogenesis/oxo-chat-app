@@ -24,7 +24,7 @@ class TabAddressBookScreen extends React.Component {
             ({ item }) => {
               return (<View>
                 <Text style={my_styles.Link}
-                  onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                  onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
                   {`${item.Name}:${item.Address}`}
                 </Text>
               </View>)

@@ -16,7 +16,7 @@ class BulletinListScreen extends React.Component {
     super(props)
   }
 
-  loadBulletinList() {
+  loadBulletinList(flag) {
     if (this.props.route.params.session == BulletinMarkSession) {
       this.props.navigation.setOptions({ title: '收藏公告' })
     } else if (this.props.route.params.session == BulletinHistorySession) {
@@ -30,6 +30,7 @@ class BulletinListScreen extends React.Component {
     }
     this.props.dispatch({
       type: actionType.avatar.LoadBulletinList,
+      session_flag: flag,
       session: this.props.route.params.session,
       address: this.props.route.params.address
     })
@@ -46,7 +47,7 @@ class BulletinListScreen extends React.Component {
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadBulletinList()
+      this.loadBulletinList(true)
     })
   }
 
@@ -69,7 +70,7 @@ class BulletinListScreen extends React.Component {
                 <View>
                   <View style={{ flexDirection: "row" }} >
                     <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
-                      <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                      <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
                         {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                       </Text>
                     </View>
@@ -95,6 +96,8 @@ class BulletinListScreen extends React.Component {
               )
             }
           }
+          onEndReachedThreshold={0.01}
+          onEndReached={() => { this.loadBulletinList(false) }}
         >
         </FlatList>
       </View>

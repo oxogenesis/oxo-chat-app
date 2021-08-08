@@ -35,6 +35,7 @@ import AddressEditScreen from './screens/AddressEdit'
 import SettingMeScreen from './screens/SettingMe'
 import SettingNetworkScreen from './screens/SettingNetwork'
 import SettingBulletinScreen from './screens/SettingBulletin'
+import BulletinCacheScreen from './screens/BulletinCache'
 import AvatarNameEditScreen from './screens/AvatarNameEdit'
 import AvatarSeedScreen from './screens/AvatarSeed'
 
@@ -117,7 +118,7 @@ class App extends React.Component {
                   <IconMaterial
                     name={'post-add'}
                     size={24}
-                    onPress={() => navigation.push('BulletinPublish')}
+                    onPress={() => navigation.navigate('BulletinPublish')}
                   />)
               })
             } />
@@ -199,6 +200,14 @@ class App extends React.Component {
             options={
               ({ route, navigation }) => ({
                 title: '公告设置'
+              })
+            } />
+          <Stack.Screen
+            name="BulletinCache"
+            component={BulletinCacheScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '公告缓存设置'
               })
             } />
         </Stack.Navigator>

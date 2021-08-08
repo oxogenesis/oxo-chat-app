@@ -9,6 +9,7 @@ function initialState() {
       Address: null,
       PublicKey: null,
       PrivateKey: null,
+      Setting: {},
 
       Database: null,
 
@@ -47,6 +48,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('Address', action.address)
     .set('PublicKey', action.public_key)
     .set('PrivateKey', action.private_key)
+    .set('Setting', action.setting)
     .set('Database', null)
     .set('Hosts', [])
     .set('CurrentHost', null)
@@ -89,6 +91,11 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('Setting', {})
+}
+
+reducer.prototype[actionType.avatar.setSetting] = (state, action) => {
+  return state.set('Setting', action.setting)
 }
 
 reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {
@@ -139,12 +146,12 @@ reducer.prototype[actionType.avatar.setBulletinList] = (state, action) => {
   return state.set('BulletinList', action.bulletin_list)
 }
 
-reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {
-  return state.set('CurrentBBSession', action.current_BB_session)
-}
-
 reducer.prototype[actionType.avatar.setCurrentBulletin] = (state, action) => {
   return state.set('CurrentBulletin', action.bulletin)
+}
+
+reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {
+  return state.set('CurrentBBSession', action.current_BB_session)
 }
 
 reducer.prototype[actionType.avatar.setQuoteList] = (state, action) => {

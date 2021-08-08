@@ -67,7 +67,7 @@ const SessionType = {
 }
 
 //Bulletin
-const BulletinPageSize = 10
+const BulletinPageSize = 20
 const BulletinTabSession = '<BT>'
 const BulletinMarkSession = '<BM>'
 const BulletinHistorySession = '<BH>'

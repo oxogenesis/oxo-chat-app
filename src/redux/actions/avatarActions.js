@@ -212,6 +212,9 @@ export function* enableAvatar(action) {
   yield call([db, db.initDB], address, '0.0.1', address, 0)
   yield put({ type: actionType.avatar.setDatabase, db: db })
 
+  let setting = yield call([db, db.loadSetting])
+  yield put({ type: actionType.avatar.setSetting, setting: setting })
+
   let [address_map, address_array] = yield call([db, db.loadAddressBook])
   address_map[address] = action.name
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
@@ -238,8 +241,20 @@ export function* enableAvatar(action) {
 
 export function* disableAvatar() {
   let db = yield select(state => state.avatar.get('Database'))
+  let setting = yield select(state => state.avatar.get('Setting'))
+  let address_list = yield select(state => state.avatar.get('Follows'))
+  yield call([db, db.limitBulletinCache], setting.BulletinCacheSize, Array2Str(address_list))
   yield call([db, db.closeDB])
   yield put({ type: actionType.avatar.resetAvatar })
+}
+
+export function* setBulletinCacheSize(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let setting = yield select(state => state.avatar.get('Setting'))
+  setting.BulletinCacheSize = action.cache_size
+  console.log(setting)
+  yield call([db, db.saveSetting], setting)
+  yield put({ type: actionType.avatar.setSetting, setting: setting })
 }
 
 // AddressBook
@@ -436,6 +451,12 @@ export function* LoadCurrentBulletin(action) {
   }
 }
 
+export function* clearBulletinCache() {
+  let db = yield select(state => state.avatar.get('Database'))
+  let address_list = yield select(state => state.avatar.get('Follows'))
+  yield call([db, db.clearBulletinCache], Array2Str(address_list))
+}
+
 export function* PublishBulletin(action) {
   //console.log(`=================================================PublishBulletin`)
   let address = yield select(state => state.avatar.get('Address'))
@@ -571,22 +592,29 @@ export function* LoadBulletinList(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let address_list = []
   let sql = ''
+  let bulletin_list = []
+  if (action.session_flag == true) {
+    yield put({ type: actionType.avatar.setBulletinList, bulletin_list: [] })
+  } else {
+    bulletin_list = yield select(state => state.avatar.get('BulletinList'))
+  }
+  let bulletin_list_size = bulletin_list.length
 
-  yield put({ type: actionType.avatar.setCurrentBBSession, current_BB_session: action.address })
 
   if (action.session == BulletinTabSession) {
     address_list = yield select(state => state.avatar.get('Follows'))
     address_list.push(self_address)
-    sql = `SELECT * FROM BULLETINS WHERE address in (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize}`
+    sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   } else if (action.session == BulletinAddressSession) {
-    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize}`
+    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   } else if (action.session == BulletinHistorySession) {
-    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT ${BulletinPageSize}`
+    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   } else if (action.session == BulletinMarkSession) {
-    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY mark_at DESC LIMIT ${BulletinPageSize}`
+    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY mark_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   }
 
-  let bulletin_list = yield call([db, db.loadBulletinBySql], sql)
+  let tmp = yield call([db, db.loadBulletinBySql], sql)
+  bulletin_list = bulletin_list.concat(tmp)
   yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
 
   // 获取更新

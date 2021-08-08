@@ -17,16 +17,17 @@ class TabBulletinScreen extends React.Component {
     this.state = { session: BulletinTabSession, timestamp: 1 }
   }
 
-  loadBulletinList() {
+  loadBulletinList(flag) {
     this.props.dispatch({
       type: actionType.avatar.LoadBulletinList,
+      session_flag: flag,
       session: BulletinTabSession
     })
   }
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadBulletinList()
+      this.loadBulletinList(true)
     })
   }
 
@@ -37,7 +38,7 @@ class TabBulletinScreen extends React.Component {
   render() {
     return (
       <View>
-        <Button title="发布公告" onPress={() => this.props.navigation.push('BulletinPublish')} />
+        <Button title="发布公告" onPress={() => this.props.navigation.navigate('BulletinPublish')} />
         <View style={my_styles.TabSheet}>
           <FlatList
             data={this.props.avatar.get('BulletinList')}
@@ -51,7 +52,7 @@ class TabBulletinScreen extends React.Component {
                   <View>
                     <View style={{ flexDirection: "row" }} >
                       <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
-                        <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: item.Address })}>
+                        <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
                           {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                         </Text>
                       </View>
@@ -77,13 +78,8 @@ class TabBulletinScreen extends React.Component {
                 )
               }
             }
-            onEndReachedThreshold={0.1}
-            onEndReached={() => {
-              if (this.state.page) {
-                let page = this.state.page
-              }
-            }
-            }
+            onEndReachedThreshold={0.01}
+            onEndReached={() => { this.loadBulletinList(false) }}
           >
           </FlatList>
         </View>

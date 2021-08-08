@@ -70,7 +70,7 @@ class BulletinScreen extends React.Component {
             <>
               <View style={{ flexDirection: "row" }} >
                 <View style={{ backgroundColor: "yellow", flex: 0.9 }} >
-                  <Text style={my_styles.Link} onPress={() => this.props.navigation.navigate('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
+                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
                     {`${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
                   </Text>
                 </View>

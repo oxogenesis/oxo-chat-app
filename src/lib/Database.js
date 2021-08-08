@@ -2,6 +2,8 @@ import SQLite from "react-native-sqlite-storage"
 import { resolve } from "url"
 import { DefaultHost } from './Const'
 
+const SettingJson = { "BulletinCacheSize": 0 }
+
 SQLite.enablePromise(true)
 
 export default class Database {
@@ -11,9 +13,9 @@ export default class Database {
 
   async initDB(name, version, displayName, size) {
     try {
-      console.log(`=====================Database opening`)
+      // console.log(`=====================Database opening`)
       this.db = await SQLite.openDatabase(name, version, displayName, size)
-      console.log(`=====================Database opened`)
+      // console.log(`=====================Database opened`)
       await this.createTable('ADDRESS_MARKS', `CREATE TABLE IF NOT EXISTS ADDRESS_MARKS(
         address VARCHAR(35) PRIMARY KEY,
         name VARCHAR(20) NOT NULL,
@@ -160,6 +162,11 @@ export default class Database {
           updated_at INTEGER
           )`)
 
+      await this.createTable('SETTINGS', `CREATE TABLE IF NOT EXISTS SETTINGS(
+          settings TEXT PRIMARY KEY,
+          updated_at INTEGER
+          )`)
+
       console.log(`************done********************`)
     } catch (e) {
       console.log(e)
@@ -270,6 +277,70 @@ export default class Database {
         tx.executeSql(sql)
           .then(([tx, result]) => {
             resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  loadSetting() {
+    let sql = 'SELECT * FROM SETTINGS LIMIT 1'
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let len = results.rows.length
+            if (len != 0) {
+              let json = JSON.parse(results.rows.item(0))
+              resolve(json)
+            } else {
+              resolve(SettingJson)
+            }
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  saveSetting(setting) {
+    let sql = `UPDATE SETTINGS SET settings = ${JSON.stringify(setting)} WHERE updated_at = "${Date.now()}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            console.log(tx)
+            console.log(results)
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  limitBulletinCache(cache_size, address_list) {
+    let sql = `DELETE FROM BULLETINS WHERE (SELECT * from BULLETINS is_mark = "FALSE" AND address NOT IN (${address_list}) ORDER BY view_at DESC, created_at DESC OFFSET ${cache_size})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  clearBulletinCache(address_list) {
+    let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
           })
       }).catch((err) => {
         console.log(err)

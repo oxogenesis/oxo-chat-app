@@ -82,7 +82,7 @@ export default class Database {
           view_at INTEGER,
           mark_at INTEGER,
           is_mark BOOLEAN DEFAULT FALSE,
-          is_follow BOOLEAN DEFAULT FALSE
+          is_cache BOOLEAN DEFAULT TRUE
           )`)
 
       //group
@@ -191,7 +191,7 @@ export default class Database {
 
   async addAddressMark(address, name, timestamp) {
     let sql = `INSERT INTO ADDRESS_MARKS (address, name, created_at, updated_at)
-      VALUES ('${address}', '${name}', ${timestamp}, ${timestamp})`
+VALUES ('${address}', '${name}', ${timestamp}, ${timestamp})`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -226,8 +226,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, result]) => {
-            //console.log(`insertAddressMark=================================${result}`)
-            //console.log(result)
             resolve(result)
           })
       }).catch((err) => {
@@ -239,7 +237,7 @@ export default class Database {
   addFriend(address) {
     let timestamp = Date.now()
     let sql = `INSERT INTO FRIENDS (address, created_at, updated_at)
-      VALUES ('${address}', ${timestamp}, ${timestamp})`
+VALUES ('${address}', ${timestamp}, ${timestamp})`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -254,8 +252,7 @@ export default class Database {
 
   addFollow(address) {
     let timestamp = Date.now()
-    let sql = `INSERT INTO FOLLOWS (address, created_at, updated_at)
-      VALUES ('${address}', ${timestamp}, ${timestamp})`
+    let sql = `INSERT INTO FOLLOWS (address, created_at, updated_at)VALUES ('${address}', ${timestamp}, ${timestamp})`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -271,7 +268,7 @@ export default class Database {
   addHost(address) {
     let timestamp = Date.now()
     let sql = `INSERT INTO HOSTS (address, updated_at)
-    VALUES ('${address}', ${timestamp})`
+VALUES ('${address}', ${timestamp})`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -310,8 +307,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log(tx)
-            console.log(results)
             resolve(results)
           })
       }).catch((err) => {
@@ -322,6 +317,7 @@ export default class Database {
 
   limitBulletinCache(cache_size, address_list) {
     let sql = `DELETE FROM BULLETINS WHERE (SELECT * from BULLETINS is_mark = "FALSE" AND address NOT IN (${address_list}) ORDER BY view_at DESC, created_at DESC OFFSET ${cache_size})`
+    console.log(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -335,7 +331,11 @@ export default class Database {
   }
 
   clearBulletinCache(address_list) {
-    let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
+    let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE"`
+    if (address_list != "") {
+      sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
+    }
+    console.log(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -443,16 +443,14 @@ export default class Database {
             for (let i = 0; i < len; i++) {
               let bulletin = results.rows.item(i)
               bulletins.push({
-                'Address': bulletin.address,
-                'Timestamp': bulletin.timestamp,
-                'CreateAt': bulletin.created_at,
-                'Sequence': bulletin.sequence,
-                'Content': bulletin.content,
-                'Hash': bulletin.hash,
-                'QuoteSize': bulletin.quote_size,
-                'ViewAt': bulletin.view_at,
-                'IsFollow': bulletin.is_follow,
-                'IsMark': bulletin.is_mark
+                "Address": bulletin.address,
+                "Timestamp": bulletin.timestamp,
+                "CreateAt": bulletin.created_at,
+                "Sequence": bulletin.sequence,
+                "Content": bulletin.content,
+                "Hash": bulletin.hash,
+                "QuoteSize": bulletin.quote_size,
+                "IsMark": bulletin.is_mark
               })
             }
             resolve(bulletins)
@@ -548,19 +546,19 @@ export default class Database {
             if (len != 0) {
               let item = results.rows.item(0)
               let bulletin = {
-                'Address': item.address,
-                'Timestamp': item.timestamp,
-                'CreateAt': item.created_at,
-                'Sequence': item.sequence,
-                'Content': item.content,
-                'Hash': item.hash,
-                'QuoteSize': item.quote_size,
-                'ViewAt': item.view_at,
-                'IsFollow': item.is_follow,
-                'IsMark': item.is_mark,
+                "Address": item.address,
+                "Timestamp": item.timestamp,
+                "CreateAt": item.created_at,
+                "Sequence": item.sequence,
+                "Content": item.content,
+                "Hash": item.hash,
+                "QuoteSize": item.quote_size,
+                "ViewAt": item.view_at,
+                "IsCache": item.is_cache,
+                "IsMark": item.is_mark,
 
-                'PreHash': item.pre_hash,
-                'QuoteList': []
+                "PreHash": item.pre_hash,
+                "QuoteList": []
               }
               if (item.QuoteSize != 0) {
                 let json = JSON.parse(item.json)
@@ -584,9 +582,20 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log("===========================update completed")
-            console.log(tx)
-            console.log(results)
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  updateIsCache(address, flag) {
+    let sql = `UPDATE BULLETINS SET is_cache = "${flag}" WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
             resolve(results)
           })
       }).catch((err) => {
@@ -601,9 +610,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log("===========================update completed")
-            console.log(tx)
-            console.log(results)
             resolve(results)
           })
       }).catch((err) => {
@@ -618,9 +624,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log("===========================update completed")
-            console.log(tx)
-            console.log(results)
             resolve(results)
           })
       }).catch((err) => {
@@ -663,9 +666,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log("===========================DELETE completed")
-            console.log(tx)
-            console.log(results)
             resolve(results)
           })
       }).catch((err) => {
@@ -680,9 +680,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log("===========================update completed")
-            console.log(tx)
-            console.log(results)
             resolve(results)
           })
       }).catch((err) => {

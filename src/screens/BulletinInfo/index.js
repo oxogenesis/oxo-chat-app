@@ -48,7 +48,6 @@ class BulletinInfoScreen extends React.Component {
               <Text>{`序号：${this.props.avatar.get('CurrentBulletin').Sequence}`}</Text>
               <Text>{`时间：${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
               <Text>{`引用：${this.props.avatar.get('CurrentBulletin').QuoteSize}`}</Text>
-              <Text style={my_styles.SeperateLine}>{`<-------------------------------->`}</Text>
               <ScrollView>
                 <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
               </ScrollView>

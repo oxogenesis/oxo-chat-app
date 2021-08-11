@@ -118,7 +118,7 @@ reducer.prototype[actionType.avatar.setFriends] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setFollows] = (state, action) => {
-  return state.set('Follows', action.follows)
+  return state.set('Follows', action.follow_list)
 }
 
 reducer.prototype[actionType.avatar.setHosts] = (state, action) => {

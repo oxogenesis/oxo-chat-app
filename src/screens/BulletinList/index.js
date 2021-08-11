@@ -74,7 +74,7 @@ class BulletinListScreen extends React.Component {
                         {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                       </Text>
                     </View>
-                    <View style={{ backgroundColor: "red", flex: 0.2 }} >
+                    <View style={{ backgroundColor: "orange", flex: 0.2 }} >
                       <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
                         {`#${item.Sequence}`}
                       </Text>
@@ -86,7 +86,7 @@ class BulletinListScreen extends React.Component {
                     </View>
                     {
                       item.QuoteSize != 0 &&
-                      <View style={{ backgroundColor: "orange", flex: 0.2 }} >
+                      <View style={{ backgroundColor: "red", flex: 0.2 }} >
                         <Text>{`◀${item.QuoteSize}`}</Text>
                       </View>
                     }

@@ -53,7 +53,7 @@ export const actionType = {
 
     HandleBulletinRequest: 'HANDLE_BULLETIN_REQUEST',
     SaveBulletin: 'SAVE_BULLETIN',
-    SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
+    // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
     PublishBulletin: 'PUBLISH_BULLETIN'
   }

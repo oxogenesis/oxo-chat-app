@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
-import SessionListScreen from '../TabSession'
+import TabSessionScreen from '../TabSession'
 import TabBulletinScreen from '../TabBulletin'
 import TabAddressBookScreen from '../TabAddressBook'
 import TabSettingScreen from '../TabSetting'
@@ -22,7 +22,7 @@ class TabHomeScreen extends React.Component {
           inactiveBackgroundColor: 'grey',
           style: { height: 50 }
         }}>
-        <Tab.Screen name="SessionList" component={SessionListScreen} options={{
+        <Tab.Screen name="TabSession" component={TabSessionScreen} options={{
           tabBarLabel: '聊天',
           tabBarBadge: 8,
           tabBarIcon: (tintColor, focusd) => (

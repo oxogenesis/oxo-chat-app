@@ -20,7 +20,7 @@ class UnlockScreen extends React.Component {
             type: actionType.master.setMasterKey,
             master_key: this.state.master_key
           })
-          this.setState({ master_key: '' })
+          this.setState({ master_key: '', error_msg: '' })
           this.props.navigation.navigate('AvatarList')
         } else {
           this.setState({ master_key: '', error_msg: 'invalid MasterKey...' })
@@ -30,10 +30,14 @@ class UnlockScreen extends React.Component {
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      // if (this.props.master.get('MasterKey') != null) {
-      //   this.props.navigation.navigate('AvatarList')
-      // }
-      this.setState({ error_msg: '' })
+      if (this.props.master.get('MasterKey') != null) {
+        // 强制安全退出：加载此页面，置空MasterKey
+        this.props.dispatch({
+          type: actionType.master.setMasterKey,
+          MasterKey: null
+        })
+      }
+      this.setState({ master_key: '', error_msg: '' })
     })
   }
 

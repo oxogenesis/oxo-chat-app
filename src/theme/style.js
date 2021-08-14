@@ -21,6 +21,11 @@ const my_styles = StyleSheet.create({
   SeperateLine: {
     textAlign: 'center'
   },
+  Avatar: {
+    width: 50,
+    height: 50,
+    resizeMode: 'stretch',
+  },
   container: {
     flex: 1,
     padding: 5,

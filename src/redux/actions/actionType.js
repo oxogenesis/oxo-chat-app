@@ -55,6 +55,9 @@ export const actionType = {
     SaveBulletin: 'SAVE_BULLETIN',
     // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
-    PublishBulletin: 'PUBLISH_BULLETIN'
+    PublishBulletin: 'PUBLISH_BULLETIN',
+
+    setSessionMap: 'SET_SESSION_MAP',
+    LoadSessionList: 'LOAD_SESSION_LIST'
   }
 }

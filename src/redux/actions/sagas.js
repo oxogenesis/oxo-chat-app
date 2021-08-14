@@ -24,7 +24,8 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.changeCurrentHost, avatarActions.changeCurrentHost)
 
   yield takeEvery(actionType.avatar.Conn, avatarActions.Conn)
-  
+
+  //Bulletin
   yield takeEvery(actionType.avatar.setBulletinCacheSize, avatarActions.setBulletinCacheSize)
   yield takeEvery(actionType.avatar.clearBulletinCache, avatarActions.clearBulletinCache)
 
@@ -37,4 +38,7 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.LoadCurrentBulletin, avatarActions.LoadCurrentBulletin)
   yield takeEvery(actionType.avatar.MarkBulletin, avatarActions.MarkBulletin)
   yield takeEvery(actionType.avatar.UnmarkBulletin, avatarActions.UnmarkBulletin)
+
+  //Chat
+  yield takeEvery(actionType.avatar.LoadSessionList, avatarActions.LoadSessionList)
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, Button } from 'react-native'
+import { View, Text, Button, Alert } from 'react-native'
 
 import QRCode from 'react-native-qrcode-svg'
 
@@ -23,6 +23,19 @@ class SettingMeScreen extends React.Component {
       address: this.props.avatar.get('Address'),
       name: this.props.avatar.get('Name')
     })
+  }
+
+  viewSeedAlert() {
+    Alert.alert(
+      '提示',
+      `查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
+确定要查看种子吗？`,
+      [
+        { text: '确认', onPress: () => this.props.navigation.navigate('AvatarSeed') },
+        { text: '取消', style: 'cancel' },
+      ],
+      { cancelable: false }
+    )
   }
 
   componentDidMount() {
@@ -50,7 +63,7 @@ class SettingMeScreen extends React.Component {
           />
         </View>
         <Button title="修改昵称" onPress={() => { this.props.navigation.navigate('AvatarNameEdit') }} />
-        <Button color="red" title="查看种子" onPress={() => { this.props.navigation.navigate('AvatarSeed') }} />
+        <Button color="red" title="查看种子" onPress={() => { this.viewSeedAlert() }} />
       </View >
     )
   }

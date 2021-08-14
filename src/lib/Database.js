@@ -646,6 +646,82 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
+  clearFriendMessage(address) {
+    let sql = `DELETE FROM MESSAGES WHERE sour_address = "${address}" OR dest_address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  clearFriendECDH(address) {
+    let sql = `DELETE FROM ECDHS WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  loadRecentMessageReceive() {
+    let sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let messages = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let message = results.rows.item(i)
+              messages.push({
+                "Address": message.address,
+                'Timestamp': message.timestamp,
+                'Content': message.content
+              })
+            }
+            resolve(messages)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  loadRecentMessageSend() {
+    let sql = `SELECT * FROM MESSAGES GROUP BY dest_address`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let messages = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let message = results.rows.item(i)
+              messages.push({
+                "Address": message.address,
+                'Timestamp': message.timestamp,
+                'Content': message.content
+              })
+            }
+            resolve(messages)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
   delFollow(address) {
     let sql = `DELETE FROM FOLLOWS WHERE address = "${address}"`
     return new Promise((resolve, reject) => {

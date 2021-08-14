@@ -49,7 +49,7 @@ class BulletinCacheScreen extends React.Component {
         }
         <Button title="设置" onPress={() => this.setBulletinCacheSize()} />
         <Text>{`说明：
-1、关注账号的公告、收藏的公告均不是缓存公告。
+1、关注账户的公告、收藏的公告均不是缓存公告。
 2、公告缓存数量设置为0时，应用不会自动删除缓存公告。`}
         </Text>
       </>

@@ -237,6 +237,25 @@ export function* enableAvatar(action) {
   yield put({ type: actionType.avatar.Conn })
 
   yield put({ type: actionType.avatar.UpdateFollowBulletin })
+
+  // LoadSessionList
+  let recent_message_receive = yield call([db, db.loadRecentMessageReceive])
+  let recent_message_send = yield call([db, db.loadRecentMessageSend])
+  let session_map = {}
+  follow_list.forEach(follow => {
+    session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '' }
+  })
+  recent_message_receive.forEach(message => {
+    session_map[message.Address].Timestamp = message.Timestamp
+    session_map[message.Address].Content = message.Content
+  })
+  recent_message_send.forEach(message => {
+    if (message.Timestamp > session_map[message.Address].Timestamp) {
+      session_map[message.Address].Timestamp = message.Timestamp
+      session_map[message.Address].Content = message.Content
+    }
+  })
+  yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 }
 
 export function* disableAvatar() {
@@ -342,6 +361,10 @@ export function* delFriend(action) {
   if (current_address_mark || action.address == current_address_mark.Address) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
   }
+
+  //清楚聊天痕迹
+  yield call([db, db.clearFriendMessage], action.address)
+  yield call([db, db.clearFriendECDH], action.address)
 }
 
 // Follow
@@ -655,4 +678,10 @@ export function* UnmarkBulletin(action) {
   let db = yield select(state => state.avatar.get('Database'))
   yield call([db, db.unmarkBulletin], action.hash)
   yield put({ type: actionType.avatar.LoadCurrentBulletin, hash: action.hash })
+}
+
+//Chat
+export function* LoadSessionList(action) {
+  console.log(`=================================================LoadSessionList`)
+  let session_list = yield select(state => state.avatar.get('SessionList'))
 }

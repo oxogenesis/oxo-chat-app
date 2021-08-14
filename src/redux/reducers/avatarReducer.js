@@ -29,7 +29,10 @@ function initialState() {
       CurrentBBSession: null,
       CurrentBulletin: null,
       QuoteList: [],
-      QuoteWhiteList: []
+      QuoteWhiteList: [],
+
+      SessionMap: {},
+      SessionList: []
     }
   )
 }
@@ -62,6 +65,9 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('SessionMap', {})
+    .set('SessionList', [])
+    .set('Setting', {})
 }
 
 reducer.prototype[actionType.avatar.setAvatarName] = (state, action) => {
@@ -91,6 +97,8 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('SessionMap', {})
+    .set('SessionList', [])
     .set('Setting', {})
 }
 
@@ -193,4 +201,16 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
   }
   console.log(tmp_quote_list)
   return state.set('QuoteList', tmp_quote_list)
+}
+
+//Chat
+reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
+  let session_list = Object.values(action.session_map)
+  session_list.sort(function (m, n) {
+    if (m.Timestamp < n.Timestamp) return 1
+    else if (m.Timestamp > n.Timestamp) return -1
+    else return 0
+  })
+  return state.set('SessionList', session_list)
+    .set('SessionMap', action.session_map)
 }

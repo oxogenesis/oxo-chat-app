@@ -52,14 +52,10 @@ class AvatarListScreen extends React.Component {
   }
 
   lock() {
-    // console.log(`==========================================lock`)
-    // console.log(this.props.master.get('MasterKey'))
     this.props.dispatch({
       type: actionType.master.setMasterKey,
       MasterKey: null
     })
-    // console.log(this.props.master.get('MasterKey'))
-    // console.log(`==========================================WTF!!!`)
     this.props.navigation.navigate('Unlock')
   }
 
@@ -70,7 +66,7 @@ class AvatarListScreen extends React.Component {
           data={this.state.avatarList}
           keyExtractor={item => item.Name}
           ListEmptyComponent={
-            <Text>暂无账号...</Text>
+            <Text>暂无账户...</Text>
           }
           renderItem={
             ({ item }) => {
@@ -86,10 +82,6 @@ class AvatarListScreen extends React.Component {
         >
         </FlatList>
         <Button color="red" title="安全退出" onPress={() => this.lock()} />
-        {/* {
-          this.props.master.get('MasterKey') == '' &&
-          this.props.navigation.navigate('Unlock')
-        } */}
       </View>
     )
   }

@@ -187,7 +187,6 @@ reducer.prototype[actionType.avatar.addQuote] = (state, action) => {
     Sequence: action.sequence,
     Hash: action.hash
   })
-  console.log(quote_list)
   return state.set('QuoteList', quote_list)
 }
 
@@ -195,11 +194,10 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
   let quote_list = state.get('QuoteList')
   let tmp_quote_list = []
   for (const quote of quote_list) {
-    if (quote.Hash != action.Hash) {
+    if (quote.Hash != action.hash) {
       tmp_quote_list.push(quote)
     }
   }
-  console.log(tmp_quote_list)
   return state.set('QuoteList', tmp_quote_list)
 }
 

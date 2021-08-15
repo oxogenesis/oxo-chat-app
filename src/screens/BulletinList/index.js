@@ -75,7 +75,8 @@ class BulletinListScreen extends React.Component {
                       </Text>
                     </View>
                     <View style={{ backgroundColor: "orange", flex: 0.2 }} >
-                      <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
+                      <Text style={{ color: 'blue', fontWeight: 'bold', textAlign: "right" }}
+                        onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
                         {`#${item.Sequence}`}
                       </Text>
                     </View>
@@ -87,7 +88,7 @@ class BulletinListScreen extends React.Component {
                     {
                       item.QuoteSize != 0 &&
                       <View style={{ backgroundColor: "red", flex: 0.2 }} >
-                        <Text>{`◀${item.QuoteSize}`}</Text>
+                        <Text style={{ textAlign: "right" }}>{`◀${item.QuoteSize}`}</Text>
                       </View>
                     }
                   </View>

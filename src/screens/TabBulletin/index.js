@@ -57,19 +57,20 @@ class TabBulletinScreen extends React.Component {
                         </Text>
                       </View>
                       <View style={{ backgroundColor: "orange", flex: 0.2 }} >
-                        <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
+                        <Text style={{ color: 'blue', fontWeight: 'bold', textAlign: "right" }}
+                          onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
                           {`#${item.Sequence}`}
                         </Text>
                       </View>
                     </View>
                     <View style={{ flexDirection: "row" }} >
                       <View style={{ backgroundColor: "green", flex: 0.8 }} >
-                        <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
+                        <Text >{`@${timestamp_format(item.Timestamp)}`}</Text>
                       </View>
                       {
                         item.QuoteSize != 0 &&
                         <View style={{ backgroundColor: "red", flex: 0.2 }} >
-                          <Text>{`◀${item.QuoteSize}`}</Text>
+                          <Text style={{ textAlign: "right" }}>{`◀${item.QuoteSize}`}</Text>
                         </View>
                       }
                     </View>

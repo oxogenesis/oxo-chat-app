@@ -16,18 +16,18 @@ function DelayExec(ms) {
 }
 
 function createWebSocket(url) {
-  console.log(`======================================================createWebSocket`)
+  // console.log(`======================================================createWebSocket`)
   return new Promise((resolve, reject) => {
     let ws = new WebSocket(url)
     ws.onopen = () => {
-      console.log(`======================================================createWebSocket-open`)
+      // console.log(`======================================================createWebSocket-open`)
       resolve(ws)
     }
     ws.onerror = (error) => {
       //{"isTrusted": false, "message": "Connection reset"}
       //TODO: catch this error
-      console.log(`======================================================createWebSocket-error`)
-      console.log(error)
+      // console.log(`======================================================createWebSocket-error`)
+      // console.log(error)
       reject(error)
     }
   })
@@ -65,8 +65,8 @@ export function* Conn(action) {
     return
   }
 
-  console.log(`======================================================${CurrentHost}`)
-  console.log(`======================================================Conn`)
+  // console.log(`======================================================${CurrentHost}`)
+  // console.log(`======================================================Conn`)
   try {
 
     // Make our connection
@@ -166,8 +166,8 @@ export function* Conn(action) {
       //yield put(nowPlayingUpdate(stationName, artist, title, artUrl))
     }
   } catch (error) {
-    console.log(`======================================================Conn-catch`)
-    console.log(error)
+    // console.log(`======================================================Conn-catch`)
+    // console.log(error)
     // let regx = /^failed to connect to/
     // let rs = regx.exec(error.message)
     // if (rs != null) {
@@ -177,7 +177,7 @@ export function* Conn(action) {
     //{"isTrusted": false, "message": "failed to connect to /127.0.0.1 (port 3000) from /10.0.2.15 (port 36216) after 10000ms"}
   } finally {
     // Clean up the connection
-    console.log(`======================================================Conn-finally`)
+    // console.log(`======================================================Conn-finally`)
     if (typeof channel !== 'undefined') {
       channel.close()
     }
@@ -186,7 +186,7 @@ export function* Conn(action) {
     }
     yield call(DelayExec, 10 * 1000)
     yield put({ type: actionType.avatar.Conn })
-    console.log(`======================================================reconnect`)
+    // console.log(`======================================================reconnect`)
     // if (yield cancelled()) {
     //   console.log(`================================================Conn-cancelled`)
     //   if (typeof channel !== 'undefined') {
@@ -601,6 +601,7 @@ export function* LoadBulletinList(action) {
   let sql = ''
   let bulletin_list = []
 
+  // session_flag?新的列表：延长列表
   if (action.session_flag == true) {
     yield put({ type: actionType.avatar.setBulletinList, bulletin_list: [] })
   } else {
@@ -622,8 +623,10 @@ export function* LoadBulletinList(action) {
   }
 
   let tmp = yield call([db, db.loadBulletinBySql], sql)
-  bulletin_list = bulletin_list.concat(tmp)
-  yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
+  if (tmp.length != 0) {
+    bulletin_list = bulletin_list.concat(tmp)
+    yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
+  }
 
   // 获取更新
   if (action.session == BulletinTabSession) {

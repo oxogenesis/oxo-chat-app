@@ -74,8 +74,9 @@ class BulletinScreen extends React.Component {
                     {`${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
                   </Text>
                 </View>
-                <View style={{ backgroundColor: "red", flex: 0.1 }} >
-                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: this.props.avatar.get('CurrentBulletin').Hash })}>
+                <View style={{ backgroundColor: "orange", flex: 0.1 }} >
+                  <Text style={{ color: 'blue', fontWeight: 'bold', textAlign: "right" }}
+                    onPress={() => this.props.navigation.push('Bulletin', { hash: this.props.avatar.get('CurrentBulletin').Hash })}>
                     {`#${this.props.avatar.get('CurrentBulletin').Sequence}`}
                   </Text>
                 </View>

@@ -103,7 +103,7 @@ class App extends React.Component {
                     name={'more-horizontal'}
                     size={24}
                     onPress={() => navigation.push('AddressMark', {
-                      AddressMark: route.params.AddressMark
+                      address: route.params.address
                     })}
                   />)
               })

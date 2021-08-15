@@ -17,7 +17,7 @@ class BulletinPublishScreen extends React.Component {
   publishBulletin() {
     let content = this.state.content.trim()
     if (content == '') {
-      this.setState({ error_msg: 'content could not be blank...' })
+      this.setState({ error_msg: '公告不能为空...' })
       return
     }
     this.props.dispatch({
@@ -51,15 +51,16 @@ class BulletinPublishScreen extends React.Component {
           renderItem={
             ({ item }) => {
               return (
-                <View>
-                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ backgroundColor: "yellow", flex: 0.8, color: 'blue', fontWeight: 'bold' }} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
                     {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
                   </Text>
-                  <Text onPress={() => this.props.dispatch({
-                    type: actionType.avatar.delQuote,
-                    hash: item.Hash
-                  })}>
-                    X
+                  <Text style={{ backgroundColor: "orange", flex: 0.2, color: 'blue', fontWeight: 'bold', textAlign: "right" }}
+                    onPress={() => this.props.dispatch({
+                      type: actionType.avatar.delQuote,
+                      hash: item.Hash
+                    })}>
+                    取消引用
                   </Text>
                 </View>)
             }

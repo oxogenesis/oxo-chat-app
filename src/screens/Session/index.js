@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, TextInput, Button, FlatList } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
+import { timestamp_format, AddressToName } from '../../lib/Util'
 
 import { connect } from 'react-redux'
 
@@ -9,16 +10,129 @@ import { connect } from 'react-redux'
 class SessionScreen extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { address: '', message_list: [] }
+    this.state = { address: '', name: '', message_list: [], message: '' }
   }
 
-  loadSessionList() {
-    this.setState({ address: this.props.route.params.address })
+  loadMessageList() {
+    this.setState({
+      message_list: [
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 11,
+          Hash: 11,
+          Timestamp: 1628608850592,
+          Content: '111'
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 22,
+          Hash: 22,
+          Timestamp: 1628608850592,
+          Content: '222'
+        },
+        {
+          SourAddress: "",
+          Sequence: 88,
+          Hash: 88,
+          Timestamp: 1628608850592,
+          Content: 'aaa'
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 33,
+          Hash: 33,
+          Timestamp: 1628608850592,
+          Content: '333'
+        },
+        {
+          SourAddress: "",
+          Sequence: 89,
+          Hash: 89,
+          Timestamp: 1628608850592,
+          Content: 'bbb'
+        },
+        {
+          SourAddress: "",
+          Sequence: 90,
+          Hash: 90,
+          Timestamp: 1628608850592,
+          Content: 'ccc'
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 34,
+          Hash: 34,
+          Timestamp: 1628608850592,
+          Content: '444'
+        },
+        {
+          SourAddress: "",
+          Sequence: 91,
+          Hash: 91,
+          Timestamp: 1628608850592,
+          Content: 'ddd'
+        },
+        {
+          SourAddress: "",
+          Sequence: 92,
+          Hash: 92,
+          Timestamp: 1628608850592,
+          Content: 'eee'
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 35,
+          Hash: 35,
+          Timestamp: 1628608850592,
+          Content: '555'
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 36,
+          Hash: 36,
+          Timestamp: 1628608850592,
+          Content: '666'
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 37,
+          Hash: 37,
+          Timestamp: 1728708850592,
+          Content: `'999'
+          kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+          llllllllllllllllllllllllllllllllllllllllllll
+          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 38,
+          Hash: 38,
+          Timestamp: 1828808850592,
+          Content: `'999'
+          kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+          llllllllllllllllllllllllllllllllllllllllllll
+          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`
+        },
+        {
+          SourAddress: "o5rdqyAP36HG6HTCHbiTNh1GJ7kvKk4Z5m",
+          Sequence: 39,
+          Hash: 39,
+          Timestamp: 1928908850592,
+          Content: `'999'
+          kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+          llllllllllllllllllllllllllllllllllllllllllll
+          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`
+        }
+      ]
+    })
   }
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadSessionList()
+      let name = AddressToName(this.props.avatar.get('AddressMap'), this.props.route.params.address)
+      this.setState({ name: name, address: this.props.route.params.address })
+      this.props.navigation.setOptions({ title: name })
+      this.loadMessageList()
     })
   }
 
@@ -28,9 +142,66 @@ class SessionScreen extends React.Component {
 
   render() {
     return (
-      <View>
-        <Text>address: {this.state.address}</Text>
-        <Text>name: {this.state.name}</Text>
+      <View style={{ flexDirection: "column" }}>
+        <View style={{ flexDirection: "row-reverse" }}>
+          <Button
+            style={{ flex: 0.2 }}
+            title="发送"
+            onPress={() => this.loadMessageList()}
+          />
+          <TextInput
+            placeholder="消息"
+            value={this.state.message}
+            multiline={true}
+            style={{ backgroundColor: "yellow", flex: 1 }}
+            onChangeText={text => this.setState({ message: text })}
+          />
+        </View>
+
+        <View style={{ paddingBottom: 100 }}>
+          <FlatList
+            data={this.state.message_list}
+            keyExtractor={item => item.Hash}
+            ListEmptyComponent={
+              <Text>暂无消息...</Text>
+            }
+            renderItem={
+              ({ item }) => {
+                return (
+                  <>
+                    {
+                      item.SourAddress == this.state.address ?
+                        <View style={{ flexDirection: "row" }} >
+                          <View style={{ flex: 0.8 }}>
+                            <Text style={{ color: 'grey' }}>
+                              {`${this.state.name}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
+                            </Text>
+                            <Text>{`${item.Content}`}</Text>
+                          </View>
+                          <View style={{ flex: 0.2 }}>
+                          </View>
+                        </View>
+                        :
+                        <View style={{ flexDirection: "row" }} >
+                          <View style={{ flex: 0.2 }}>
+                          </View>
+                          <View style={{ flex: 0.8 }}>
+                            <Text style={{ color: 'grey', textAlign: "right" }}>
+                              {`${this.props.avatar.get('Name')}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
+                            </Text>
+                            <Text style={{ textAlign: "right" }}>{`${item.Content}`}</Text>
+                          </View>
+                        </View>
+                    }
+                  </>
+                )
+              }
+            }
+            onEndReachedThreshold={0.01}
+            onEndReached={() => { }}
+          >
+          </FlatList>
+        </View>
       </View>
     )
   }

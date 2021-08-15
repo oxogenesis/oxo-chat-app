@@ -36,10 +36,7 @@ class TabSessionScreen extends React.Component {
               return (
                 <View style={{ flexDirection: "row" }} >
                   <View>
-                    <Image
-                      style={my_styles.Avatar}
-                      source={require('../../assets/app.png')}
-                      onPress={() => this.props.navigation.push('Session', { address: item.Address })}></Image>
+                    <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
                   </View>
                   <View style={{ backgroundColor: "grey", flex: 1 }} >
                     <View style={{ flexDirection: "row" }}>
@@ -49,7 +46,7 @@ class TabSessionScreen extends React.Component {
                         </Text>
                       </View>
                       <View style={{ backgroundColor: "orange", flex: 0.5 }} >
-                        <Text >
+                        <Text style={{ textAlign: "right" }}>
                           {timestamp_format(item.Timestamp)}
                         </Text>
                       </View>

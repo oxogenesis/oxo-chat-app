@@ -25,6 +25,7 @@ function initialState() {
       Friends: [],
       Follows: [],
 
+      TabBulletinList: [],
       BulletinList: [],
       CurrentBBSession: null,
       CurrentBulletin: null,
@@ -62,6 +63,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('CurrentAddressMark', null)
     .set('Friends', [])
     .set('Follows', [])
+    .set('TabBulletinList', [])
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
@@ -94,6 +96,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('CurrentAddressMark', null)
     .set('Friends', [])
     .set('Follows', [])
+    .set('TabBulletinList', [])
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
@@ -150,6 +153,10 @@ reducer.prototype[actionType.avatar.setMessageGenerator] = (state, action) => {
 }
 
 //Bulletin
+reducer.prototype[actionType.avatar.setTabBulletinList] = (state, action) => {
+  return state.set('TabBulletinList', action.tab_bulletin_list)
+}
+
 reducer.prototype[actionType.avatar.setBulletinList] = (state, action) => {
   return state.set('BulletinList', action.bulletin_list)
 }

@@ -5,7 +5,6 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { BulletinTabSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
 
@@ -14,20 +13,21 @@ class TabBulletinScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = { session: BulletinTabSession, timestamp: 1 }
+    this.state = {  timestamp: 1 }
   }
 
-  loadBulletinList(flag) {
+  loadTabBulletinList(flag) {
     this.props.dispatch({
-      type: actionType.avatar.LoadBulletinList,
-      session_flag: flag,
-      session: BulletinTabSession
+      type: actionType.avatar.LoadTabBulletinList,
+      session_flag: flag
     })
   }
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadBulletinList(true)
+      if (this.props.avatar.get('TabBulletinList').length == 0) {
+        this.loadTabBulletinList(true)
+      }
     })
   }
 
@@ -41,7 +41,7 @@ class TabBulletinScreen extends React.Component {
         <Button title="发布公告" onPress={() => this.props.navigation.navigate('BulletinPublish')} />
         <View style={my_styles.TabSheet}>
           <FlatList
-            data={this.props.avatar.get('BulletinList')}
+            data={this.props.avatar.get('TabBulletinList')}
             keyExtractor={item => item.Hash}
             ListEmptyComponent={
               <Text>暂无公告...</Text>
@@ -80,7 +80,7 @@ class TabBulletinScreen extends React.Component {
               }
             }
             onEndReachedThreshold={0.01}
-            onEndReached={() => { this.loadBulletinList(false) }}
+            onEndReached={() => { this.loadTabBulletinList(false) }}
           >
           </FlatList>
         </View>

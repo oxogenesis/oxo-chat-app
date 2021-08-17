@@ -40,9 +40,11 @@ export const actionType = {
     setQuoteList: 'SET_QUOTE_LIST',
     setQuoteWhiteList: 'SET_QUOTE_WHITE_LIST',
 
+    setTabBulletinList: 'SET_TAB_BULLETIN_LIST',
     setBulletinList: 'SET_BULLETIN_LIST',
     setBulletinCacheSize: 'SET_BULLETIN_CACHE_SIZE',
     clearBulletinCache: 'CLEAR_BULLETIN_CACHE',
+    LoadTabBulletinList: 'LOAD_TAB_BULLETIN_LIST',
     LoadBulletinList: 'LOAD_BULLETIN_LIST',
     LoadCurrentBulletin: 'LOAD_CURRENT_BULLETIN',
     MarkBulletin: "MARK_BULLETIN",

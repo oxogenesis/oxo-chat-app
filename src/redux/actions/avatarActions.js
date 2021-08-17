@@ -2,7 +2,7 @@ import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
-import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinTabSession, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
+import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileChunkSchema, checkGroupManageSchema, checkGroupRequestSchema, checkGroupMessageSchema, checkFileSchema } from '../../lib/MessageSchemaVerifier'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
@@ -536,7 +536,6 @@ export function* SaveBulletin(action) {
     let db = yield select(state => state.avatar.get('Database'))
     let follow_list = yield select(state => state.avatar.get('Follows'))
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
-    let bulletin_list = yield select(state => state.avatar.get('BulletinList'))
 
     console.log(quote_white_list)
 
@@ -555,19 +554,26 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
 
       //save bulletin
       yield call([db, db.doInsert], sql)
+      let bulletin = {
+        "Address": object_address,
+        "Timestamp": bulletin_json.Timestamp,
+        "CreatedAt": timestamp,
+        'Sequence': bulletin_json.Sequence,
+        "Content": bulletin_json.Content,
+        "Hash": hash,
+        "QuoteSize": bulletin_json.Quote.length,
+        "IsMark": false
+      }
+      //刷新TabBulletin页
+      let tab_bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
+      tab_bulletin_list.unshift(bulletin)
+      yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: tab_bulletin_list })
+
       let current_BB_session = yield select(state => state.avatar.get('CurrentBBSession'))
-      if (current_BB_session == BulletinTabSession || current_BB_session == object_address) {
-        // Tab页、FollowBulletinList页
-        bulletin_list.unshift({
-          "Address": object_address,
-          "Timestamp": bulletin_json.Timestamp,
-          "CreatedAt": timestamp,
-          'Sequence': bulletin_json.Sequence,
-          "Content": bulletin_json.Content,
-          "Hash": hash,
-          "QuoteSize": bulletin_json.Quote.length,
-          "IsMark": false
-        })
+      if (current_BB_session == object_address) {
+        let bulletin_list = yield select(state => state.avatar.get('BulletinList'))
+        // 刷新FollowBulletinList页
+        bulletin_list.unshift(bulletin)
         yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
       }
       yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
@@ -594,10 +600,38 @@ function Array2Str(array) {
   return tmpArray.join(',')
 }
 
-export function* LoadBulletinList(action) {
+export function* LoadTabBulletinList(action) {
   let self_address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
   let address_list = []
+  let sql = ''
+  let bulletin_list = []
+
+  // session_flag?新的列表：延长列表
+  if (action.session_flag == true) {
+    yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: [] })
+  } else {
+    bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
+  }
+  let bulletin_list_size = bulletin_list.length
+
+  address_list = yield select(state => state.avatar.get('Follows'))
+  address_list.push(self_address)
+  sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
+
+  let tmp = yield call([db, db.loadBulletinBySql], sql)
+  if (tmp.length != 0) {
+    bulletin_list = bulletin_list.concat(tmp)
+    yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: bulletin_list })
+  }
+
+  // 获取更新
+  yield put({ type: actionType.avatar.UpdateFollowBulletin })
+}
+
+export function* LoadBulletinList(action) {
+  let self_address = yield select(state => state.avatar.get('Address'))
+  let db = yield select(state => state.avatar.get('Database'))
   let sql = ''
   let bulletin_list = []
 
@@ -609,11 +643,7 @@ export function* LoadBulletinList(action) {
   }
   let bulletin_list_size = bulletin_list.length
 
-  if (action.session == BulletinTabSession) {
-    address_list = yield select(state => state.avatar.get('Follows'))
-    address_list.push(self_address)
-    sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
-  } else if (action.session == BulletinAddressSession) {
+  if (action.session == BulletinAddressSession) {
     yield put({ type: actionType.avatar.setCurrentBBSession, current_BB_session: action.address })
     sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   } else if (action.session == BulletinHistorySession) {
@@ -629,9 +659,7 @@ export function* LoadBulletinList(action) {
   }
 
   // 获取更新
-  if (action.session == BulletinTabSession) {
-    yield put({ type: actionType.avatar.UpdateFollowBulletin })
-  } else if (action.session == BulletinAddressSession && action.address != self_address) {
+  if (action.session == BulletinAddressSession && action.address != self_address) {
     let next_sequence = 1
     if (bulletin_list.length != 0) {
       next_sequence = bulletin_list[0].Sequence + 1

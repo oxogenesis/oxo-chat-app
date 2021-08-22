@@ -127,7 +127,7 @@ async function AvatarNameEdit(name, seed, password) {
   let msg = { "seed": seed }
   let crypted = encrypt(key, iv, JSON.stringify(msg))
   let save = { "salt": salt, "iv": iv, "ct": crypted }
-  
+
   console.log(name)
   console.log(seed)
   console.log(password)

@@ -173,6 +173,19 @@ export default class Database {
     }
   }
 
+  createTable(table_name, sql) {
+    return new Promise((resolve) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+      }).then((result) => {
+        console.log(`${table_name} created successfully`)
+        resolve(result)
+      }).catch(error => {
+        console.log(error)
+      })
+    })
+  }
+
   closeDB() {
     console.log("DB Checking")
     if (this.db) {
@@ -189,30 +202,14 @@ export default class Database {
     }
   }
 
-  async addAddressMark(address, name, timestamp) {
-    let sql = `INSERT INTO ADDRESS_MARKS (address, name, created_at, updated_at)
-VALUES ('${address}', '${name}', ${timestamp}, ${timestamp})`
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, result]) => {
-            //console.log(`insertAddressMark=================================${result}`)
-            //console.log(result)
-            resolve(result)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  async delAddressMark(address) {
-    let sql = `DELETE FROM ADDRESS_MARKS WHERE address = "${address}"`
+  doInsert(sql) {
+    console.log(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
             resolve(results)
+            console.log(results)
           })
       }).catch((err) => {
         console.log(err)
@@ -220,67 +217,7 @@ VALUES ('${address}', '${name}', ${timestamp}, ${timestamp})`
     })
   }
 
-  async saveAddressName(address, name, timestamp) {
-    let sql = `UPDATE ADDRESS_MARKS SET name = '${name}', updated_at = ${timestamp} WHERE address = "${address}"`
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, result]) => {
-            resolve(result)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  addFriend(address) {
-    let timestamp = Date.now()
-    let sql = `INSERT INTO FRIENDS (address, created_at, updated_at)
-VALUES ('${address}', ${timestamp}, ${timestamp})`
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, result]) => {
-            resolve(result)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  addFollow(address) {
-    let timestamp = Date.now()
-    let sql = `INSERT INTO FOLLOWS (address, created_at, updated_at)VALUES ('${address}', ${timestamp}, ${timestamp})`
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, result]) => {
-            resolve(result)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  addHost(address) {
-    let timestamp = Date.now()
-    let sql = `INSERT INTO HOSTS (address, updated_at)
-VALUES ('${address}', ${timestamp})`
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, result]) => {
-            resolve(result)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
+  // Setting
   loadSetting() {
     let sql = 'SELECT * FROM SETTINGS LIMIT 1'
     return new Promise((resolve, reject) => {
@@ -315,101 +252,7 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  limitBulletinCache(cache_size, address_list) {
-    let sql = `DELETE FROM BULLETINS WHERE (SELECT * from BULLETINS is_mark = "FALSE" AND address NOT IN (${address_list}) ORDER BY view_at DESC, created_at DESC OFFSET ${cache_size})`
-    console.log(sql)
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            resolve(results)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  clearBulletinCache(address_list) {
-    let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE"`
-    if (address_list != "") {
-      sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
-    }
-    console.log(sql)
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            resolve(results)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  loadAddressBook() {
-    let sql = 'SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC'
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            let addressMap = {}
-            let addressArray = []
-            let len = results.rows.length
-            for (let i = 0; i < len; i++) {
-              let addressMark = results.rows.item(i)
-              addressMap[addressMark.address] = addressMark.name
-              addressArray.push({ "Address": addressMark.address, "Name": addressMark.name, "UpdatedAt": addressMark.updated_at })
-            }
-            resolve([addressMap, addressArray])
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  loadFriends() {
-    let sql = 'SELECT * FROM FRIENDS ORDER BY updated_at DESC'
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            let friends = []
-            let len = results.rows.length
-            for (let i = 0; i < len; i++) {
-              let friend = results.rows.item(i)
-              friends.push(friend.address)
-            }
-            resolve(friends)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  loadFollows() {
-    let sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            let follows = []
-            let len = results.rows.length
-            for (let i = 0; i < len; i++) {
-              let follow = results.rows.item(i)
-              follows.push(follow.address)
-            }
-            resolve(follows)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
+  // Host
   loadHosts() {
     let sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
     return new Promise((resolve, reject) => {
@@ -433,6 +276,51 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
+  addHost(address) {
+    let timestamp = Date.now()
+    let sql = `INSERT INTO HOSTS (address, updated_at)
+VALUES ('${address}', ${timestamp})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, result]) => {
+            resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  updateHost(address) {
+    let sql = `UPDATE HOSTS SET updated_at = ${Date.now()} WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  async delHost(address) {
+    let sql = `DELETE FROM HOSTS WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  // Bulletin
   loadBulletinBySql(sql) {
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
@@ -496,20 +384,6 @@ VALUES ('${address}', ${timestamp})`
               })
             }
             resolve(bulletins)
-          })
-      }).catch((err) => {
-        console.log(err)
-      })
-    })
-  }
-
-  doInsert(sql) {
-    console.log(sql)
-    return new Promise((resolve, reject) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-          .then(([tx, results]) => {
-            resolve(results)
           })
       }).catch((err) => {
         console.log(err)
@@ -632,6 +506,117 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
+  //TODO
+  limitBulletinCache(cache_size, address_list) {
+    let sql = `DELETE FROM BULLETINS WHERE (SELECT * from BULLETINS is_mark = "FALSE" AND address NOT IN (${address_list}) ORDER BY view_at DESC, created_at DESC OFFSET ${cache_size})`
+    console.log(sql)
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  clearBulletinCache(address_list) {
+    let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE"`
+    if (address_list != "") {
+      sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
+    }
+    console.log(sql)
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  // AddressMark
+  async addAddressMark(address, name, timestamp) {
+    let sql = `INSERT INTO ADDRESS_MARKS (address, name, created_at, updated_at)
+VALUES ('${address}', '${name}', ${timestamp}, ${timestamp})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, result]) => {
+            //console.log(`insertAddressMark=================================${result}`)
+            //console.log(result)
+            resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  async delAddressMark(address) {
+    let sql = `DELETE FROM ADDRESS_MARKS WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  async saveAddressName(address, name, timestamp) {
+    let sql = `UPDATE ADDRESS_MARKS SET name = '${name}', updated_at = ${timestamp} WHERE address = "${address}"`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, result]) => {
+            resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  addFriend(address) {
+    let timestamp = Date.now()
+    let sql = `INSERT INTO FRIENDS (address, created_at, updated_at)
+VALUES ('${address}', ${timestamp}, ${timestamp})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, result]) => {
+            resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  addFollow(address) {
+    let timestamp = Date.now()
+    let sql = `INSERT INTO FOLLOWS (address, created_at, updated_at)VALUES ('${address}', ${timestamp}, ${timestamp})`
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, result]) => {
+            resolve(result)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
   delFriend(address) {
     let sql = `DELETE FROM FRIENDS WHERE address = "${address}"`
     return new Promise((resolve, reject) => {
@@ -646,8 +631,8 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  clearFriendMessage(address) {
-    let sql = `DELETE FROM MESSAGES WHERE sour_address = "${address}" OR dest_address = "${address}"`
+  delFollow(address) {
+    let sql = `DELETE FROM FOLLOWS WHERE address = "${address}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -660,13 +645,21 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  clearFriendECDH(address) {
-    let sql = `DELETE FROM ECDHS WHERE address = "${address}"`
+  loadAddressBook() {
+    let sql = 'SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC'
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            resolve(results)
+            let addressMap = {}
+            let addressArray = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let addressMark = results.rows.item(i)
+              addressMap[addressMark.address] = addressMark.name
+              addressArray.push({ "Address": addressMark.address, "Name": addressMark.name, "UpdatedAt": addressMark.updated_at })
+            }
+            resolve([addressMap, addressArray])
           })
       }).catch((err) => {
         console.log(err)
@@ -674,6 +667,47 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
+  loadFriends() {
+    let sql = 'SELECT * FROM FRIENDS ORDER BY updated_at DESC'
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let friends = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let friend = results.rows.item(i)
+              friends.push(friend.address)
+            }
+            resolve(friends)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  loadFollows() {
+    let sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let follows = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let follow = results.rows.item(i)
+              follows.push(follow.address)
+            }
+            resolve(follows)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  // Chat
   loadRecentMessageReceive() {
     let sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
     return new Promise((resolve, reject) => {
@@ -722,8 +756,8 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  delFollow(address) {
-    let sql = `DELETE FROM FOLLOWS WHERE address = "${address}"`
+  clearFriendMessage(address) {
+    let sql = `DELETE FROM MESSAGES WHERE sour_address = "${address}" OR dest_address = "${address}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -736,8 +770,8 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  async delHost(address) {
-    let sql = `DELETE FROM HOSTS WHERE address = "${address}"`
+  clearFriendECDH(address) {
+    let sql = `DELETE FROM ECDHS WHERE address = "${address}"`
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -750,13 +784,18 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  updateHost(address) {
-    let sql = `UPDATE HOSTS SET updated_at = ${Date.now()} WHERE address = "${address}"`
+  loadFriendECDH(address, division, sequence) {
+    let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${division}" AND sequence = ${sequence}`
+    console.log(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            resolve(results)
+            if (results.rows.length != 0) {
+              resolve(results.rows.item(0))
+            } else {
+              resolve(null)
+            }
           })
       }).catch((err) => {
         console.log(err)
@@ -764,16 +803,4 @@ VALUES ('${address}', ${timestamp})`
     })
   }
 
-  createTable(table_name, sql) {
-    return new Promise((resolve) => {
-      this.db.transaction((tx) => {
-        tx.executeSql(sql)
-      }).then((result) => {
-        console.log(`${table_name} created successfully`)
-        resolve(result)
-      }).catch(error => {
-        console.log(error)
-      })
-    })
-  }
 }

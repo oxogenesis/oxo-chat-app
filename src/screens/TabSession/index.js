@@ -12,9 +12,7 @@ class TabSessionScreen extends React.Component {
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      // this.props.dispatch({
-      //   type: actionType.avatar.LoadSessionList
-      // })
+
     })
   }
 

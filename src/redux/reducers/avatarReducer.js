@@ -33,7 +33,10 @@ function initialState() {
       QuoteWhiteList: [],
 
       SessionMap: {},
-      SessionList: []
+      SessionList: [],
+      UnreadMessage: 0,
+      UnreadSessionMap: {},
+      CurrentSession: null,
     }
   )
 }
@@ -69,6 +72,9 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('QuoteWhiteList', [])
     .set('SessionMap', {})
     .set('SessionList', [])
+    .set('UnreadMessage', 0,)
+    .set('UnreadSessionMap', {})
+    .set('CurrentSession', null)
     .set('Setting', {})
 }
 
@@ -102,6 +108,9 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('QuoteWhiteList', [])
     .set('SessionMap', {})
     .set('SessionList', [])
+    .set('UnreadMessage', 0,)
+    .set('UnreadSessionMap', {})
+    .set('CurrentSession', null)
     .set('Setting', {})
 }
 
@@ -218,4 +227,12 @@ reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
   })
   return state.set('SessionList', session_list)
     .set('SessionMap', action.session_map)
+}
+
+reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
+  let session = null
+  if (action.address != null) {
+    session = { Address: action.address, Sequence: action.sequence, AesKey: action.aes_key }
+  }
+  return state.set('CurrentSession', session)
 }

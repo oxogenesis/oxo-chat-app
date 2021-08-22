@@ -1,9 +1,11 @@
+import crypto from 'crypto'
 import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
 import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
-import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileChunkSchema, checkGroupManageSchema, checkGroupRequestSchema, checkGroupMessageSchema, checkFileSchema } from '../../lib/MessageSchemaVerifier'
+import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileChunkSchema } from '../../lib/MessageSchemaVerifier'
+import { DHSequence } from '../../lib/OXO'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
 import Database from '../../lib/Database'
@@ -15,6 +17,15 @@ function DelayExec(ms) {
   })
 }
 
+function Array2Str(array) {
+  let tmpArray = []
+  for (let i = array.length - 1; i >= 0; i--) {
+    tmpArray.push(`'${array[i]}'`)
+  }
+  return tmpArray.join(',')
+}
+
+// WebSocket
 function createWebSocket(url) {
   // console.log(`======================================================createWebSocket`)
   return new Promise((resolve, reject) => {
@@ -83,7 +94,7 @@ export function* Conn(action) {
 
     // Handle messages as they come in
     while (true) {
-      console.log(`======================================================yield take(channel)`)
+      // console.log(`======================================================yield take(channel)`)
       let payload = yield take(channel)
       let json = JSON.parse(payload)
       console.log(json)
@@ -197,6 +208,14 @@ export function* Conn(action) {
     //   }
     // } else {
     // }
+  }
+}
+
+export function* sendMessage(action) {
+  console.log(action)
+  let ws = yield select(state => state.avatar.get('WebSocket'))
+  if (ws != null && ws.readyState == WebSocket.OPEN) {
+    ws.send(action.message)
   }
 }
 
@@ -444,7 +463,6 @@ export function* changeCurrentHost(action) {
 export function* HandleBulletinRequest(action) {
   console.log(`===================================================================HandleBulletinRequest`)
   console.log(action.json)
-  let ws = yield select(state => state.avatar.get('WebSocket'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let json = action.json
   let address = DeriveAddress(json.PublicKey)
@@ -452,10 +470,8 @@ export function* HandleBulletinRequest(action) {
   let item = yield call([db, db.loadBulletinResponse], json.Address, json.Sequence)
   if (item != null) {
     let bulletin = JSON.parse(item.json)
-    if (ws != null && ws.readyState == WebSocket.OPEN) {
-      let msg = MessageGenerator.genObjectResponse(bulletin, address)
-      ws.send(msg)
-    }
+    let msg = MessageGenerator.genObjectResponse(bulletin, address)
+    yield put({ type: actionType.avatar.sendMessage, message: msg })
   }
 }
 
@@ -510,17 +526,12 @@ export function* PublishBulletin(action) {
   let file_saved = false
   let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
 VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${address}', 'FALSE')`
-  //console.log(sql)
   yield call([db, db.doInsert], sql)
 
   yield put({ type: actionType.avatar.setQuoteList, quote_list: [] })
 
-  let ws = yield select(state => state.avatar.get('WebSocket'))
-  if (ws != null && ws.readyState == WebSocket.OPEN) {
-    let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-    let msg = MessageGenerator.genObjectResponse(bulletin_json, address)
-    ws.send(msg)
-  }
+  let msg = MessageGenerator.genObjectResponse(bulletin_json, address)
+  yield put({ type: actionType.avatar.sendMessage, message: msg })
 }
 
 export function* SaveBulletin(action) {
@@ -590,14 +601,6 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
       }
     }
   }
-}
-
-function Array2Str(array) {
-  let tmpArray = []
-  for (let i = array.length - 1; i >= 0; i--) {
-    tmpArray.push(`'${array[i]}'`)
-  }
-  return tmpArray.join(',')
 }
 
 export function* LoadTabBulletinList(action) {
@@ -689,14 +692,10 @@ export function* UpdateFollowBulletin(action) {
 }
 
 export function* FetchBulletin(action) {
-  let ws = yield select(state => state.avatar.get('WebSocket'))
-  console.log(`======================================================FetchBulletin`)
-  if (ws != null && ws.readyState == WebSocket.OPEN) {
-    let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-    let msg = MessageGenerator.genBulletinRequest(action.address, action.sequence, action.to)
-    console.log(msg)
-    ws.send(msg)
-  }
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let json = MessageGenerator.genBulletinRequest(action.address, action.sequence, action.to)
+  let msg = JSON.stringify(json)
+  yield put({ type: actionType.avatar.sendMessage, message: msg })
 }
 
 export function* MarkBulletin(action) {
@@ -712,7 +711,48 @@ export function* UnmarkBulletin(action) {
 }
 
 //Chat
-export function* LoadSessionList(action) {
-  console.log(`=================================================LoadSessionList`)
-  let session_list = yield select(state => state.avatar.get('SessionList'))
+export function* FriendSessionHandshake(action) {
+  yield put({ type: actionType.avatar.setCurrentSession })
+  let db = yield select(state => state.avatar.get('Database'))
+  let address = action.address
+  let timestamp = Date.now()
+  let division = DefaultDivision
+  let self_address = yield select(state => state.avatar.get('Address'))
+  let sequence = DHSequence(division, timestamp, self_address, address)
+
+  //fetch aes-Key according to (address+division+sequence)
+  let ecdh = yield call([db, db.loadFriendECDH], address, division, sequence)
+  console.log(ecdh)
+  if (ecdh != null) {
+    if (ecdh.aes_key != null) {
+      //aes ready
+      yield put({ type: actionType.avatar.setCurrentSession, address: address, sequence: ecdh.sequence, aes_key: ecdh.aes_key })
+      //handsake already done, ready to chat
+    } else {
+      //my-sk-pk exist, aes not ready
+      //send self-not-ready-json
+      console.log(ecdh.self_json)
+      yield put({ type: actionType.avatar.sendMessage, message: ecdh.self_json })
+    }
+  } else {
+    //my-sk-pk not exist
+    //gen my-sk-pk
+    let ecdh = crypto.createECDH('secp256k1')
+    let ecdh_pk = ecdh.generateKeys('hex')
+    let ecdh_sk = ecdh.getPrivateKey('hex')
+    let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+    let json = MessageGenerator.genFriendECDHRequest(division, sequence, ecdh_pk, address, timestamp)
+    let msg = JSON.stringify(json)
+    console.log(msg)
+
+    //save my-sk-pk, self-not-ready-json
+    let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, self_json)
+VALUES ('${address}', '${division}', ${sequence}, '${ecdh_sk}', '${msg}')`
+    let reuslt = yield call([db, db.doInsert], sql)
+    // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
+    // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.division, ECDHS.sequence (code 1555 SQLITE_CONSTRAINT_PRIMARYKEY)"}
+    if (reuslt.code != 0) {
+      yield put({ type: actionType.avatar.sendMessage, message: msg })
+    }
+  }
 }

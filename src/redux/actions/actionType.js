@@ -32,6 +32,7 @@ export const actionType = {
     changeCurrentHost: 'CHANGE_CURRENT_HOST',
     setWebSocket: 'SET_WEBSOCKET',
     setWebSocketChannel: 'SET_WEBSOCKET_CHANNEL',
+    sendMessage: 'SEND_MESSAGE',
 
     setMessageGenerator: 'SET_MESSAGE_GENERATOR',
 
@@ -60,6 +61,7 @@ export const actionType = {
     PublishBulletin: 'PUBLISH_BULLETIN',
 
     setSessionMap: 'SET_SESSION_MAP',
-    LoadSessionList: 'LOAD_SESSION_LIST'
+    setCurrentSession: 'SET_CURRENT_SESSION',
+    FriendSessionHandshake: 'FRIEND_SESSION_HANDSHAKE'
   }
 }

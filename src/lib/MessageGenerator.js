@@ -69,4 +69,18 @@ export default class MessageGenerator {
     }
     return this.signJson(json)
   }
+
+  genFriendECDHRequest(division, sequence, ecdh_pk, address, timestamp) {
+    let json = {
+      "Action": ActionCode.ChatDH,
+      "Division": division,
+      "Sequence": sequence,
+      "DHPublicKey": ecdh_pk,
+      "Pair": "",
+      "To": address,
+      "Timestamp": timestamp,
+      "PublicKey": this.PublicKey
+    }
+    return this.signJson(json)
+  }
 }

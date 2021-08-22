@@ -24,13 +24,14 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.changeCurrentHost, avatarActions.changeCurrentHost)
 
   yield takeEvery(actionType.avatar.Conn, avatarActions.Conn)
-  yield takeEvery(actionType.avatar.sendMessage, avatarActions.sendMessage)
+  yield takeEvery(actionType.avatar.SendMessage, avatarActions.SendMessage)
   
   //Bulletin
   yield takeEvery(actionType.avatar.setBulletinCacheSize, avatarActions.setBulletinCacheSize)
   yield takeEvery(actionType.avatar.clearBulletinCache, avatarActions.clearBulletinCache)
 
   yield takeEvery(actionType.avatar.LoadTabBulletinList, avatarActions.LoadTabBulletinList)
+  yield takeEvery(actionType.avatar.UpdateFollowBulletin, avatarActions.UpdateFollowBulletin)
   yield takeEvery(actionType.avatar.LoadBulletinList, avatarActions.LoadBulletinList)
   yield takeEvery(actionType.avatar.HandleBulletinRequest, avatarActions.HandleBulletinRequest)
   yield takeEvery(actionType.avatar.SaveBulletin, avatarActions.SaveBulletin)
@@ -40,7 +41,12 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.LoadCurrentBulletin, avatarActions.LoadCurrentBulletin)
   yield takeEvery(actionType.avatar.MarkBulletin, avatarActions.MarkBulletin)
   yield takeEvery(actionType.avatar.UnmarkBulletin, avatarActions.UnmarkBulletin)
-
+  
   //Chat
   yield takeEvery(actionType.avatar.FriendSessionHandshake, avatarActions.FriendSessionHandshake)
+  yield takeEvery(actionType.avatar.LoadCurrentMessageList, avatarActions.LoadCurrentMessageList)
+  yield takeEvery(actionType.avatar.HandleFriendECDH, avatarActions.HandleFriendECDH)
+  yield takeEvery(actionType.avatar.HandleFriendMessage, avatarActions.HandleFriendMessage)
+  yield takeEvery(actionType.avatar.SaveFriendMessage, avatarActions.SaveFriendMessage)
+  yield takeEvery(actionType.avatar.HandleFriendSync, avatarActions.HandleFriendSync)
 }

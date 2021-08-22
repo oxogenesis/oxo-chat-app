@@ -137,7 +137,10 @@ class SessionScreen extends React.Component {
         type: actionType.avatar.FriendSessionHandshake,
         address: this.props.route.params.address
       })
-      this.loadMessageList()
+      this.props.dispatch({
+        type: actionType.avatar.LoadCurrentMessageList,
+        address: this.props.route.params.address
+      })
     })
   }
 
@@ -175,7 +178,7 @@ class SessionScreen extends React.Component {
 
         <View style={{ paddingBottom: 100 }}>
           <FlatList
-            data={this.state.message_list}
+            data={this.props.avatar.get("CurrentMessageList")}
             keyExtractor={item => item.Hash}
             ListEmptyComponent={
               <Text>暂无消息...</Text>

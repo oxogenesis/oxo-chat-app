@@ -208,8 +208,62 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            resolve(results)
             console.log(results)
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  doUpdate(sql) {
+    console.log(sql)
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            console.log(results)
+            resolve(results)
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  getOne(sql) {
+    console.log(sql)
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            if (results.rows.length != 0) {
+              resolve(results.rows.item(0))
+            } else {
+              resolve(null)
+            }
+          })
+      }).catch((err) => {
+        console.log(err)
+      })
+    })
+  }
+
+  getAll(sql) {
+    console.log(sql)
+    return new Promise((resolve, reject) => {
+      this.db.transaction((tx) => {
+        tx.executeSql(sql)
+          .then(([tx, results]) => {
+            let items = []
+            let len = results.rows.length
+            for (let i = 0; i < len; i++) {
+              let item = results.rows.item(i)
+              items.push(item)
+            }
+            console.log(items)
+            resolve(items)
           })
       }).catch((err) => {
         console.log(err)
@@ -718,12 +772,16 @@ VALUES ('${address}', ${timestamp}, ${timestamp})`
             let len = results.rows.length
             for (let i = 0; i < len; i++) {
               let message = results.rows.item(i)
-              messages.push({
-                "Address": message.address,
-                'Timestamp': message.timestamp,
-                'Content': message.content
-              })
+              if (message.sour_address != null) {
+                messages.push({
+                  "Address": message.sour_address,
+                  'Timestamp': message.timestamp,
+                  'Content': message.content
+                })
+              }
             }
+            console.log(results)
+            console.log(messages)
             resolve(messages)
           })
       }).catch((err) => {
@@ -742,12 +800,16 @@ VALUES ('${address}', ${timestamp}, ${timestamp})`
             let len = results.rows.length
             for (let i = 0; i < len; i++) {
               let message = results.rows.item(i)
-              messages.push({
-                "Address": message.address,
-                'Timestamp': message.timestamp,
-                'Content': message.content
-              })
+              if (message.dest_address != null) {
+                messages.push({
+                  "Address": message.dest_address,
+                  'Timestamp': message.timestamp,
+                  'Content': message.content
+                })
+              }
             }
+            console.log(results)
+            console.log(messages)
             resolve(messages)
           })
       }).catch((err) => {

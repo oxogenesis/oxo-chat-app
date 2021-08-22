@@ -57,7 +57,8 @@ export default class MessageGenerator {
     return JSON.stringify(this.signJson(json))
   }
 
-  genBulletin(sequence, pre_hash, quote, content, timestamp) {
+  // not a message
+  genBulletinJson(sequence, pre_hash, quote, content, timestamp) {
     let json = {
       "ObjectType": ObjectType.Bulletin,
       "Sequence": sequence,
@@ -70,17 +71,32 @@ export default class MessageGenerator {
     return this.signJson(json)
   }
 
-  genFriendECDHRequest(division, sequence, ecdh_pk, address, timestamp) {
+  //Chat
+  genFriendECDHRequest(division, sequence, ecdh_pk, pair, address, timestamp) {
     let json = {
       "Action": ActionCode.ChatDH,
       "Division": division,
       "Sequence": sequence,
       "DHPublicKey": ecdh_pk,
-      "Pair": "",
+      "Pair": pair,
       "To": address,
       "Timestamp": timestamp,
       "PublicKey": this.PublicKey
     }
-    return this.signJson(json)
+    console.log(json)
+    return JSON.stringify(this.signJson(json))
   }
+
+  genFriendSync(current_sequence, sour_address) {
+    let json = {
+      "Action": ActionCode.ChatSync,
+      "CurrentSequence": current_sequence,
+      "To": sour_address,
+      "Timestamp": Date.now(),
+      "PublicKey": this.PublicKey,
+    }
+    console.log(json)
+    return JSON.stringify(this.signJson(json))
+  }
+
 }

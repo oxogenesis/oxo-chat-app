@@ -37,6 +37,7 @@ function initialState() {
       UnreadMessage: 0,
       UnreadSessionMap: {},
       CurrentSession: null,
+      CurrentMessageList: []
     }
   )
 }
@@ -75,6 +76,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', null)
+    .set('CurrentMessageList', [])
     .set('Setting', {})
 }
 
@@ -111,6 +113,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', null)
+    .set('CurrentMessageList', [])
     .set('Setting', {})
 }
 
@@ -235,4 +238,8 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
     session = { Address: action.address, Sequence: action.sequence, AesKey: action.aes_key }
   }
   return state.set('CurrentSession', session)
+}
+
+reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => {
+  return state.set('CurrentMessageList', action.message_list)
 }

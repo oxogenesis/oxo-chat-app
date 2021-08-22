@@ -32,7 +32,7 @@ export const actionType = {
     changeCurrentHost: 'CHANGE_CURRENT_HOST',
     setWebSocket: 'SET_WEBSOCKET',
     setWebSocketChannel: 'SET_WEBSOCKET_CHANNEL',
-    sendMessage: 'SEND_MESSAGE',
+    SendMessage: 'SEND_MESSAGE',
 
     setMessageGenerator: 'SET_MESSAGE_GENERATOR',
 
@@ -60,8 +60,15 @@ export const actionType = {
     FetchBulletin: 'FETCH_BULLETIN',
     PublishBulletin: 'PUBLISH_BULLETIN',
 
+    //Chat
     setSessionMap: 'SET_SESSION_MAP',
     setCurrentSession: 'SET_CURRENT_SESSION',
-    FriendSessionHandshake: 'FRIEND_SESSION_HANDSHAKE'
+    setCurrentMessageList: 'SET_CURRENT_MESSAGE_LIST',
+    FriendSessionHandshake: 'FRIEND_SESSION_HANDSHAKE',
+    LoadCurrentMessageList: 'LOAD_CURRENT_MESSAGE_LIST',
+    HandleFriendECDH: 'HANDLE_FRIEND_ECDH',
+    HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
+    SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
+    HandleFriendSync: 'HANDLE_FRIEND_SYNC'
   }
 }

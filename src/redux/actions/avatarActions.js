@@ -4,8 +4,8 @@ import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
 import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
-import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileChunkSchema } from '../../lib/MessageSchemaVerifier'
-import { DHSequence } from '../../lib/OXO'
+import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema } from '../../lib/MessageSchemaVerifier'
+import { DHSequence, AesEncrypt, AesDecrypt, } from '../../lib/OXO'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
 import Database from '../../lib/Database'
@@ -114,15 +114,15 @@ export function* Conn(action) {
         //verify signature
         else if (VerifyJsonSignature(json) == true) {
           switch (json.Action) {
-            // case ActionCode.ChatDH:
-            //   console.log('HandleChatDH(json)')
-            //   break
-            // case ActionCode.ChatMessage:
-            //   console.log('HandleChatMessage(json)')
-            //   break
-            // case ActionCode.ChatSync:
-            //   console.log('HandleChatSync(json)')
-            //   break
+            case ActionCode.ChatDH:
+              yield put({ type: actionType.avatar.HandleFriendECDH, json: json })
+              break
+            case ActionCode.ChatMessage:
+              yield put({ type: actionType.avatar.HandleFriendMessage, json: json })
+              break
+            case ActionCode.ChatSync:
+              yield put({ type: actionType.avatar.HandleFriendSync, json: json })
+              break
             case ActionCode.BulletinRequest:
               yield put({ type: actionType.avatar.HandleBulletinRequest, json: json })
               break
@@ -211,7 +211,7 @@ export function* Conn(action) {
   }
 }
 
-export function* sendMessage(action) {
+export function* SendMessage(action) {
   console.log(action)
   let ws = yield select(state => state.avatar.get('WebSocket'))
   if (ws != null && ws.readyState == WebSocket.OPEN) {
@@ -471,7 +471,7 @@ export function* HandleBulletinRequest(action) {
   if (item != null) {
     let bulletin = JSON.parse(item.json)
     let msg = MessageGenerator.genObjectResponse(bulletin, address)
-    yield put({ type: actionType.avatar.sendMessage, message: msg })
+    yield put({ type: actionType.avatar.SendMessage, message: msg })
   }
 }
 
@@ -519,7 +519,7 @@ export function* PublishBulletin(action) {
   let quote_list = yield select(state => state.avatar.get('QuoteList'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let timestamp = Date.now()
-  let bulletin_json = MessageGenerator.genBulletin(next_sequence, pre_hash, quote_list, action.content, timestamp)
+  let bulletin_json = MessageGenerator.genBulletinJson(next_sequence, pre_hash, quote_list, action.content, timestamp)
   let str_bulletin = JSON.stringify(bulletin_json)
   let hash = quarterSHA512(str_bulletin)
   let is_file = false
@@ -531,7 +531,7 @@ VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_
   yield put({ type: actionType.avatar.setQuoteList, quote_list: [] })
 
   let msg = MessageGenerator.genObjectResponse(bulletin_json, address)
-  yield put({ type: actionType.avatar.sendMessage, message: msg })
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 
 export function* SaveBulletin(action) {
@@ -621,7 +621,7 @@ export function* LoadTabBulletinList(action) {
   address_list = yield select(state => state.avatar.get('Follows'))
   address_list.push(self_address)
   sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
-
+  console.log(sql)
   let tmp = yield call([db, db.loadBulletinBySql], sql)
   if (tmp.length != 0) {
     bulletin_list = bulletin_list.concat(tmp)
@@ -672,6 +672,7 @@ export function* LoadBulletinList(action) {
 }
 
 export function* UpdateFollowBulletin(action) {
+  let db = yield select(state => state.avatar.get('Database'))
   let follow_list = yield select(state => state.avatar.get('Follows'))
   let bulletin_list = yield call([db, db.loadRecentBulletin], follow_list)
   let address_next_sequence = {}
@@ -685,6 +686,8 @@ export function* UpdateFollowBulletin(action) {
       address_next_sequence[bulletin_list[i].Address] = bulletin_list[i].Sequence + 1
     }
   }
+  console.log(follow_list)
+  console.log(address_next_sequence)
   //fetch next bulletin
   for (let i = follow_list.length - 1; i >= 0; i--) {
     yield put({ type: actionType.avatar.FetchBulletin, address: follow_list[i], sequence: address_next_sequence[follow_list[i]], to: follow_list[i] })
@@ -693,9 +696,8 @@ export function* UpdateFollowBulletin(action) {
 
 export function* FetchBulletin(action) {
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let json = MessageGenerator.genBulletinRequest(action.address, action.sequence, action.to)
-  let msg = JSON.stringify(json)
-  yield put({ type: actionType.avatar.sendMessage, message: msg })
+  let msg = MessageGenerator.genBulletinRequest(action.address, action.sequence, action.to)
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 
 export function* MarkBulletin(action) {
@@ -716,13 +718,12 @@ export function* FriendSessionHandshake(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let address = action.address
   let timestamp = Date.now()
-  let division = DefaultDivision
   let self_address = yield select(state => state.avatar.get('Address'))
-  let sequence = DHSequence(division, timestamp, self_address, address)
+  let sequence = DHSequence(DefaultDivision, timestamp, self_address, address)
 
   //fetch aes-Key according to (address+division+sequence)
-  let ecdh = yield call([db, db.loadFriendECDH], address, division, sequence)
-  console.log(ecdh)
+  let ecdh = yield call([db, db.loadFriendECDH], address, DefaultDivision, sequence)
+  // console.log(ecdh)
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
       //aes ready
@@ -731,8 +732,8 @@ export function* FriendSessionHandshake(action) {
     } else {
       //my-sk-pk exist, aes not ready
       //send self-not-ready-json
-      console.log(ecdh.self_json)
-      yield put({ type: actionType.avatar.sendMessage, message: ecdh.self_json })
+      // console.log(ecdh.self_json)
+      yield put({ type: actionType.avatar.SendMessage, message: ecdh.self_json })
     }
   } else {
     //my-sk-pk not exist
@@ -741,18 +742,303 @@ export function* FriendSessionHandshake(action) {
     let ecdh_pk = ecdh.generateKeys('hex')
     let ecdh_sk = ecdh.getPrivateKey('hex')
     let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-    let json = MessageGenerator.genFriendECDHRequest(division, sequence, ecdh_pk, address, timestamp)
-    let msg = JSON.stringify(json)
-    console.log(msg)
+    let msg = MessageGenerator.genFriendECDHRequest(DefaultDivision, sequence, ecdh_pk, "", address, timestamp)
+    // console.log(msg)
 
     //save my-sk-pk, self-not-ready-json
     let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, self_json)
-VALUES ('${address}', '${division}', ${sequence}, '${ecdh_sk}', '${msg}')`
+VALUES ('${address}', '${DefaultDivision}', ${sequence}, '${ecdh_sk}', '${msg}')`
     let reuslt = yield call([db, db.doInsert], sql)
     // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
-    // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.division, ECDHS.sequence (code 1555 SQLITE_CONSTRAINT_PRIMARYKEY)"}
+    // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.division, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
     if (reuslt.code != 0) {
-      yield put({ type: actionType.avatar.sendMessage, message: msg })
+      yield put({ type: actionType.avatar.SendMessage, message: msg })
     }
   }
+}
+
+export function* LoadCurrentMessageList(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC`
+  // let sql =`SELECT * FROM MESSAGES WHERE address = '${action.address}' ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}` 
+  let items = yield call([db, db.getAll], sql)
+  let message_list = []
+  let current_sequence = 0
+  items.forEach(item => {
+    message_list.push({
+      "SourAddress": item.sour_address,
+      "Timestamp": item.timestamp,
+      "Sequence": item.sequence,
+      "created_at": item.created_at,
+      "Content": item.content,
+      'confirmed': item.false,
+      'Hash': item.hash
+    })
+    if (item.sour_address == action.address && item.sequence > current_sequence) {
+      current_sequence = item.sequence
+    }
+  })
+  yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genFriendSync(current_sequence, action.address)
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* HandleFriendECDH(action) {
+  let json = action.json
+  //check message from my friend
+  let address = DeriveAddress(json.PublicKey)
+  let timestamp = Date.now()
+  let db = yield select(state => state.avatar.get('Database'))
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  // yield call([db, db.addFriend], action.address)
+  let friends = yield select(state => state.avatar.get('Friends'))
+  if (!friends.includes(address)) {
+    console.log('message is not from my friend...')
+    //Strangers
+    // while (state.Strangers.size >= 10) {
+    //   state.Strangers.shift()
+    // }
+    // state.Strangers.push({ "address": address, "created_at": timestamp })
+    // return
+  }
+
+  //check dh(my-sk-pk pair-pk aes-key)
+
+  let item = yield call([db, db.loadFriendECDH], address, json.Division, json.Sequence)
+
+  if (item == null) {
+    //self not ready, so pair could not be ready
+    //gen my-sk-pk and aes-key
+    let ecdh = crypto.createECDH('secp256k1')
+    let ecdh_pk = ecdh.generateKeys('hex')
+    let ecdh_sk = ecdh.getPrivateKey('hex')
+    let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
+
+    //gen message with my-pk, indicate self ready
+    let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
+
+    //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
+    let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, public_key, aes_key, self_json)
+VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
+    let reuslt = yield call([db, db.doInsert], sql)
+    if (reuslt.code != 0) {
+      yield put({ type: actionType.avatar.SendMessage, message: msg })
+    }
+  } else if (item.pair_json == null) {
+    //item not null => my-sk-pk, self-not-ready-json is exist
+    //gen aes
+    let ecdh = crypto.createECDH('secp256k1')
+    ecdh.setPrivateKey(item.private_key, 'hex')
+    let ecdh_pk = ecdh.getPublicKey('hex')
+    let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
+
+    //gen self-ready-json
+    let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
+
+    if (json.Pair == "") {
+      //pair not ready
+      //save pair-pk, aes-key, self-ready-json
+      let sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      let reuslt = yield call([db, db.doUpdate], sql)
+      if (reuslt.code != 0) {
+        yield put({ type: actionType.avatar.SendMessage, message: msg })
+      }
+    } else {
+      //pair ready
+      //save pair-pk, aes-key, self-ready-json, pair-ready-json
+      let sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      let reuslt = yield call([db, db.doUpdate], sql)
+      if (reuslt.code != 0) {
+        yield put({ type: actionType.avatar.SendMessage, message: msg })
+        let current_session = yield select(state => state.avatar.get('CurrentSession'))
+        if (current_session && address == current_session.Address) {
+          yield put({ type: actionType.avatar.setCurrentSession, address: address, sequence: json.Sequence, aes_key: aes_key })
+        }
+      }
+    }
+  }
+  //else: self and pair are ready, do nothing
+  //both ready to talk
+}
+
+export function* HandleFriendMessage(action) {
+  let json = action.json
+  let sour_address = DeriveAddress(json.PublicKey)
+  let db = yield select(state => state.avatar.get('Database'))
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  //check message from my friend
+  let friends = yield select(state => state.avatar.get('Friends'))
+  if (!friends.includes(sour_address)) {
+    console.log('message is not from my friend...')
+    return
+  }
+
+  //check pre-message
+  let sql = `SELECT * FROM MESSAGES WHERE sour_address = "${sour_address}" AND hash = "${json.PreHash}" AND sequence = ${json.Sequence - 1}`
+  let item = yield call([db, db.getOne], sql)
+  if (item == null) {
+    if (json.Sequence == 1) {
+      yield put({ type: actionType.avatar.SaveFriendMessage, sour_address: sour_address, json: json })
+    } else {
+      //some message is missing
+      //get last message(biggest sequence)
+      sql = `SELECT * FROM MESSAGES WHERE sour_address = "${sour_address}" ORDER BY sequence DESC`
+      item = yield call([db, db.getOne], sql)
+      //send ChatSync
+      let current_sequence = 0
+      if (item != null) {
+        current_sequence = item.sequence
+      }
+      let msg = MessageGenerator.genFriendSync(current_sequence, sour_address)
+      yield put({ type: actionType.avatar.SendMessage, message: msg })
+    }
+  } else {
+    //pre-message exist
+    yield put({ type: actionType.avatar.SaveFriendMessage, sour_address: sour_address, json: json })
+  }
+
+}
+
+export function* SaveFriendMessage(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let sour_address = action.sour_address
+  let json = action.json
+
+  let self_address = yield select(state => state.avatar.get('Address'))
+  let sequence = DHSequence(DefaultDivision, json.Timestamp, self_address, sour_address)
+  //fetch chatkey(aes_key) to decrypt content
+  let sql = `SELECT * FROM ECDHS WHERE address = "${sour_address}" AND division = "${DefaultDivision}" AND sequence = ${sequence}`
+  let item = yield call([db, db.getOne], sql)
+  if (item == null && item.aes_key == null) {
+    console.log('chatkey not exist...')
+  } else {
+    //decrypt content
+    let content = AesDecrypt(json.Content, item.aes_key)
+
+    let strJson = JSON.stringify(json)
+    let hash = quarterSHA512(strJson)
+    let created_at = Date.now()
+
+    let readed = 'FALSE'
+    let current_session = yield select(state => state.avatar.get('CurrentSession'))
+    if (current_session && sour_address == current_session.Address) {
+      readed = 'TRUE'
+    }
+
+    //check is_file?
+    let is_file = 'FALSE'
+    let file_saved = 'FALSE'
+    let fileJson = null
+    let fileSHA1 = null
+
+    //save message
+    let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
+      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}',' ${is_file}', '${file_saved}', '${fileSHA1}')`
+
+    let reuslt = yield call([db, db.doInsert], sql)
+    if (reuslt.code != 0) {
+      // yield put({ type: actionType.avatar.SendMessage, message: msg })
+      // let i = state.Sessions.length - 1
+      // for (; i >= 0; i--) {
+      //   if (state.Sessions[i].type == state.SessionType.Private && state.Sessions[i].session == sour_address) {
+      //     break
+      //   }
+      // }
+      if (current_session && sour_address == current_session.Address) {
+        //CurrentSession: show message
+        let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+        message_list.push({
+          "SourAddress": sour_address,
+          "Timestamp": json.Timestamp,
+          "Sequence": json.Sequence,
+          "created_at": created_at,
+          "Content": content,
+          'confirmed': false,
+          'Hash': hash,
+          "is_file": is_file,
+          "file_saved": file_saved,
+          "file": fileJson
+        })
+        yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+      } else {
+        //not CurrentSession: update unread_count
+        // state.Sessions[i].unread_count += 1
+      }
+      // state.Sessions[i].updated_at = created_at
+      // state.Sessions.sort((a, b) => (a.updated_at < b.updated_at) ? 1 : -1)
+
+      //tray blink
+      // ipcRenderer.send('synchronous-message', 'new-private-message')
+
+      //update db-message(confirmed)
+      // SQL = `UPDATE MESSAGES SET confirmed = true WHERE dest_address = '${sour_address}' AND hash IN (${Array2Str(json.PairHash)})`
+      // state.DB.run(SQL, err => {
+      //   if (err) {
+      //     console.log(err)
+      //   } else {
+      //     //update view-message(confirmed)
+      //     for (let i = state.Messages.length - 1; i >= 0; i--) {
+      //       if (state.Messages[i].confirmed == false && json.PairHash.includes(state.Messages[i].hash)) {
+      //         state.Messages[i].confirmed = true
+      //       }
+      //     }
+      //   }
+      // })
+    }
+
+
+    // try {
+    //   fileJson = JSON.parse(content)
+    //   //is a json
+    //   if (checkFileSchema(fileJson)) {
+    //     //is a file json
+    //     is_file = true
+    //     fileSHA1 = fileJson["SHA1"]
+    //     let filesql = `SELECT * FROM FILES WHERE sha1 = "${fileJson.SHA1}" AND saved = true`
+    //     state.DB.get(filesql, (err, item) => {
+    //       if (err) {
+    //         console.log(err)
+    //       } else {
+    //         if (item != null) {
+    //           file_saved = true
+    //         }
+    //         //update sql
+    //         sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
+    //           VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', ${readed}, ${is_file}, ${file_saved}, '${fileSHA1}')`
+    //       }
+    //     })
+    //   }
+    // } catch (e) {
+    //   console.log(e)
+    // }
+  }
+}
+
+export function* HandleFriendSync(action) {
+  let json = action.json
+
+  let sour_address = DeriveAddress(json.PublicKey)
+  //check message from my friend
+  let friends = yield select(state => state.avatar.get('Friends'))
+  if (!friends.includes(sour_address)) {
+    console.log('message is not from my friend...')
+    return
+  }
+
+  // let SQL = `SELECT * FROM MESSAGES WHERE dest_address = "${sour_address}" AND confirmed = false AND sequence > ${json.CurrentSequence} ORDER BY sequence ASC`
+  // state.DB.all(SQL, (err, items) => {
+  //   if (err) {
+  //     console.log(err)
+  //   } else {
+  //     let s = 0;
+  //     for (const item of items) {
+  //       DelayExec(s * MessageInterval).then(() => {
+  //         state.WS.send(item.json)
+  //       })
+  //       s = s + 1
+  //     }
+  //   }
+  // })
 }

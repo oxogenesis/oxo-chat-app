@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, TextInput, Button, FlatList } from 'react-native'
+import { View, Text, TextInput, Button, FlatList, Alert } from 'react-native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
@@ -17,7 +17,7 @@ class SettingNetworkScreen extends React.Component {
     let regx = /^ws[s]?:\/\/.+/
     let rs = regx.exec(host_input)
     if (rs == null) {
-      this.setState({ error_msg: 'address invalid...' })
+      this.setState({ error_msg: '地址格式无效...' })
     } else {
       this.props.dispatch({
         type: actionType.avatar.addHost,
@@ -32,6 +32,18 @@ class SettingNetworkScreen extends React.Component {
       type: actionType.avatar.changeCurrentHost,
       host: host
     })
+  }
+
+  delHostAlert(host) {
+    Alert.alert(
+      '提示',
+      `确定要删除${host}吗？`,
+      [
+        { text: '确认', onPress: () => this.delHost(host) },
+        { text: '取消', style: 'cancel' },
+      ],
+      { cancelable: false }
+    )
   }
 
   delHost(host) {
@@ -76,7 +88,7 @@ class SettingNetworkScreen extends React.Component {
                   </View>
                   <View style={{ backgroundColor: "red", flex: 0.1 }} >
                     <Text style={my_styles.Link}
-                      onPress={() => this.delHost(item.Address)}>
+                      onPress={() => this.delHostAlert(item.Address)}>
                       {`删除`}
                     </Text>
                   </View>

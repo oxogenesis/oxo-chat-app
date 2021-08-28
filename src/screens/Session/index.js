@@ -3,6 +3,8 @@ import { View, Text, TextInput, Button, FlatList } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { timestamp_format, AddressToName } from '../../lib/Util'
+import { DefaultDivision } from '../../lib/Const'
+import { DHSequence } from '../../lib/OXO'
 import { actionType } from '../../redux/actions/actionType'
 
 import { connect } from 'react-redux'
@@ -11,121 +13,31 @@ import { connect } from 'react-redux'
 class SessionScreen extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { address: '', name: '', message_list: [], message: '' }
+    this.state = { address: '', name: '', message_list: [], message_input: '', error_msg: '' }
   }
 
-  loadMessageList() {
-    this.setState({
-      message_list: [
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 11,
-          Hash: '11',
-          Timestamp: 1628608850592,
-          Content: '111'
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 22,
-          Hash: '22',
-          Timestamp: 1628608850592,
-          Content: '222'
-        },
-        {
-          SourAddress: "",
-          Sequence: 88,
-          Hash: '88',
-          Timestamp: 1628608850592,
-          Content: 'aaa'
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 33,
-          Hash: '33',
-          Timestamp: 1628608850592,
-          Content: '333'
-        },
-        {
-          SourAddress: "",
-          Sequence: 89,
-          Hash: '89',
-          Timestamp: 1628608850592,
-          Content: 'bbb'
-        },
-        {
-          SourAddress: "",
-          Sequence: 90,
-          Hash: '90',
-          Timestamp: 1628608850592,
-          Content: 'ccc'
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 34,
-          Hash: '34',
-          Timestamp: 1628608850592,
-          Content: '444'
-        },
-        {
-          SourAddress: "",
-          Sequence: 91,
-          Hash: '91',
-          Timestamp: 1628608850592,
-          Content: 'ddd'
-        },
-        {
-          SourAddress: "",
-          Sequence: 92,
-          Hash: '92',
-          Timestamp: 1628608850592,
-          Content: 'eee'
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 35,
-          Hash: '35',
-          Timestamp: 1628608850592,
-          Content: '555'
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 36,
-          Hash: '36',
-          Timestamp: 1628608850592,
-          Content: '666'
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 37,
-          Hash: '37',
-          Timestamp: 1728708850592,
-          Content: `'999'
-          kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-          llllllllllllllllllllllllllllllllllllllllllll
-          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 38,
-          Hash: '38',
-          Timestamp: 1828808850592,
-          Content: `'999'
-          kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-          llllllllllllllllllllllllllllllllllllllllllll
-          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`
-        },
-        {
-          SourAddress: "oGmPAefRgXKwFptiXwmTZngX8mNVrikZ5z",
-          Sequence: 39,
-          Hash: '39',
-          Timestamp: 1928908850592,
-          Content: `'999'
-          kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-          llllllllllllllllllllllllllllllllllllllllllll
-          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`
-        }
-      ]
-    })
+  sendMessage() {
+    let timestamp = Date.now()
+    let message_input = this.state.message_input.trim()
+    if (message_input == "") {
+      this.setState({ error_msg: '消息不能为空...' })
+    } else {
+      let ecdh_sequence = DHSequence(DefaultDivision, timestamp, this.props.avatar.get("Address"), this.state.address)
+      let current_session = this.props.avatar.get("CurrentSession")
+      console.log(current_session)
+      console.log(ecdh_sequence)
+      if (ecdh_sequence != current_session.EcdhSequence) {
+        this.setState({ error_msg: '握手未完成...' })
+      } else {
+        this.props.dispatch({
+          type: actionType.avatar.SendFriendMessage,
+          address: this.state.address,
+          message: message_input,
+          timestamp: timestamp
+        })
+        this.setState({ message_input: '', error_msg: '' })
+      }
+    }
   }
 
   componentDidMount() {
@@ -134,7 +46,7 @@ class SessionScreen extends React.Component {
       this.setState({ name: name, address: this.props.route.params.address })
       this.props.navigation.setOptions({ title: name })
       this.props.dispatch({
-        type: actionType.avatar.FriendSessionHandshake,
+        type: actionType.avatar.LoadCurrentSession,
         address: this.props.route.params.address
       })
       this.props.dispatch({
@@ -153,28 +65,32 @@ class SessionScreen extends React.Component {
       <View style={{ flexDirection: "column" }}>
         <View style={{ flexDirection: "row-reverse" }}>
           {
-            this.props.avatar.get("CurrentSession") == null ?
+            this.props.avatar.get("CurrentSession").AesKey ?
               <Button
                 style={{ flex: 0.2 }}
                 title="发送"
-                disabled={true}
-                onPress={() => this.loadMessageList()}
+                onPress={() => this.sendMessage()}
               />
               :
               <Button
                 style={{ flex: 0.2 }}
                 title="发送"
-                onPress={() => this.loadMessageList()}
+                disabled={true}
               />
           }
           <TextInput
             placeholder="消息"
-            value={this.state.message}
+            value={this.state.message_input}
             multiline={true}
             style={{ backgroundColor: "yellow", flex: 1 }}
-            onChangeText={text => this.setState({ message: text })}
+            onChangeText={text => this.setState({ message_input: text })}
           />
         </View>
+
+        {
+          this.state.error_msg.length > 0 &&
+          <Text>{this.state.error_msg}</Text>
+        }
 
         <View style={{ paddingBottom: 100 }}>
           <FlatList

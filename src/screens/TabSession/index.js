@@ -49,7 +49,7 @@ class TabSessionScreen extends React.Component {
                         </Text>
                       </View>
                     </View>
-                    <Text ellipsizeMode={"tail"} numberOfLines={2}>
+                    <Text style={{ backgroundColor: "green", flex: 0.5 }} ellipsizeMode={"tail"} numberOfLines={2}>
                       {`${item.Content}`}
                     </Text>
                   </View>

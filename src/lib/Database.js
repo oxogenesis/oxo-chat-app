@@ -741,7 +741,7 @@ VALUES ('${address}', ${timestamp}, ${timestamp})`
     })
   }
 
-  loadFollows() {
+  async loadFollows() {
     let sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {

@@ -43,10 +43,11 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.UnmarkBulletin, avatarActions.UnmarkBulletin)
   
   //Chat
-  yield takeEvery(actionType.avatar.FriendSessionHandshake, avatarActions.FriendSessionHandshake)
+  yield takeEvery(actionType.avatar.LoadCurrentSession, avatarActions.LoadCurrentSession)
   yield takeEvery(actionType.avatar.LoadCurrentMessageList, avatarActions.LoadCurrentMessageList)
   yield takeEvery(actionType.avatar.HandleFriendECDH, avatarActions.HandleFriendECDH)
   yield takeEvery(actionType.avatar.HandleFriendMessage, avatarActions.HandleFriendMessage)
   yield takeEvery(actionType.avatar.SaveFriendMessage, avatarActions.SaveFriendMessage)
   yield takeEvery(actionType.avatar.HandleFriendSync, avatarActions.HandleFriendSync)
+  yield takeEvery(actionType.avatar.SendFriendMessage, avatarActions.SendFriendMessage)
 }

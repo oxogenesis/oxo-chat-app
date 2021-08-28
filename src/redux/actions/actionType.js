@@ -64,11 +64,12 @@ export const actionType = {
     setSessionMap: 'SET_SESSION_MAP',
     setCurrentSession: 'SET_CURRENT_SESSION',
     setCurrentMessageList: 'SET_CURRENT_MESSAGE_LIST',
-    FriendSessionHandshake: 'FRIEND_SESSION_HANDSHAKE',
+    LoadCurrentSession: 'LOAD_CURRENT_SESSION',
     LoadCurrentMessageList: 'LOAD_CURRENT_MESSAGE_LIST',
     HandleFriendECDH: 'HANDLE_FRIEND_ECDH',
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
-    HandleFriendSync: 'HANDLE_FRIEND_SYNC'
+    HandleFriendSync: 'HANDLE_FRIEND_SYNC',
+    SendFriendMessage: 'SEND_FRIEND_MESSAGE'
   }
 }

@@ -5,7 +5,7 @@ import { eventChannel, END } from 'redux-saga'
 
 import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema } from '../../lib/MessageSchemaVerifier'
-import { DHSequence, AesEncrypt, AesDecrypt, } from '../../lib/OXO'
+import { DHSequence, AesEncrypt, AesDecrypt } from '../../lib/OXO'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
 import Database from '../../lib/Database'
@@ -238,8 +238,8 @@ export function* enableAvatar(action) {
   address_map[address] = action.name
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
 
-  let friends = yield call([db, db.loadFriends])
-  yield put({ type: actionType.avatar.setFriends, friends: friends })
+  let friend_list = yield call([db, db.loadFriends])
+  yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
   let follow_list = yield call([db, db.loadFollows])
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
@@ -261,15 +261,17 @@ export function* enableAvatar(action) {
   let recent_message_receive = yield call([db, db.loadRecentMessageReceive])
   let recent_message_send = yield call([db, db.loadRecentMessageSend])
   let session_map = {}
-  follow_list.forEach(follow => {
+  friend_list.forEach(follow => {
     session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '' }
   })
   recent_message_receive.forEach(message => {
-    session_map[message.Address].Timestamp = message.Timestamp
-    session_map[message.Address].Content = message.Content
+    if (message && session_map[message.Address]) {
+      session_map[message.Address].Timestamp = message.Timestamp
+      session_map[message.Address].Content = message.Content
+    }
   })
   recent_message_send.forEach(message => {
-    if (message.Timestamp > session_map[message.Address].Timestamp) {
+    if (message && session_map[message.Address] && message.Timestamp > session_map[message.Address].Timestamp) {
       session_map[message.Address].Timestamp = message.Timestamp
       session_map[message.Address].Content = message.Content
     }
@@ -357,9 +359,9 @@ export function* saveAddressName(action) {
 export function* addFriend(action) {
   let db = yield select(state => state.avatar.get('Database'))
   yield call([db, db.addFriend], action.address)
-  let friends = yield select(state => state.avatar.get('Friends'))
-  friends.push(action.address)
-  yield put({ type: actionType.avatar.setFriends, friends: friends })
+  let friend_list = yield select(state => state.avatar.get('Friends'))
+  friend_list.push(action.address)
+  yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
   //刷新当前AddressMark
   let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
@@ -371,9 +373,9 @@ export function* addFriend(action) {
 export function* delFriend(action) {
   let db = yield select(state => state.avatar.get('Database'))
   yield call([db, db.delFriend], action.address)
-  let friends = yield select(state => state.avatar.get('Friends'))
-  friends = friends.filter((item) => item != action.address)
-  yield put({ type: actionType.avatar.setFriends, friends: friends })
+  let friend_list = yield select(state => state.avatar.get('Friends'))
+  friend_list = friend_list.filter((item) => item != action.address)
+  yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
   //刷新当前AddressMark
   let current_address_mark = yield select(state => state.avatar.get('CurrentAddressMark'))
@@ -436,7 +438,7 @@ export function* delHost(action) {
   let db = yield select(state => state.avatar.get('Database'))
   yield call([db, db.delHost], action.host)
   let hosts = yield select(state => state.avatar.get('Hosts'))
-  hosts = hosts.filter((item) => item != action.host)
+  hosts = hosts.filter((item) => item.Address != action.host)
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 }
 
@@ -713,21 +715,20 @@ export function* UnmarkBulletin(action) {
 }
 
 //Chat
-export function* FriendSessionHandshake(action) {
+export function* LoadCurrentSession(action) {
   yield put({ type: actionType.avatar.setCurrentSession })
   let db = yield select(state => state.avatar.get('Database'))
   let address = action.address
   let timestamp = Date.now()
   let self_address = yield select(state => state.avatar.get('Address'))
-  let sequence = DHSequence(DefaultDivision, timestamp, self_address, address)
+  let ecdh_sequence = DHSequence(DefaultDivision, timestamp, self_address, address)
 
   //fetch aes-Key according to (address+division+sequence)
-  let ecdh = yield call([db, db.loadFriendECDH], address, DefaultDivision, sequence)
-  // console.log(ecdh)
+  let ecdh = yield call([db, db.loadFriendECDH], address, DefaultDivision, ecdh_sequence)
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
       //aes ready
-      yield put({ type: actionType.avatar.setCurrentSession, address: address, sequence: ecdh.sequence, aes_key: ecdh.aes_key })
+      yield put({ type: actionType.avatar.setCurrentSession, address: address, ecdh_sequence: ecdh_sequence, aes_key: ecdh.aes_key })
       //handsake already done, ready to chat
     } else {
       //my-sk-pk exist, aes not ready
@@ -742,18 +743,27 @@ export function* FriendSessionHandshake(action) {
     let ecdh_pk = ecdh.generateKeys('hex')
     let ecdh_sk = ecdh.getPrivateKey('hex')
     let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-    let msg = MessageGenerator.genFriendECDHRequest(DefaultDivision, sequence, ecdh_pk, "", address, timestamp)
+    let msg = MessageGenerator.genFriendECDHRequest(DefaultDivision, ecdh_sequence, ecdh_pk, "", address, timestamp)
     // console.log(msg)
 
     //save my-sk-pk, self-not-ready-json
     let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, self_json)
-VALUES ('${address}', '${DefaultDivision}', ${sequence}, '${ecdh_sk}', '${msg}')`
+VALUES ('${address}', '${DefaultDivision}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
     let reuslt = yield call([db, db.doInsert], sql)
     // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
     // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.division, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
     if (reuslt.code != 0) {
       yield put({ type: actionType.avatar.SendMessage, message: msg })
     }
+  }
+
+  //fetch pre message
+  let sql = `SELECT * FROM MESSAGES WHERE dest_address = "${address}" ORDER BY sequence DESC`
+  let pre_message = yield call([db, db.getOne], sql)
+  if (pre_message == null) {
+    yield put({ type: actionType.avatar.setCurrentSession, address: address, hash: GenesisHash, sequence: 0 })
+  } else {
+    yield put({ type: actionType.avatar.setCurrentSession, address: address, hash: pre_message.hash, sequence: pre_message.sequence })
   }
 }
 
@@ -793,8 +803,8 @@ export function* HandleFriendECDH(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   // yield call([db, db.addFriend], action.address)
-  let friends = yield select(state => state.avatar.get('Friends'))
-  if (!friends.includes(address)) {
+  let friend_list = yield select(state => state.avatar.get('Friends'))
+  if (!friend_list.includes(address)) {
     console.log('message is not from my friend...')
     //Strangers
     // while (state.Strangers.size >= 10) {
@@ -853,8 +863,8 @@ VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${j
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
         let current_session = yield select(state => state.avatar.get('CurrentSession'))
-        if (current_session && address == current_session.Address) {
-          yield put({ type: actionType.avatar.setCurrentSession, address: address, sequence: json.Sequence, aes_key: aes_key })
+        if (address == current_session.Address) {
+          yield put({ type: actionType.avatar.setCurrentSession, address: address, ecdh_sequence: json.Sequence, aes_key: aes_key })
         }
       }
     }
@@ -869,8 +879,8 @@ export function* HandleFriendMessage(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   //check message from my friend
-  let friends = yield select(state => state.avatar.get('Friends'))
-  if (!friends.includes(sour_address)) {
+  let friend_list = yield select(state => state.avatar.get('Friends'))
+  if (!friend_list.includes(sour_address)) {
     console.log('message is not from my friend...')
     return
   }
@@ -935,7 +945,7 @@ export function* SaveFriendMessage(action) {
 
     //save message
     let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
-      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}',' ${is_file}', '${file_saved}', '${fileSHA1}')`
+      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}')`
 
     let reuslt = yield call([db, db.doInsert], sql)
     if (reuslt.code != 0) {
@@ -949,7 +959,7 @@ export function* SaveFriendMessage(action) {
       if (current_session && sour_address == current_session.Address) {
         //CurrentSession: show message
         let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
-        message_list.push({
+        message_list.unshift({
           "SourAddress": sour_address,
           "Timestamp": json.Timestamp,
           "Sequence": json.Sequence,
@@ -966,6 +976,12 @@ export function* SaveFriendMessage(action) {
         //not CurrentSession: update unread_count
         // state.Sessions[i].unread_count += 1
       }
+
+      let session_map = yield select(state => state.avatar.get('SessionMap'))
+      session_map[sour_address].Timestamp = json.Timestamp
+      session_map[sour_address].Content = content
+      yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+
       // state.Sessions[i].updated_at = created_at
       // state.Sessions.sort((a, b) => (a.updated_at < b.updated_at) ? 1 : -1)
 
@@ -1021,8 +1037,8 @@ export function* HandleFriendSync(action) {
 
   let sour_address = DeriveAddress(json.PublicKey)
   //check message from my friend
-  let friends = yield select(state => state.avatar.get('Friends'))
-  if (!friends.includes(sour_address)) {
+  let friend_list = yield select(state => state.avatar.get('Friends'))
+  if (!friend_list.includes(sour_address)) {
     console.log('message is not from my friend...')
     return
   }
@@ -1041,4 +1057,55 @@ export function* HandleFriendSync(action) {
   //     }
   //   }
   // })
+}
+
+export function* SendFriendMessage(action) {
+  let dest_address = action.address
+  let timestamp = action.timestamp
+  let db = yield select(state => state.avatar.get('Database'))
+  let current_session = yield select(state => state.avatar.get('CurrentSession'))
+
+  //encrypt content
+  let content = AesEncrypt(action.message, current_session.AesKey)
+
+  let sequence = current_session.Sequence + 1
+  let pair_hash = []
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genFriendMessage(sequence, current_session.Hash, pair_hash, content, dest_address, timestamp)
+  let hash = quarterSHA512(msg)
+  let is_file = 'FALSE'
+  let file_saved = 'FALSE'
+  let fileSHA1 = null
+
+  let sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
+VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${fileSHA1}')`
+  let reuslt = yield call([db, db.doInsert], sql)
+  if (reuslt.code != 0) {
+    yield put({ type: actionType.avatar.SendMessage, message: msg })
+
+    if (dest_address == current_session.Address) {
+      //CurrentSession: show message
+      let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+      message_list.unshift({
+        "SourAddress": "",
+        "Timestamp": timestamp,
+        "Sequence": sequence,
+        "created_at": timestamp,
+        "Content": action.message,
+        'confirmed': false,
+        'Hash': hash,
+        "is_file": is_file,
+        "file_saved": file_saved
+      })
+      yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+    }
+
+    yield put({ type: actionType.avatar.setCurrentSession, address: dest_address, sequence: sequence, hash: hash })
+
+    //update session map
+    let session_map = yield select(state => state.avatar.get('SessionMap'))
+    session_map[dest_address].Timestamp = timestamp
+    session_map[dest_address].Content = content
+    yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+  }
 }

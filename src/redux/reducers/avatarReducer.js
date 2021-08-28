@@ -36,7 +36,7 @@ function initialState() {
       SessionList: [],
       UnreadMessage: 0,
       UnreadSessionMap: {},
-      CurrentSession: null,
+      CurrentSession: {},
       CurrentMessageList: []
     }
   )
@@ -75,7 +75,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
-    .set('CurrentSession', null)
+    .set('CurrentSession', {})
     .set('CurrentMessageList', [])
     .set('Setting', {})
 }
@@ -112,7 +112,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
-    .set('CurrentSession', null)
+    .set('CurrentSession', {})
     .set('CurrentMessageList', [])
     .set('Setting', {})
 }
@@ -137,7 +137,7 @@ reducer.prototype[actionType.avatar.setCurrentAddressMark] = (state, action) => 
 }
 
 reducer.prototype[actionType.avatar.setFriends] = (state, action) => {
-  return state.set('Friends', action.friends)
+  return state.set('Friends', action.friend_list)
 }
 
 reducer.prototype[actionType.avatar.setFollows] = (state, action) => {
@@ -233,9 +233,19 @@ reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
-  let session = null
+  let session = state.get('CurrentSession')
   if (action.address != null) {
-    session = { Address: action.address, Sequence: action.sequence, AesKey: action.aes_key }
+    session.Address = action.address
+    if (action.sequence != null) {
+      session.Sequence = action.sequence
+      session.Hash = action.hash
+    }
+    if (action.aes_key != null) {
+      session.AesKey = action.aes_key
+      session.EcdhSequence = action.ecdh_sequence
+    }
+  } else {
+    session = {}
   }
   return state.set('CurrentSession', session)
 }

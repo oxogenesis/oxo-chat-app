@@ -99,4 +99,19 @@ export default class MessageGenerator {
     return JSON.stringify(this.signJson(json))
   }
 
+  genFriendMessage(sequence, pre_hash, pair_hash, content, dest_address, timestamp) {
+    let json = {
+      "Action": ActionCode.ChatMessage,
+      "Sequence": sequence,
+      "PreHash": pre_hash,
+      "PairHash": pair_hash,
+      "Content": content,
+      "To": dest_address,
+      "Timestamp": timestamp,
+      "PublicKey": this.PublicKey,
+    }
+    console.log(json)
+    return JSON.stringify(this.signJson(json))
+  }
+
 }

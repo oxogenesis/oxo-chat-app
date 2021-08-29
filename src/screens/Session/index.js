@@ -82,7 +82,7 @@ class SessionScreen extends React.Component {
             placeholder="消息"
             value={this.state.message_input}
             multiline={true}
-            style={{ backgroundColor: "yellow", flex: 1 }}
+            style={{ flex: 1 }}
             onChangeText={text => this.setState({ message_input: text })}
           />
         </View>
@@ -107,10 +107,19 @@ class SessionScreen extends React.Component {
                       item.SourAddress == this.state.address ?
                         <View style={{ flexDirection: "row" }} >
                           <View style={{ flex: 0.8 }}>
-                            <Text style={{ color: 'grey' }}>
-                              {`${this.state.name}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
-                            </Text>
-                            <Text>{`${item.Content}`}</Text>
+                            <View>
+                              <Text style={{ color: 'grey' }}>
+                                {`${this.state.name}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
+                              </Text>
+                              <View style={{ flexDirection: "row" }} >
+                                {
+                                  item.Confirmed ?
+                                    <Text style={{ backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                    :
+                                    <Text style={{ backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                }
+                              </View>
+                            </View>
                           </View>
                           <View style={{ flex: 0.2 }}>
                           </View>
@@ -119,11 +128,20 @@ class SessionScreen extends React.Component {
                         <View style={{ flexDirection: "row" }} >
                           <View style={{ flex: 0.2 }}>
                           </View>
-                          <View style={{ flex: 0.8 }}>
-                            <Text style={{ color: 'grey', textAlign: "right" }}>
-                              {`${this.props.avatar.get('Name')}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
-                            </Text>
-                            <Text style={{ textAlign: "right" }}>{`${item.Content}`}</Text>
+                          <View style={{ flex: 0.8, flexDirection: "row-reverse" }}>
+                            <View>
+                              <Text style={{ color: 'grey', textAlign: "right" }}>
+                                {`${this.props.avatar.get('Name')}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
+                              </Text>
+                              <View style={{ flexDirection: "row-reverse" }} >
+                                {
+                                  item.Confirmed ?
+                                    <Text style={{ textAlign: "auto", backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                    :
+                                    <Text style={{ textAlign: "auto", backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                }
+                              </View>
+                            </View>
                           </View>
                         </View>
                     }

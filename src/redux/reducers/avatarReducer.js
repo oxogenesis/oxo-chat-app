@@ -31,13 +31,15 @@ function initialState() {
       CurrentBulletin: null,
       QuoteList: [],
       QuoteWhiteList: [],
+      CountUnreadBulletin: 0,
 
       SessionMap: {},
       SessionList: [],
       UnreadMessage: 0,
       UnreadSessionMap: {},
       CurrentSession: {},
-      CurrentMessageList: []
+      CurrentMessageList: [],
+      CountUnreadMessage: 0
     }
   )
 }
@@ -71,12 +73,14 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('CountUnreadBulletin', 0)
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', {})
     .set('CurrentMessageList', [])
+    .set('CountUnreadMessage', 0)
     .set('Setting', {})
 }
 
@@ -108,12 +112,14 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('CountUnreadBulletin', 0)
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', {})
     .set('CurrentMessageList', [])
+    .set('CountUnreadMessage', 0)
     .set('Setting', {})
 }
 
@@ -220,6 +226,12 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
   return state.set('QuoteList', tmp_quote_list)
 }
 
+reducer.prototype[actionType.avatar.setCountUnreadBulletin] = (state, action) => {
+  let count = state.get('CountUnreadBulletin')
+  count += action.amount
+  return state.set('CountUnreadBulletin', count)
+}
+
 //Chat
 reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
   let session_list = Object.values(action.session_map)
@@ -252,4 +264,10 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
 
 reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => {
   return state.set('CurrentMessageList', action.message_list)
+}
+
+reducer.prototype[actionType.avatar.setCountUnreadMessage] = (state, action) => {
+  let count = state.get('CountUnreadMessage')
+  count += action.amount
+  return state.set('CountUnreadMessage', count)
 }

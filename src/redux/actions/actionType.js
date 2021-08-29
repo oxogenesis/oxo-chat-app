@@ -59,6 +59,8 @@ export const actionType = {
     // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
     PublishBulletin: 'PUBLISH_BULLETIN',
+    setCountUnreadBulletin: 'SET_COUNT_UNREAD_BULLETIN',
+
 
     //Chat
     setSessionMap: 'SET_SESSION_MAP',
@@ -70,6 +72,7 @@ export const actionType = {
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
     HandleFriendSync: 'HANDLE_FRIEND_SYNC',
+    setCountUnreadMessage: 'SET_COUNT_UNREAD_MESSAGE',
     SendFriendMessage: 'SEND_FRIEND_MESSAGE'
   }
 }

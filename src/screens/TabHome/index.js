@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
+import { useNavigation, useRoute } from '@react-navigation/native'
 import TabSessionScreen from '../TabSession'
 import TabBulletinScreen from '../TabBulletin'
 import TabAddressBookScreen from '../TabAddressBook'
 import TabSettingScreen from '../TabSetting'
 
 import IconAnt from 'react-native-vector-icons/AntDesign'
+import { connect } from 'react-redux'
 
 const Tab = createBottomTabNavigator()
 
@@ -24,7 +26,7 @@ class TabHomeScreen extends React.Component {
         }}>
         <Tab.Screen name="TabSession" component={TabSessionScreen} options={{
           tabBarLabel: '聊天',
-          tabBarBadge: 8,
+          tabBarBadge: this.props.avatar.get("CountUnreadMessage"),
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'message1'}
@@ -34,6 +36,7 @@ class TabHomeScreen extends React.Component {
         }} />
         <Tab.Screen name="TabBulletin" component={TabBulletinScreen} options={{
           tabBarLabel: '公告',
+          tabBarBadge: this.props.avatar.get("CountUnreadBulletin"),
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'notification'}
@@ -64,4 +67,15 @@ class TabHomeScreen extends React.Component {
   }
 }
 
-export default TabHomeScreen
+const ReduxTabHomeScreen = connect((state) => {
+  return {
+    avatar: state.avatar
+  }
+})(TabHomeScreen)
+
+//export default TabHomeScreen
+export default function (props) {
+  const navigation = useNavigation()
+  const route = useRoute()
+  return <ReduxTabHomeScreen{...props} navigation={navigation} route={route} />
+}

@@ -315,7 +315,6 @@ export function* addAddressMark(action) {
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
 }
 
-
 export function* delAddressMark(action) {
   let db = yield select(state => state.avatar.get('Database'))
   yield call([db, db.delAddressMark], action.address)
@@ -775,14 +774,15 @@ export function* LoadCurrentMessageList(action) {
   let message_list = []
   let current_sequence = 0
   items.forEach(item => {
+    let confirmed = (item.confirmed == "TRUE")
     message_list.push({
       "SourAddress": item.sour_address,
       "Timestamp": item.timestamp,
       "Sequence": item.sequence,
       "created_at": item.created_at,
       "Content": item.content,
-      'confirmed': item.false,
-      'Hash': item.hash
+      "Confirmed": confirmed,
+      "Hash": item.hash
     })
     if (item.sour_address == action.address && item.sequence > current_sequence) {
       current_sequence = item.sequence
@@ -949,13 +949,6 @@ export function* SaveFriendMessage(action) {
 
     let reuslt = yield call([db, db.doInsert], sql)
     if (reuslt.code != 0) {
-      // yield put({ type: actionType.avatar.SendMessage, message: msg })
-      // let i = state.Sessions.length - 1
-      // for (; i >= 0; i--) {
-      //   if (state.Sessions[i].type == state.SessionType.Private && state.Sessions[i].session == sour_address) {
-      //     break
-      //   }
-      // }
       if (current_session && sour_address == current_session.Address) {
         //CurrentSession: show message
         let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
@@ -965,8 +958,8 @@ export function* SaveFriendMessage(action) {
           "Sequence": json.Sequence,
           "created_at": created_at,
           "Content": content,
-          'confirmed': false,
-          'Hash': hash,
+          "Confirmed": false,
+          "Hash": hash,
           "is_file": is_file,
           "file_saved": file_saved,
           "file": fileJson
@@ -982,26 +975,24 @@ export function* SaveFriendMessage(action) {
       session_map[sour_address].Content = content
       yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 
-      // state.Sessions[i].updated_at = created_at
-      // state.Sessions.sort((a, b) => (a.updated_at < b.updated_at) ? 1 : -1)
-
       //tray blink
       // ipcRenderer.send('synchronous-message', 'new-private-message')
 
       //update db-message(confirmed)
-      // SQL = `UPDATE MESSAGES SET confirmed = true WHERE dest_address = '${sour_address}' AND hash IN (${Array2Str(json.PairHash)})`
-      // state.DB.run(SQL, err => {
-      //   if (err) {
-      //     console.log(err)
-      //   } else {
-      //     //update view-message(confirmed)
-      //     for (let i = state.Messages.length - 1; i >= 0; i--) {
-      //       if (state.Messages[i].confirmed == false && json.PairHash.includes(state.Messages[i].hash)) {
-      //         state.Messages[i].confirmed = true
-      //       }
-      //     }
-      //   }
-      // })
+      sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN (${Array2Str(json.PairHash)})`
+      reuslt = yield call([db, db.doUpdate], sql)
+      if (reuslt.code != 0) {
+        //update view-message(confirmed)
+        if (current_session && sour_address == current_session.Address) {
+          let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+          for (let i = message_list.length - 1; i >= 0; i--) {
+            if (json.PairHash.includes(message_list[i].Hash)) {
+              message_list[i].Confirmed = true
+            }
+          }
+          yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+        }
+      }
     }
 
 
@@ -1069,7 +1060,16 @@ export function* SendFriendMessage(action) {
   let content = AesEncrypt(action.message, current_session.AesKey)
 
   let sequence = current_session.Sequence + 1
+
   let pair_hash = []
+  let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${dest_address}' AND confirmed = 'FALSE' ORDER BY sequence ASC LIMIT 8`
+  let items = yield call([db, db.getAll], sql)
+  if (items.length != 0) {
+    items.forEach(item => {
+      pair_hash.push(item.hash)
+    })
+  }
+
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genFriendMessage(sequence, current_session.Hash, pair_hash, content, dest_address, timestamp)
   let hash = quarterSHA512(msg)
@@ -1077,9 +1077,9 @@ export function* SendFriendMessage(action) {
   let file_saved = 'FALSE'
   let fileSHA1 = null
 
-  let sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
+  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
 VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${fileSHA1}')`
-  let reuslt = yield call([db, db.doInsert], sql)
+  reuslt = yield call([db, db.doInsert], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })
 
@@ -1092,8 +1092,8 @@ VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.mes
         "Sequence": sequence,
         "created_at": timestamp,
         "Content": action.message,
-        'confirmed': false,
-        'Hash': hash,
+        "Confirmed": false,
+        "Hash": hash,
         "is_file": is_file,
         "file_saved": file_saved
       })
@@ -1105,7 +1105,23 @@ VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.mes
     //update session map
     let session_map = yield select(state => state.avatar.get('SessionMap'))
     session_map[dest_address].Timestamp = timestamp
-    session_map[dest_address].Content = content
+    session_map[dest_address].Content = action.message
     yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+
+    //update db-message(confirmed)
+    sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE sour_address = '${dest_address}' AND hash IN (${Array2Str(pair_hash)})`
+    reuslt = yield call([db, db.doUpdate], sql)
+    if (reuslt.code != 0) {
+      //update view-message(confirmed)
+      if (current_session && dest_address == current_session.Address) {
+        let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+        for (let i = message_list.length - 1; i >= 0; i--) {
+          if (pair_hash.includes(message_list[i].Hash)) {
+            message_list[i].Confirmed = true
+          }
+        }
+        yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+      }
+    }
   }
 }

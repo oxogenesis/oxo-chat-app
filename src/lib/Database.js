@@ -262,6 +262,7 @@ export default class Database {
               let item = results.rows.item(i)
               items.push(item)
             }
+            console.log(`#####################${items.length}`)
             console.log(items)
             resolve(items)
           })

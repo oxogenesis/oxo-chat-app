@@ -11,6 +11,8 @@ import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
 
+const SettingJson = { "BulletinCacheSize": 0 }
+
 function DelayExec(ms) {
   return new Promise(resolve => {
     setTimeout(resolve, ms)
@@ -231,20 +233,49 @@ export function* enableAvatar(action) {
   yield call([db, db.initDB], address, '0.0.1', address, 0)
   yield put({ type: actionType.avatar.setDatabase, db: db })
 
-  let setting = yield call([db, db.loadSetting])
+  let sql = 'SELECT * FROM SETTINGS LIMIT 1'
+  let setting = yield call([db, db.getOne], sql)
+  if (setting != null) {
+    setting = JSON.parse(setting)
+  } else {
+    setting = SettingJson
+  }
   yield put({ type: actionType.avatar.setSetting, setting: setting })
 
-  let [address_map, address_array] = yield call([db, db.loadAddressBook])
+  sql = 'SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC'
+  let items = yield call([db, db.getAll], sql)
+  let address_map = {}
+  items.forEach(item => {
+    address_map[item.address] = item.name
+  })
   address_map[address] = action.name
-  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
+  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 
-  let friend_list = yield call([db, db.loadFriends])
+  sql = 'SELECT * FROM FRIENDS ORDER BY updated_at DESC'
+  items = yield call([db, db.getAll], sql)
+  let friend_list = []
+  items.forEach(item => {
+    friend_list.push(item.address)
+  })
   yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
-  let follow_list = yield call([db, db.loadFollows])
+  sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
+  items = yield call([db, db.getAll], sql)
+  let follow_list = []
+  items.forEach(item => {
+    follow_list.push(item.address)
+  })
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
 
-  let hosts = yield call([db, db.loadHosts])
+  sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
+  items = yield call([db, db.getAll], sql)
+  let hosts = []
+  items.forEach(item => {
+    hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
+  })
+  if (hosts.length == 0) {
+    hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
+  }
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 
   let current_host = hosts[0].Address || DefaultHost
@@ -258,8 +289,28 @@ export function* enableAvatar(action) {
   yield put({ type: actionType.avatar.UpdateFollowBulletin })
 
   // LoadSessionList
-  let recent_message_receive = yield call([db, db.loadRecentMessageReceive])
-  let recent_message_send = yield call([db, db.loadRecentMessageSend])
+  sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
+  let recent_message_receive = []
+  items = yield call([db, db.getAll], sql)
+  items.forEach(message => {
+    recent_message_receive.push({
+      "Address": message.sour_address,
+      'Timestamp': message.timestamp,
+      'Content': message.content
+    })
+  })
+
+  sql = `SELECT * FROM MESSAGES GROUP BY dest_address`
+  let recent_message_send = []
+  items = yield call([db, db.getAll], sql)
+  items.forEach(message => {
+    recent_message_send.push({
+      "Address": message.dest_address,
+      'Timestamp': message.timestamp,
+      'Content': message.content
+    })
+  })
+
   let session_map = {}
   friend_list.forEach(follow => {
     session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '' }
@@ -285,7 +336,8 @@ export function* disableAvatar() {
   let follow_list = yield select(state => state.avatar.get('Follows'))
   // 清理多余缓存公告
   if (setting.BulletinCacheSize != 0) {
-    yield call([db, db.limitBulletinCache], setting.BulletinCacheSize, Array2Str(follow_list))
+    //TODO
+    // yield call([db, db.limitBulletinCache], setting.BulletinCacheSize, Array2Str(follow_list))
   }
   yield call([db, db.closeDB])
   yield put({ type: actionType.avatar.resetAvatar })
@@ -296,7 +348,8 @@ export function* setBulletinCacheSize(action) {
   let setting = yield select(state => state.avatar.get('Setting'))
   setting.BulletinCacheSize = action.cache_size
   console.log(setting)
-  yield call([db, db.saveSetting], setting)
+  let sql = `UPDATE SETTINGS SET settings = ${JSON.stringify(setting)} WHERE updated_at = "${Date.now()}"`
+  yield call([db, db.runSQL], sql)
   yield put({ type: actionType.avatar.setSetting, setting: setting })
 }
 
@@ -304,60 +357,40 @@ export function* setBulletinCacheSize(action) {
 export function* addAddressMark(action) {
   let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.addAddressMark], action.address, action.name, timestamp)
-  let address_array = yield select(state => state.avatar.get('AddressArray'))
+  let sql = `INSERT INTO ADDRESS_MARKS (address, name, created_at, updated_at)
+VALUES ('${action.address}', '${action.name}', ${timestamp}, ${timestamp})`
+  yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
-  let addressMark = { Address: action.address, Name: action.name, UpdatedAt: timestamp }
-
   address_map[action.address] = action.name
-  address_array.push(addressMark)
-
-  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
+  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 }
 
 export function* delAddressMark(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.delAddressMark], action.address)
-  let address_array = yield select(state => state.avatar.get('AddressArray'))
+  let sql = `DELETE FROM ADDRESS_MARKS WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
-
   address_map[action.address] = null
-  let tmp = []
-  address_array.forEach(am => {
-    if (am.Address != action.address) {
-      tmp.push(am)
-    }
-  })
-  address_array = tmp
-
-  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
+  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 }
 
 export function* saveAddressName(action) {
   let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.saveAddressName], action.address, action.name, timestamp)
-  let address_array = yield select(state => state.avatar.get('AddressArray'))
+  let sql = `UPDATE ADDRESS_MARKS SET name = '${action.name}', updated_at = ${timestamp} WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
-  let addressMark = { Address: action.address, Name: action.name, UpdatedAt: timestamp }
-
   address_map[action.address] = action.name
-  let tmp = []
-  address_array.forEach(am => {
-    if (am.Address != action.address) {
-      tmp.push(am)
-    }
-  })
-  tmp.push(addressMark)
-  address_array = tmp
-
-  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map, address_array: address_array })
+  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 }
 
 // Friend
 export function* addFriend(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.addFriend], action.address)
+  let timestamp = Date.now()
+  let sql = `INSERT INTO FRIENDS (address, created_at, updated_at)
+VALUES ('${action.address}', ${timestamp}, ${timestamp})`
+  yield call([db, db.runSQL], sql)
   let friend_list = yield select(state => state.avatar.get('Friends'))
   friend_list.push(action.address)
   yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
@@ -371,7 +404,8 @@ export function* addFriend(action) {
 
 export function* delFriend(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.delFriend], action.address)
+  let sql = `DELETE FROM FRIENDS WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
   let friend_list = yield select(state => state.avatar.get('Friends'))
   friend_list = friend_list.filter((item) => item != action.address)
   yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
@@ -382,15 +416,19 @@ export function* delFriend(action) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
   }
 
-  //清楚聊天痕迹
-  yield call([db, db.clearFriendMessage], action.address)
-  yield call([db, db.clearFriendECDH], action.address)
+  //清除聊天痕迹
+  sql = `DELETE FROM MESSAGES WHERE sour_address = "${action.address}" OR dest_address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
+  sql = `DELETE FROM ECDHS WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
 }
 
 // Follow
 export function* addFollow(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.addFollow], action.address)
+  let timestamp = Date.now()
+  let sql = `INSERT INTO FOLLOWS (address, created_at, updated_at)VALUES ('${action.address}', ${timestamp}, ${timestamp})`
+  yield call([db, db.runSQL], sql)
   let follow_list = yield select(state => state.avatar.get('Follows'))
   follow_list.push(action.address)
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
@@ -402,12 +440,14 @@ export function* addFollow(action) {
   }
 
   //更新Bulletin的is_cache
-  yield call([db, db.updateIsCache], action.address, "FALSE")
+  sql = `UPDATE BULLETINS SET is_cache = "FALSE" WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
 }
 
 export function* delFollow(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.delFollow], action.address)
+  let sql = `DELETE FROM FOLLOWS WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
   let follow_list = yield select(state => state.avatar.get('Follows'))
   follow_list = follow_list.filter((item) => item != action.address)
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
@@ -419,15 +459,27 @@ export function* delFollow(action) {
   }
 
   //更新Bulletin的is_cache
-  yield call([db, db.updateIsCache], action.address, "TRUE")
+  sql = `UPDATE BULLETINS SET is_cache = "TRUE" WHERE address = "${action.address}"`
+  yield call([db, db.runSQL], sql)
 }
 
 // Host
 export function* addHost(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.addHost], action.host)
+  let timestamp = Date.now()
+  let sql = `INSERT INTO HOSTS (address, updated_at)
+VALUES ('${action.host}', ${timestamp})`
+  yield call([db, db.runSQL], sql)
 
-  let hosts = yield call([db, db.loadHosts])
+  sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
+  let items = yield call([db, db.getAll], sql)
+  let hosts = []
+  items.forEach(item => {
+    hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
+  })
+  if (hosts.length == 0) {
+    hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
+  }
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host })
@@ -435,7 +487,8 @@ export function* addHost(action) {
 
 export function* delHost(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.delHost], action.host)
+  let sql = `DELETE FROM HOSTS WHERE address = "${action.host}"`
+  yield call([db, db.runSQL], sql)
   let hosts = yield select(state => state.avatar.get('Hosts'))
   hosts = hosts.filter((item) => item.Address != action.host)
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
@@ -443,7 +496,8 @@ export function* delHost(action) {
 
 export function* changeCurrentHost(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.updateHost], action.host)
+  let sql = `UPDATE HOSTS SET updated_at = ${Date.now()} WHERE address = "${action.host}"`
+  yield call([db, db.runSQL], sql)
 
   let channel = yield select(state => state.avatar.get('WebSocketChannel'))
   let ws = yield select(state => state.avatar.get('WebSocket'))
@@ -468,7 +522,8 @@ export function* HandleBulletinRequest(action) {
   let json = action.json
   let address = DeriveAddress(json.PublicKey)
   let db = yield select(state => state.avatar.get('Database'))
-  let item = yield call([db, db.loadBulletinResponse], json.Address, json.Sequence)
+  let sql = `SELECT * FROM BULLETINS WHERE address = "${json.Address}" AND sequence = ${json.Sequence} LIMIT 1`
+  let item = yield call([db, db.getOne], sql)
   if (item != null) {
     let bulletin = JSON.parse(item.json)
     let msg = MessageGenerator.genObjectResponse(bulletin, address)
@@ -478,12 +533,33 @@ export function* HandleBulletinRequest(action) {
 
 export function* LoadCurrentBulletin(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  let bulletin = yield call([db, db.loadBulletinFromHash], action.hash)
-  console.log(`=================================================LoadCurrentBulletin`)
-  yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin })
-  yield call([db, db.updateBulletinViewAt], action.hash)
+  let sql = `SELECT * FROM BULLETINS WHERE hash = "${action.hash}" LIMIT 1`
+  let item = yield call([db, db.getOne], sql)
+  if (item != null) {
+    let bulletin = {
+      "Address": item.address,
+      "Timestamp": item.timestamp,
+      "CreateAt": item.created_at,
+      "Sequence": item.sequence,
+      "Content": item.content,
+      "Hash": item.hash,
+      "QuoteSize": item.quote_size,
+      "ViewAt": item.view_at,
+      "IsCache": item.is_cache,
+      "IsMark": item.is_mark,
 
-  if (bulletin != null) {
+      "PreHash": item.pre_hash,
+      "QuoteList": []
+    }
+    if (item.QuoteSize != 0) {
+      let json = JSON.parse(item.json)
+      bulletin.QuoteList = json.Quote
+    }
+
+    yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin })
+    sql = `UPDATE BULLETINS SET view_at = ${Date.now()} WHERE hash = "${action.hash}"`
+    yield call([db, db.runSQL], sql)
+
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
     for (const quote of bulletin.QuoteList) {
       if (!quote_white_list.includes(quote.Hash)) {
@@ -503,14 +579,20 @@ export function* LoadCurrentBulletin(action) {
 export function* clearBulletinCache() {
   let db = yield select(state => state.avatar.get('Database'))
   let follow_list = yield select(state => state.avatar.get('Follows'))
-  yield call([db, db.clearBulletinCache], Array2Str(follow_list))
+  let address_list = Array2Str(follow_list)
+  let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE"`
+  if (address_list != "") {
+    sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
+  }
+  yield call([db, db.runSQL], sql)
 }
 
 export function* PublishBulletin(action) {
   //console.log(`=================================================PublishBulletin`)
   let address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
-  let last_bulletin = yield call([db, db.loadLastBulletin], address)
+  let sql = `SELECT * FROM BULLETINS WHERE address = "${address}" ORDER BY sequence DESC LIMIT 1`
+  let last_bulletin = yield call([db, db.getOne], sql)
   let pre_hash = GenesisHash
   let next_sequence = 1
   if (last_bulletin != null) {
@@ -525,9 +607,9 @@ export function* PublishBulletin(action) {
   let hash = quarterSHA512(str_bulletin)
   let is_file = false
   let file_saved = false
-  let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+  sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
 VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${address}', 'FALSE')`
-  yield call([db, db.doInsert], sql)
+  yield call([db, db.runSQL], sql)
 
   yield put({ type: actionType.avatar.setQuoteList, quote_list: [] })
 
@@ -565,7 +647,7 @@ export function* SaveBulletin(action) {
 VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'FALSE')`
 
       //save bulletin
-      yield call([db, db.doInsert], sql)
+      yield call([db, db.runSQL], sql)
       let bulletin = {
         "Address": object_address,
         "Timestamp": bulletin_json.Timestamp,
@@ -595,7 +677,7 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
 VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
 
       //save bulletin
-      yield call([db, db.doInsert], sql)
+      yield call([db, db.runSQL], sql)
       let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
       if (current_bulletin == null) {
         yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
@@ -623,7 +705,20 @@ export function* LoadTabBulletinList(action) {
   address_list.push(self_address)
   sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   console.log(sql)
-  let tmp = yield call([db, db.loadBulletinBySql], sql)
+  let tmp = []
+  let items = yield call([db, db.getAll], sql)
+  items.forEach(bulletin => {
+    tmp.push({
+      "Address": bulletin.address,
+      "Timestamp": bulletin.timestamp,
+      "CreateAt": bulletin.created_at,
+      "Sequence": bulletin.sequence,
+      "Content": bulletin.content,
+      "Hash": bulletin.hash,
+      "QuoteSize": bulletin.quote_size,
+      "IsMark": bulletin.is_mark
+    })
+  })
   if (tmp.length != 0) {
     bulletin_list = bulletin_list.concat(tmp)
     yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: bulletin_list })
@@ -656,7 +751,20 @@ export function* LoadBulletinList(action) {
     sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY mark_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   }
 
-  let tmp = yield call([db, db.loadBulletinBySql], sql)
+  let tmp = []
+  let items = yield call([db, db.getAll], sql)
+  items.forEach(bulletin => {
+    tmp.push({
+      "Address": bulletin.address,
+      "Timestamp": bulletin.timestamp,
+      "CreateAt": bulletin.created_at,
+      "Sequence": bulletin.sequence,
+      "Content": bulletin.content,
+      "Hash": bulletin.hash,
+      "QuoteSize": bulletin.quote_size,
+      "IsMark": bulletin.is_mark
+    })
+  })
   if (tmp.length != 0) {
     bulletin_list = bulletin_list.concat(tmp)
     yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
@@ -672,10 +780,21 @@ export function* LoadBulletinList(action) {
   }
 }
 
-export function* UpdateFollowBulletin(action) {
+export function* UpdateFollowBulletin() {
   let db = yield select(state => state.avatar.get('Database'))
   let follow_list = yield select(state => state.avatar.get('Follows'))
-  let bulletin_list = yield call([db, db.loadRecentBulletin], follow_list)
+  let sql = `SELECT * FROM BULLETINS GROUP BY address`
+  let bulletin_list = []
+  let items = yield call([db, db.getAll], sql)
+  items.forEach(bulletin => {
+    if (follow_list.includes(bulletin.address)) {
+      bulletin_list.push({
+        "Address": bulletin.address,
+        'Sequence': bulletin.sequence
+      })
+    }
+  })
+
   let address_next_sequence = {}
   //set next sequence to 1
   for (let i = follow_list.length - 1; i >= 0; i--) {
@@ -703,13 +822,15 @@ export function* FetchBulletin(action) {
 
 export function* MarkBulletin(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.markBulletin], action.hash)
+  let sql = `UPDATE BULLETINS SET is_mark = "TRUE", mark_at = ${Date.now()} WHERE hash = "${action.hash}"`
+  yield call([db, db.runSQL], sql)
   yield put({ type: actionType.avatar.LoadCurrentBulletin, hash: action.hash })
 }
 
 export function* UnmarkBulletin(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  yield call([db, db.unmarkBulletin], action.hash)
+  let sql = `UPDATE BULLETINS SET is_mark = "FALSE" WHERE hash = "${action.hash}"`
+  yield call([db, db.runSQL], sql)
   yield put({ type: actionType.avatar.LoadCurrentBulletin, hash: action.hash })
 }
 
@@ -723,7 +844,8 @@ export function* LoadCurrentSession(action) {
   let ecdh_sequence = DHSequence(DefaultDivision, timestamp, self_address, address)
 
   //fetch aes-Key according to (address+division+sequence)
-  let ecdh = yield call([db, db.loadFriendECDH], address, DefaultDivision, ecdh_sequence)
+  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${DefaultDivision}" AND sequence = ${ecdh_sequence}`
+  let ecdh = yield call([db, db.getOne], sql)
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
       //aes ready
@@ -748,7 +870,7 @@ export function* LoadCurrentSession(action) {
     //save my-sk-pk, self-not-ready-json
     let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, self_json)
 VALUES ('${address}', '${DefaultDivision}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
-    let reuslt = yield call([db, db.doInsert], sql)
+    let reuslt = yield call([db, db.runSQL], sql)
     // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
     // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.division, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
     if (reuslt.code != 0) {
@@ -757,7 +879,7 @@ VALUES ('${address}', '${DefaultDivision}', ${ecdh_sequence}, '${ecdh_sk}', '${m
   }
 
   //fetch pre message
-  let sql = `SELECT * FROM MESSAGES WHERE dest_address = "${address}" ORDER BY sequence DESC`
+  sql = `SELECT * FROM MESSAGES WHERE dest_address = "${address}" ORDER BY sequence DESC`
   let pre_message = yield call([db, db.getOne], sql)
   if (pre_message == null) {
     yield put({ type: actionType.avatar.setCurrentSession, address: address, hash: GenesisHash, sequence: 0 })
@@ -802,7 +924,6 @@ export function* HandleFriendECDH(action) {
   let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  // yield call([db, db.addFriend], action.address)
   let friend_list = yield select(state => state.avatar.get('Friends'))
   if (!friend_list.includes(address)) {
     console.log('message is not from my friend...')
@@ -816,7 +937,8 @@ export function* HandleFriendECDH(action) {
 
   //check dh(my-sk-pk pair-pk aes-key)
 
-  let item = yield call([db, db.loadFriendECDH], address, json.Division, json.Sequence)
+  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${json.Division}" AND sequence = ${json.Sequence}`
+  let item = yield call([db, db.getOne], sql)
 
   if (item == null) {
     //self not ready, so pair could not be ready
@@ -830,9 +952,9 @@ export function* HandleFriendECDH(action) {
     let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
 
     //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
-    let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, public_key, aes_key, self_json)
+    sql = `INSERT INTO ECDHS (address, division, sequence, private_key, public_key, aes_key, self_json)
 VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
-    let reuslt = yield call([db, db.doInsert], sql)
+    let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
       yield put({ type: actionType.avatar.SendMessage, message: msg })
     }
@@ -850,16 +972,16 @@ VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${j
     if (json.Pair == "") {
       //pair not ready
       //save pair-pk, aes-key, self-ready-json
-      let sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
-      let reuslt = yield call([db, db.doUpdate], sql)
+      sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      let reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
       }
     } else {
       //pair ready
       //save pair-pk, aes-key, self-ready-json, pair-ready-json
-      let sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
-      let reuslt = yield call([db, db.doUpdate], sql)
+      sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      let reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
         let current_session = yield select(state => state.avatar.get('CurrentSession'))
@@ -947,7 +1069,7 @@ export function* SaveFriendMessage(action) {
     let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
       VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}')`
 
-    let reuslt = yield call([db, db.doInsert], sql)
+    let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
       if (current_session && sour_address == current_session.Address) {
         //CurrentSession: show message
@@ -980,7 +1102,7 @@ export function* SaveFriendMessage(action) {
 
       //update db-message(confirmed)
       sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN (${Array2Str(json.PairHash)})`
-      reuslt = yield call([db, db.doUpdate], sql)
+      reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         //update view-message(confirmed)
         if (current_session && sour_address == current_session.Address) {
@@ -1079,7 +1201,7 @@ export function* SendFriendMessage(action) {
 
   sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
 VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${fileSHA1}')`
-  reuslt = yield call([db, db.doInsert], sql)
+  reuslt = yield call([db, db.runSQL], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })
 
@@ -1110,7 +1232,7 @@ VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.mes
 
     //update db-message(confirmed)
     sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE sour_address = '${dest_address}' AND hash IN (${Array2Str(pair_hash)})`
-    reuslt = yield call([db, db.doUpdate], sql)
+    reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
       //update view-message(confirmed)
       if (current_session && dest_address == current_session.Address) {

@@ -151,7 +151,6 @@ class BulletinScreen extends React.Component {
     )
   }
 }
-import { from } from 'readable-stream'
 
 const ReduxBulletinScreen = connect((state) => {
   return {

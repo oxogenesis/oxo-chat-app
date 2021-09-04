@@ -36,7 +36,6 @@ class TabHomeScreen extends React.Component {
         }} />
         <Tab.Screen name="TabBulletin" component={TabBulletinScreen} options={{
           tabBarLabel: '公告',
-          tabBarBadge: this.props.avatar.get("CountUnreadBulletin"),
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'notification'}

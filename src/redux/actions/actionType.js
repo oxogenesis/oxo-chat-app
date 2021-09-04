@@ -59,7 +59,6 @@ export const actionType = {
     // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
     PublishBulletin: 'PUBLISH_BULLETIN',
-    setCountUnreadBulletin: 'SET_COUNT_UNREAD_BULLETIN',
 
 
     //Chat

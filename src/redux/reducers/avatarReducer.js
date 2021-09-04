@@ -31,7 +31,6 @@ function initialState() {
       CurrentBulletin: null,
       QuoteList: [],
       QuoteWhiteList: [],
-      CountUnreadBulletin: 0,
 
       SessionMap: {},
       SessionList: [],
@@ -73,14 +72,13 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
-    .set('CountUnreadBulletin', 0)
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', {})
     .set('CurrentMessageList', [])
-    .set('CountUnreadMessage', 0)
+    .set('CountUnreadMessage', null)
     .set('Setting', {})
 }
 
@@ -112,14 +110,13 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
-    .set('CountUnreadBulletin', 0)
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', {})
     .set('CurrentMessageList', [])
-    .set('CountUnreadMessage', 0)
+    .set('CountUnreadMessage', null)
     .set('Setting', {})
 }
 
@@ -128,8 +125,17 @@ reducer.prototype[actionType.avatar.setSetting] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {
+  let address_list = []
+  Object.keys(action.address_map).forEach(address => {
+    address_list.push({ "Address": address, "Name": action.address_map[address] })
+  })
+  address_list.sort(function (m, n) {
+    if (m.Name < n.Name) return 1
+    else if (m.Name > n.Name) return -1
+    else return 0
+  })
   return state.set('AddressMap', action.address_map)
-    .set('AddressArray', action.address_array)
+    .set('AddressArray', address_list)
 }
 
 reducer.prototype[actionType.avatar.setCurrentAddressMark] = (state, action) => {
@@ -226,12 +232,6 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
   return state.set('QuoteList', tmp_quote_list)
 }
 
-reducer.prototype[actionType.avatar.setCountUnreadBulletin] = (state, action) => {
-  let count = state.get('CountUnreadBulletin')
-  count += action.amount
-  return state.set('CountUnreadBulletin', count)
-}
-
 //Chat
 reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
   let session_list = Object.values(action.session_map)
@@ -268,6 +268,12 @@ reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => 
 
 reducer.prototype[actionType.avatar.setCountUnreadMessage] = (state, action) => {
   let count = state.get('CountUnreadMessage')
+  if (count == null) {
+    count = 0
+  }
   count += action.amount
+  if (count == 0) {
+    count = null
+  }
   return state.set('CountUnreadMessage', count)
 }

@@ -43,7 +43,7 @@ class TabSessionScreen extends React.Component {
                           {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                         </Text>
                         {
-                          item.CountUnread != 0 &&
+                          item.CountUnread != null && item.CountUnread != 0 &&
                           <Text style={{ color: 'red' }}>{`==>${item.CountUnread}`}</Text>
                         }
                       </View>

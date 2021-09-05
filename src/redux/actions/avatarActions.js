@@ -227,118 +227,149 @@ export function* enableAvatar(action) {
   let address = DeriveAddress(keypair.publicKey)
   yield put({ type: actionType.avatar.setAvatar, seed: action.seed, name: action.name, address: address, public_key: keypair.publicKey, private_key: keypair.privateKey })
 
+  let mg = new MessageGenerator(keypair.publicKey, keypair.privateKey)
+  yield put({ type: actionType.avatar.setMessageGenerator, message_generator: mg })
 
   let db = new Database()
 
   yield call([db, db.initDB], address, '0.0.1', address, 0)
   yield put({ type: actionType.avatar.setDatabase, db: db })
 
-  let sql = 'SELECT * FROM SETTINGS LIMIT 1'
+  let sql = 'SELECT * FROM CACHES LIMIT 1'
+  let cache = yield call([db, db.getOne], sql)
+  if (cache != null) {
+    // Load from snapshot, fast
+    cache = JSON.parse(cache.content)
+    console.log(cache)
+    yield put({ type: actionType.avatar.setAddressBook, address_map: cache.address_map })
+    yield put({ type: actionType.avatar.setFriends, friend_list: cache.friend_list })
+    yield put({ type: actionType.avatar.setFollows, follow_list: cache.follow_list })
+    yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
+    yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host })
+    yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
+  } else {
+    // Load from db, very slow
+    // AddressMap
+    sql = 'SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC'
+    let items = yield call([db, db.getAll], sql)
+    let address_map = {}
+    items.forEach(item => {
+      address_map[item.address] = item.name
+    })
+    address_map[address] = action.name
+    yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
+
+    // Friend
+    sql = 'SELECT * FROM FRIENDS ORDER BY updated_at DESC'
+    items = yield call([db, db.getAll], sql)
+    let friend_list = []
+    items.forEach(item => {
+      friend_list.push(item.address)
+    })
+    yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
+
+    // Follow
+    sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
+    items = yield call([db, db.getAll], sql)
+    let follow_list = []
+    items.forEach(item => {
+      follow_list.push(item.address)
+    })
+    yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
+
+    // Host
+    sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
+    items = yield call([db, db.getAll], sql)
+    let hosts = []
+    items.forEach(item => {
+      hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
+    })
+    if (hosts.length == 0) {
+      hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
+    }
+    yield put({ type: actionType.avatar.setHosts, hosts: hosts })
+
+    let current_host = hosts[0].Address || DefaultHost
+    yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host })
+
+    // SessionList
+    sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
+    let recent_message_receive = []
+    items = yield call([db, db.getAll], sql)
+    items.forEach(message => {
+      recent_message_receive.push({
+        Address: message.sour_address,
+        Timestamp: message.timestamp,
+        Content: message.content
+      })
+    })
+
+    sql = `SELECT * FROM MESSAGES GROUP BY dest_address`
+    let recent_message_send = []
+    items = yield call([db, db.getAll], sql)
+    items.forEach(message => {
+      recent_message_send.push({
+        Address: message.dest_address,
+        Timestamp: message.timestamp,
+        Content: message.content
+      })
+    })
+
+    let session_map = {}
+    friend_list.forEach(follow => {
+      session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '', CountUnread: 0 }
+    })
+    recent_message_receive.forEach(message => {
+      if (message && session_map[message.Address]) {
+        session_map[message.Address].Timestamp = message.Timestamp
+        session_map[message.Address].Content = message.Content
+      }
+    })
+    recent_message_send.forEach(message => {
+      if (message && session_map[message.Address] && message.Timestamp > session_map[message.Address].Timestamp) {
+        session_map[message.Address].Timestamp = message.Timestamp
+        session_map[message.Address].Content = message.Content
+      }
+    })
+    yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+  }
+
+  yield put({ type: actionType.avatar.Conn })
+
+  sql = 'SELECT * FROM SETTINGS LIMIT 1'
   let setting = yield call([db, db.getOne], sql)
   if (setting != null) {
-    setting = JSON.parse(setting)
+    setting = JSON.parse(setting.content)
   } else {
     setting = SettingJson
   }
   yield put({ type: actionType.avatar.setSetting, setting: setting })
 
-  sql = 'SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC'
-  let items = yield call([db, db.getAll], sql)
-  let address_map = {}
-  items.forEach(item => {
-    address_map[item.address] = item.name
-  })
-  address_map[address] = action.name
-  yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
-
-  sql = 'SELECT * FROM FRIENDS ORDER BY updated_at DESC'
-  items = yield call([db, db.getAll], sql)
-  let friend_list = []
-  items.forEach(item => {
-    friend_list.push(item.address)
-  })
-  yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
-
-  sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
-  items = yield call([db, db.getAll], sql)
-  let follow_list = []
-  items.forEach(item => {
-    follow_list.push(item.address)
-  })
-  yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
-
-  sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
-  items = yield call([db, db.getAll], sql)
-  let hosts = []
-  items.forEach(item => {
-    hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
-  })
-  if (hosts.length == 0) {
-    hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
-  }
-  yield put({ type: actionType.avatar.setHosts, hosts: hosts })
-
-  let current_host = hosts[0].Address || DefaultHost
-  yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host })
-
-  let mg = new MessageGenerator(keypair.publicKey, keypair.privateKey)
-  yield put({ type: actionType.avatar.setMessageGenerator, message_generator: mg })
-
-  yield put({ type: actionType.avatar.Conn })
-
+  // update
   yield put({ type: actionType.avatar.UpdateFollowBulletin })
-
-  // LoadSessionList
-  sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
-  let recent_message_receive = []
-  items = yield call([db, db.getAll], sql)
-  items.forEach(message => {
-    recent_message_receive.push({
-      Address: message.sour_address,
-      Timestamp: message.timestamp,
-      Content: message.content
-    })
-  })
-
-  sql = `SELECT * FROM MESSAGES GROUP BY dest_address`
-  let recent_message_send = []
-  items = yield call([db, db.getAll], sql)
-  items.forEach(message => {
-    recent_message_send.push({
-      Address: message.dest_address,
-      Timestamp: message.timestamp,
-      Content: message.content
-    })
-  })
-
-  let session_map = {}
-  friend_list.forEach(follow => {
-    session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '', CountUnread: 0 }
-  })
-  recent_message_receive.forEach(message => {
-    if (message && session_map[message.Address]) {
-      session_map[message.Address].Timestamp = message.Timestamp
-      session_map[message.Address].Content = message.Content
-    }
-  })
-  recent_message_send.forEach(message => {
-    if (message && session_map[message.Address] && message.Timestamp > session_map[message.Address].Timestamp) {
-      session_map[message.Address].Timestamp = message.Timestamp
-      session_map[message.Address].Content = message.Content
-    }
-  })
-  yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 }
 
 export function* disableAvatar() {
   let db = yield select(state => state.avatar.get('Database'))
-  let setting = yield select(state => state.avatar.get('Setting'))
-  let follow_list = yield select(state => state.avatar.get('Follows'))
+  let timestamp = Date.now()
   // 清理多余缓存公告
+  let setting = yield select(state => state.avatar.get('Setting'))
   if (setting.BulletinCacheSize != 0) {
     //TODO
     // yield call([db, db.limitBulletinCache], setting.BulletinCacheSize, Array2Str(follow_list))
   }
+
+  let cache = {}
+  cache.address_map = yield select(state => state.avatar.get('AddressMap'))
+  cache.friend_list = yield select(state => state.avatar.get('Friends'))
+  cache.follow_list = yield select(state => state.avatar.get('Follows'))
+  cache.hosts = yield select(state => state.avatar.get('Hosts'))
+  cache.current_host = yield select(state => state.avatar.get('CurrentHost'))
+  cache.session_map = yield select(state => state.avatar.get('SessionMap'))
+  let sql = `UPDATE CACHES SET content = ${JSON.stringify(cache)} WHERE updated_at = ${timestamp}`
+  yield call([db, db.runSQL], sql)
+  console.log(cache)
+
   yield call([db, db.closeDB])
   yield put({ type: actionType.avatar.resetAvatar })
 }
@@ -348,7 +379,7 @@ export function* setBulletinCacheSize(action) {
   let setting = yield select(state => state.avatar.get('Setting'))
   setting.BulletinCacheSize = action.cache_size
   console.log(setting)
-  let sql = `UPDATE SETTINGS SET settings = ${JSON.stringify(setting)} WHERE updated_at = "${Date.now()}"`
+  let sql = `UPDATE SETTINGS SET content = ${JSON.stringify(setting)} WHERE updated_at = ${Date.now()}`
   yield call([db, db.runSQL], sql)
   yield put({ type: actionType.avatar.setSetting, setting: setting })
 }

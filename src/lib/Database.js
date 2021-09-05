@@ -160,7 +160,12 @@ export default class Database {
           )`)
 
       await this.createTable('SETTINGS', `CREATE TABLE IF NOT EXISTS SETTINGS(
-          settings TEXT PRIMARY KEY,
+          content TEXT PRIMARY KEY,
+          updated_at INTEGER
+          )`)
+
+      await this.createTable('CACHES', `CREATE TABLE IF NOT EXISTS CACHES(
+          content TEXT PRIMARY KEY,
           updated_at INTEGER
           )`)
 

@@ -71,7 +71,6 @@ export const actionType = {
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
     HandleFriendSync: 'HANDLE_FRIEND_SYNC',
-    setCountUnreadMessage: 'SET_COUNT_UNREAD_MESSAGE',
     SendFriendMessage: 'SEND_FRIEND_MESSAGE'
   }
 }

@@ -38,10 +38,14 @@ class TabSessionScreen extends React.Component {
                   </View>
                   <View style={{ backgroundColor: "grey", flex: 1 }} >
                     <View style={{ flexDirection: "row" }}>
-                      <View style={{ backgroundColor: "yellow", flex: 0.5 }} >
+                      <View style={{ backgroundColor: "yellow", flex: 0.5, flexDirection: "row" }} >
                         <Text onPress={() => this.props.navigation.push('Session', { address: item.Address })}>
                           {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                         </Text>
+                        {
+                          item.CountUnread != 0 &&
+                          <Text style={{ color: 'red' }}>{`==>${item.CountUnread}`}</Text>
+                        }
                       </View>
                       <View style={{ backgroundColor: "orange", flex: 0.5 }} >
                         <Text style={{ textAlign: "right" }}>
@@ -49,7 +53,7 @@ class TabSessionScreen extends React.Component {
                         </Text>
                       </View>
                     </View>
-                    <Text style={{ backgroundColor: "green", flex: 0.5 }} ellipsizeMode={"tail"} numberOfLines={2}>
+                    <Text style={{ backgroundColor: "green", flex: 0.5 }} ellipsizeMode={"tail"} numberOfLines={1}>
                       {`${item.Content}`}
                     </Text>
                   </View>

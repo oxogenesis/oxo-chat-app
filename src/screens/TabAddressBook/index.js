@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, Button, FlatList } from 'react-native'
+import { View, Text, Image, Button, FlatList } from 'react-native'
 
 import { connect } from 'react-redux'
 import { my_styles } from '../../theme/style'
@@ -22,12 +22,19 @@ class TabAddressBookScreen extends React.Component {
           }
           renderItem={
             ({ item }) => {
-              return (<View>
-                <Text style={my_styles.Link}
-                  onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
-                  {`${item.Name}:${item.Address}`}
-                </Text>
-              </View>)
+              return (
+                <View style={{ flexDirection: "row" }} >
+                  <View>
+                    <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
+                  </View>
+                  <View>
+                    <Text style={my_styles.Link}
+                      onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
+                      {`${item.Name}`}
+                    </Text>
+                  </View>
+                </View>
+              )
             }
           }
         >

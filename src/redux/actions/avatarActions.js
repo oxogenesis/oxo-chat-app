@@ -294,9 +294,9 @@ export function* enableAvatar(action) {
   items = yield call([db, db.getAll], sql)
   items.forEach(message => {
     recent_message_receive.push({
-      "Address": message.sour_address,
-      'Timestamp': message.timestamp,
-      'Content': message.content
+      Address: message.sour_address,
+      Timestamp: message.timestamp,
+      Content: message.content
     })
   })
 
@@ -305,15 +305,15 @@ export function* enableAvatar(action) {
   items = yield call([db, db.getAll], sql)
   items.forEach(message => {
     recent_message_send.push({
-      "Address": message.dest_address,
-      'Timestamp': message.timestamp,
-      'Content': message.content
+      Address: message.dest_address,
+      Timestamp: message.timestamp,
+      Content: message.content
     })
   })
 
   let session_map = {}
   friend_list.forEach(follow => {
-    session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '' }
+    session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '', CountUnread: 0 }
   })
   recent_message_receive.forEach(message => {
     if (message && session_map[message.Address]) {
@@ -400,6 +400,11 @@ VALUES ('${action.address}', ${timestamp}, ${timestamp})`
   if (current_address_mark || action.address == current_address_mark.Address) {
     yield put({ type: actionType.avatar.setCurrentAddressMark, address: action.address })
   }
+
+  //刷新会话列表
+  let session_map = yield select(state => state.avatar.get('SessionMap'))
+  session_map[action.address] = { Address: action.address, Timestamp: timestamp, Content: '', CountUnread: 0 }
+  yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 }
 
 export function* delFriend(action) {
@@ -421,6 +426,11 @@ export function* delFriend(action) {
   yield call([db, db.runSQL], sql)
   sql = `DELETE FROM ECDHS WHERE address = "${action.address}"`
   yield call([db, db.runSQL], sql)
+
+  //刷新会话列表
+  let session_map = yield select(state => state.avatar.get('SessionMap'))
+  delete session_map[action.address]
+  yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 }
 
 // Follow
@@ -689,7 +699,6 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
 export function* LoadTabBulletinList(action) {
   let self_address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
-  let address_list = []
   let sql = ''
   let bulletin_list = []
 
@@ -701,10 +710,13 @@ export function* LoadTabBulletinList(action) {
   }
   let bulletin_list_size = bulletin_list.length
 
-  address_list = yield select(state => state.avatar.get('Follows'))
+  let follow_list = yield select(state => state.avatar.get('Follows'))
+  let address_list = []
+  follow_list.forEach(follow => {
+    address_list.push(follow)
+  })
   address_list.push(self_address)
   sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
-  console.log(sql)
   let tmp = []
   let items = yield call([db, db.getAll], sql)
   items.forEach(bulletin => {
@@ -806,8 +818,6 @@ export function* UpdateFollowBulletin() {
       address_next_sequence[bulletin_list[i].Address] = bulletin_list[i].Sequence + 1
     }
   }
-  console.log(follow_list)
-  console.log(address_next_sequence)
   //fetch next bulletin
   for (let i = follow_list.length - 1; i >= 0; i--) {
     yield put({ type: actionType.avatar.FetchBulletin, address: follow_list[i], sequence: address_next_sequence[follow_list[i]], to: follow_list[i] })
@@ -836,7 +846,6 @@ export function* UnmarkBulletin(action) {
 
 //Chat
 export function* LoadCurrentSession(action) {
-  yield put({ type: actionType.avatar.setCurrentSession })
   let db = yield select(state => state.avatar.get('Database'))
   let address = action.address
   let timestamp = Date.now()
@@ -889,6 +898,10 @@ VALUES ('${address}', '${DefaultDivision}', ${ecdh_sequence}, '${ecdh_sk}', '${m
 }
 
 export function* LoadCurrentMessageList(action) {
+  let session_map = yield select(state => state.avatar.get('SessionMap'))
+  session_map[action.address].CountUnread = 0
+  yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC`
   // let sql =`SELECT * FROM MESSAGES WHERE address = '${action.address}' ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}` 
@@ -1035,6 +1048,7 @@ export function* HandleFriendMessage(action) {
 
 export function* SaveFriendMessage(action) {
   let db = yield select(state => state.avatar.get('Database'))
+  let session_map = yield select(state => state.avatar.get('SessionMap'))
   let sour_address = action.sour_address
   let json = action.json
 
@@ -1089,10 +1103,9 @@ export function* SaveFriendMessage(action) {
         yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
       } else {
         //not CurrentSession: update unread_count
-        // state.Sessions[i].unread_count += 1
+        session_map[sour_address].CountUnread += 1
       }
 
-      let session_map = yield select(state => state.avatar.get('SessionMap'))
       session_map[sour_address].Timestamp = json.Timestamp
       session_map[sour_address].Content = content
       yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })

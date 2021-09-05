@@ -58,6 +58,9 @@ class SessionScreen extends React.Component {
 
   componentWillUnmount() {
     this._unsubscribe()
+    this.props.dispatch({
+      type: actionType.avatar.setCurrentSession
+    })
   }
 
   render() {

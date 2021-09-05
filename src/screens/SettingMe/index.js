@@ -38,6 +38,12 @@ class SettingMeScreen extends React.Component {
     )
   }
 
+  loadFromDB() {
+    this.props.dispatch({
+      type: actionType.avatar.loadFromDB
+    })
+  }
+
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadState()
@@ -63,6 +69,7 @@ class SettingMeScreen extends React.Component {
           />
         </View>
         <Button title="修改昵称" onPress={() => { this.props.navigation.navigate('AvatarNameEdit') }} />
+        <Button title="重载配置" onPress={() => { this.loadFromDB() }} />
         <Button color="red" title="查看种子" onPress={() => { this.viewSeedAlert() }} />
       </View >
     )

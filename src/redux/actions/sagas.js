@@ -8,7 +8,8 @@ export default function* rootSaga() {
   //avatar
   yield takeEvery(actionType.avatar.enableAvatar, avatarActions.enableAvatar)
   yield takeEvery(actionType.avatar.disableAvatar, avatarActions.disableAvatar)
-
+  yield takeEvery(actionType.avatar.loadFromDB, avatarActions.loadFromDB)
+  
   yield takeEvery(actionType.avatar.addAddressMark, avatarActions.addAddressMark)
   yield takeEvery(actionType.avatar.delAddressMark, avatarActions.delAddressMark)
   yield takeEvery(actionType.avatar.saveAddressName, avatarActions.saveAddressName)

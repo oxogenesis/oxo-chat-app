@@ -11,6 +11,7 @@ export const actionType = {
     disableAvatar: 'DISABLE_AVATAR',
     resetAvatar: 'RESET_AVATAR',
     setSetting: 'SET_SETTING',
+    loadFromDB: 'LOAD_FROM_DB',
 
     setAddressBook: 'SET_ADDRESS_BOOK',
     setCurrentAddressMark: 'SET_CURRENT_ADDRESS_MARK',

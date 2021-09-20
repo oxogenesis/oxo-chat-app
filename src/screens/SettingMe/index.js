@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, Button, Alert } from 'react-native'
+import { View, Text, Button, Alert, TextInput } from 'react-native'
 
 import QRCode from 'react-native-qrcode-svg'
 
@@ -57,11 +57,19 @@ class SettingMeScreen extends React.Component {
   render() {
     return (
       <View>
-        <Text>地址：{this.state.address}</Text>
-        <Text>昵称：{this.state.name}</Text>
+        <TextInput
+          style={{ color: 'blue', fontWeight: 'bold' }}
+          value={this.state.address}
+          multiline={false}
+        />
+        <TextInput
+          style={{ color: 'blue', fontWeight: 'bold' }}
+          value={this.state.name}
+          multiline={false}
+        />
         <View style={{ alignItems: 'center' }}>
           <QRCode
-            value={this.state.address}
+            value={this.props.avatar.get('Qrcode')}
             size={350}
             logo={require('../../assets/app.png')}
             logoSize={50}

@@ -14,6 +14,7 @@ class TabAddressBookScreen extends React.Component {
     return (
       <View style={my_styles.TabSheet}>
         <Button title="标记地址" onPress={() => this.props.navigation.navigate('AddressAdd')} />
+        <Button title="ToDo:二维码接口" onPress={() => this.props.navigation.navigate('AddressAddFromQrcode')} />
         <FlatList
           data={this.props.avatar.get('AddressArray')}
           keyExtractor={item => item.Name}

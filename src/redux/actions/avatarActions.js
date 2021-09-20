@@ -228,7 +228,7 @@ export function* loadFromDB(action) {
   let name = yield select(state => state.avatar.get('Name'))
 
   // AddressMap
-  let sql = 'SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC'
+  let sql = `SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC`
   let items = yield call([db, db.getAll], sql)
   let address_map = {}
   items.forEach(item => {
@@ -238,7 +238,7 @@ export function* loadFromDB(action) {
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 
   // Friend
-  sql = 'SELECT * FROM FRIENDS ORDER BY updated_at DESC'
+  sql = `SELECT * FROM FRIENDS ORDER BY updated_at DESC`
   items = yield call([db, db.getAll], sql)
   let friend_list = []
   items.forEach(item => {
@@ -247,7 +247,7 @@ export function* loadFromDB(action) {
   yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
   // Follow
-  sql = 'SELECT * FROM FOLLOWS ORDER BY updated_at DESC'
+  sql = `SELECT * FROM FOLLOWS ORDER BY updated_at DESC`
   items = yield call([db, db.getAll], sql)
   let follow_list = []
   items.forEach(item => {
@@ -256,7 +256,7 @@ export function* loadFromDB(action) {
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
 
   // Host
-  sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
+  sql = `SELECT * FROM HOSTS ORDER BY updated_at DESC`
   items = yield call([db, db.getAll], sql)
   let hosts = []
   items.forEach(item => {
@@ -269,6 +269,10 @@ export function* loadFromDB(action) {
 
   let current_host = hosts[0].Address || DefaultHost
   yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host })
+
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let qrcode = MessageGenerator.genQrcode(current_host)
+  yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
 
   // SessionList
   sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
@@ -325,7 +329,7 @@ export function* enableAvatar(action) {
   yield call([db, db.initDB], address, '0.0.1', address, 0)
   yield put({ type: actionType.avatar.setDatabase, db: db })
 
-  let sql = 'SELECT * FROM CACHES LIMIT 1'
+  let sql = `SELECT * FROM CACHES LIMIT 1`
   let cache = yield call([db, db.getOne], sql)
   if (cache != null) {
     // Load from snapshot, fast
@@ -337,6 +341,9 @@ export function* enableAvatar(action) {
     yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
     yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host })
     yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
+
+    let qrcode = mg.genQrcode(cache.current_host)
+    yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
   } else {
     // Load from db, very slow
     yield put({ type: actionType.avatar.loadFromDB })
@@ -344,7 +351,7 @@ export function* enableAvatar(action) {
 
   yield put({ type: actionType.avatar.Conn })
 
-  sql = 'SELECT * FROM SETTINGS LIMIT 1'
+  sql = `SELECT * FROM SETTINGS LIMIT 1`
   let setting = yield call([db, db.getOne], sql)
   if (setting != null) {
     setting = JSON.parse(setting.content)
@@ -360,13 +367,8 @@ export function* enableAvatar(action) {
 export function* disableAvatar() {
   let db = yield select(state => state.avatar.get('Database'))
   let timestamp = Date.now()
-  // 清理多余缓存公告
-  let setting = yield select(state => state.avatar.get('Setting'))
-  if (setting.BulletinCacheSize != 0) {
-    //TODO
-    // yield call([db, db.limitBulletinCache], setting.BulletinCacheSize, Array2Str(follow_list))
-  }
 
+  // 缓存设置
   let cache = {}
   cache.address_map = yield select(state => state.avatar.get('AddressMap'))
   cache.friend_list = yield select(state => state.avatar.get('Friends'))
@@ -379,6 +381,20 @@ export function* disableAvatar() {
   sql = `INSERT INTO CACHES (content, updated_at)
 VALUES ('${JSON.stringify(cache)}', ${timestamp})`
   yield call([db, db.runSQL], sql)
+
+  // 清理多余缓存公告
+  let setting = yield select(state => state.avatar.get('Setting'))
+  if (setting.BulletinCacheSize != 0) {
+    let sql = `SELECT hash FROM BULLETINS WHERE is_cache = 'TRUE' AND is_mark = 'FALSE' ORDER BY created_at DESC LIMIT ${setting.BulletinCacheSize}`
+    let items = yield call([db, db.getAll], sql)
+    let hashes = []
+    items.forEach(item => {
+      hashes.push(item.hash)
+    })
+    sql = `DELETE FROM BULLETINS where is_cache = 'TRUE' AND is_mark = 'FALSE' AND hash NOT IN (${Array2Str(hashes)})`
+    console.log(sql)
+    yield call([db, db.runSQL], sql)
+  }
 
   yield call([db, db.closeDB])
   yield put({ type: actionType.avatar.resetAvatar })
@@ -393,7 +409,7 @@ export function* setBulletinCacheSize(action) {
   let sql = `DELETE FROM SETTINGS`
   yield call([db, db.runSQL], sql)
   sql = `INSERT INTO SETTINGS (content, updated_at)
-VALUES ('${JSON.stringify(cache)}', ${timestamp})`
+VALUES ('${JSON.stringify(setting)}', ${timestamp})`
   yield call([db, db.runSQL], sql)
   yield put({ type: actionType.avatar.setSetting, setting: setting })
 }
@@ -526,7 +542,7 @@ export function* addHost(action) {
 VALUES ('${action.host}', ${timestamp})`
   yield call([db, db.runSQL], sql)
 
-  sql = 'SELECT * FROM HOSTS ORDER BY updated_at DESC'
+  sql = `SELECT * FROM HOSTS ORDER BY updated_at DESC`
   let items = yield call([db, db.getAll], sql)
   let hosts = []
   items.forEach(item => {
@@ -538,6 +554,10 @@ VALUES ('${action.host}', ${timestamp})`
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host })
+
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let qrcode = MessageGenerator.genQrcode(action.host)
+  yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
 }
 
 export function* delHost(action) {
@@ -560,6 +580,10 @@ export function* changeCurrentHost(action) {
   // let wm = yield select(state => state.avatar.get('WebSocketManager'))
   // wm.initConn(action.host)
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host })
+  
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let qrcode = MessageGenerator.genQrcode(action.host)
+  yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
   // let ws = yield select(state => state.avatar.get('WebSocketChannel'))
   // console.log(`=====================================================================changeCurrentHost`)
   // console.log(ws)

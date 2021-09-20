@@ -1,4 +1,4 @@
-const DefaultHost = 'ws://192.168.0.122:3000'
+const DefaultHost = 'ws://127.0.0.1:3000'
 
 //1000*60*60*24=86400000
 //const Epoch = Date.parse('2011-11-11 11:11:11')

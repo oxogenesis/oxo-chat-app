@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, Button, Alert } from 'react-native'
+import { View, Text, Button, Alert, TextInput } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
@@ -106,8 +106,16 @@ class AddressMarkScreen extends React.Component {
         {
           this.props.avatar.get('CurrentAddressMark') &&
           <View>
-            <Text>地址: {this.props.avatar.get('CurrentAddressMark').Address}</Text>
-            <Text>昵称: {this.props.avatar.get('CurrentAddressMark').Name}</Text>
+            <TextInput
+              style={{ color: 'blue', fontWeight: 'bold' }}
+              value={this.props.avatar.get('CurrentAddressMark').Address}
+              multiline={false}
+            />
+            <TextInput
+              style={{ color: 'blue', fontWeight: 'bold' }}
+              value={this.props.avatar.get('CurrentAddressMark').Name}
+              multiline={false}
+            />
             {
               this.props.avatar.get('CurrentAddressMark').IsMark ?
                 <>

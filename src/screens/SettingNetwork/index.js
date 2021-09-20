@@ -86,12 +86,15 @@ class SettingNetworkScreen extends React.Component {
                       {`使用`}
                     </Text>
                   </View>
-                  <View style={{ backgroundColor: "red", flex: 0.1 }} >
-                    <Text style={my_styles.Link}
-                      onPress={() => this.delHostAlert(item.Address)}>
-                      {`删除`}
-                    </Text>
-                  </View>
+                  {
+                    item.Address != this.props.avatar.get('CurrentHost') &&
+                    <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                      <Text style={my_styles.Link}
+                        onPress={() => this.delHostAlert(item.Address)}>
+                        {`删除`}
+                      </Text>
+                    </View>
+                  }
                 </View>
               )
             }

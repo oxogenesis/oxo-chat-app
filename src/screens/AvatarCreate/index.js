@@ -14,7 +14,7 @@ class AvatarCreateScreen extends React.Component {
 
   createAvatar() {
     if (this.state.name.trim() == '') {
-      this.setState({ error_msg: 'name could not be blank...' })
+      this.setState({ error_msg: '昵称不能为空...' })
       return
     }
     AvatarCreateNew(this.state.name, this.props.master.get('MasterKey'))

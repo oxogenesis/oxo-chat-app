@@ -32,7 +32,7 @@ class AddressAddScreen extends React.Component {
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       if (this.props.route.params && this.props.route.params.address) {
-        this.state.address = this.props.route.params.address
+        this.setState({ address: this.props.route.params.address })
       }
     })
   }

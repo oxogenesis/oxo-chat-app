@@ -180,6 +180,17 @@ async function AvatarDerive(strSave, masterKey) {
   }
 }
 
+function ParseQrcode(qrcode) {
+  try {
+    let json = JSON.parse(qrcode)
+    let address = oxoKeyPairs.deriveAddress(json.PublicKey)
+    return { Relay: json.Relay, Address: address }
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 function DHSequence(division, timestamp, address1, address2) {
   let tmpStr = ''
   if (address1 > address2) {
@@ -247,5 +258,6 @@ export {
   AvatarCreateWithSeed,
   AvatarDerive,
   AvatarNameEdit,
+  ParseQrcode,
   DHSequence
 }

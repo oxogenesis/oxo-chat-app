@@ -31,6 +31,7 @@ import BulletinListScreen from './screens/BulletinList'
 import BulletinPublishScreen from './screens/BulletinPublish'
 import AddressMarkScreen from './screens/AddressMark'
 import AddressAddScreen from './screens/AddressAdd'
+import AddressAddFromQrcodeScreen from './screens/AddressAddFromQrcode'
 import AddressEditScreen from './screens/AddressEdit'
 import SettingMeScreen from './screens/SettingMe'
 import SettingNetworkScreen from './screens/SettingNetwork'
@@ -73,7 +74,7 @@ class App extends React.Component {
                   <IconAnt
                     name={'qrcode'}
                     size={24}
-                    onPress={() => alert('qrcode')
+                    onPress={() => alert('ToDo:qrcode')
                     }
                   />)
               })
@@ -143,7 +144,15 @@ class App extends React.Component {
             component={AddressAddScreen}
             options={
               ({ route, navigation }) => ({
-                title: '标记用户'
+                title: '标记地址'
+              })
+            } />
+          <Stack.Screen
+            name="AddressAddFromQrcode"
+            component={AddressAddFromQrcodeScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '扫描二维码标记地址'
               })
             } />
           <Stack.Screen

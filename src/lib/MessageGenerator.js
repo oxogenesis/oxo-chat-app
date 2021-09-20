@@ -25,6 +25,15 @@ export default class MessageGenerator {
     return json
   }
 
+  genQrcode(server) {
+    let json = {
+      "Relay": server,
+      "Timestamp": new Date().getTime(),
+      "PublicKey": this.PublicKey
+    }
+    return JSON.stringify(this.signJson(json))
+  }
+
   genDeclare() {
     let json = {
       "Action": ActionCode.Declare,

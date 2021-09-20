@@ -11,6 +11,7 @@ export const actionType = {
     disableAvatar: 'DISABLE_AVATAR',
     resetAvatar: 'RESET_AVATAR',
     setSetting: 'SET_SETTING',
+    setQrcode: 'SET_QRCODE',
     loadFromDB: 'LOAD_FROM_DB',
 
     setAddressBook: 'SET_ADDRESS_BOOK',

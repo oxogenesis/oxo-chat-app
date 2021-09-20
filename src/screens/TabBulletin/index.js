@@ -13,7 +13,7 @@ class TabBulletinScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {  timestamp: 1 }
+    this.state = { timestamp: 1 }
   }
 
   loadTabBulletinList(flag) {
@@ -51,11 +51,20 @@ class TabBulletinScreen extends React.Component {
                 return (
                   <View>
                     <View style={{ flexDirection: "row" }} >
-                      <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
-                        <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
-                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
-                        </Text>
-                      </View>
+                      {
+                        this.props.avatar.get('Address') == item.Address ?
+                          <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
+                            <Text style={my_styles.Link}>
+                              {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
+                            </Text>
+                          </View>
+                          :
+                          <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
+                            <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
+                              {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
+                            </Text>
+                          </View>
+                      }
                       <View style={{ backgroundColor: "orange", flex: 0.2 }} >
                         <Text style={{ color: 'blue', fontWeight: 'bold', textAlign: "right" }}
                           onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>

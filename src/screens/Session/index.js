@@ -53,6 +53,12 @@ class SessionScreen extends React.Component {
         type: actionType.avatar.LoadCurrentMessageList,
         address: this.props.route.params.address
       })
+      let message_input = ''
+      if (this.props.route.params.content != null) {
+        message_input = JSON.stringify(this.props.route.params.content)
+        console.log(message_input)
+      }
+      this.setState({ name: name, address: this.props.route.params.address, message_input: message_input })
     })
   }
 

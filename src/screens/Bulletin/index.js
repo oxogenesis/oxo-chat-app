@@ -65,7 +65,7 @@ class BulletinScreen extends React.Component {
       }]}>
         {
           this.props.avatar.get('CurrentBulletin') == null ?
-            <Text>not found...</Text>
+            <Text>公告不存在...</Text>
             :
             <>
               <View style={{ flexDirection: "row" }} >
@@ -120,6 +120,20 @@ class BulletinScreen extends React.Component {
                     this.quoteBulletin(this.props.avatar.get('CurrentBulletin').Address,
                       this.props.avatar.get('CurrentBulletin').Sequence,
                       this.props.avatar.get('CurrentBulletin').Hash)}
+                />
+                <IconMaterialIcons
+                  name={'send'}
+                  size={24}
+                  color='blue'
+                  onPress={() =>
+                    this.props.navigation.push('AddressSelect', {
+                      content: {
+                        ObjectType: "Bulletin",
+                        Address: this.props.avatar.get('CurrentBulletin').Address,
+                        Sequence: this.props.avatar.get('CurrentBulletin').Sequence,
+                        Hash: this.props.avatar.get('CurrentBulletin').Hash
+                      }
+                    })}
                 />
               </View>
               <ScrollView>

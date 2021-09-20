@@ -77,7 +77,7 @@ class SettingMeScreen extends React.Component {
           />
         </View>
         <Button title="修改昵称" onPress={() => { this.props.navigation.navigate('AvatarNameEdit') }} />
-        <Button title="重载配置" onPress={() => { this.loadFromDB() }} />
+        <Button title="应用异常退出，导致数据显示：重载" onPress={() => { this.loadFromDB() }} />
         <Button color="red" title="查看种子" onPress={() => { this.viewSeedAlert() }} />
       </View >
     )

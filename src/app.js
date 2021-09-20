@@ -33,6 +33,7 @@ import AddressMarkScreen from './screens/AddressMark'
 import AddressAddScreen from './screens/AddressAdd'
 import AddressAddFromQrcodeScreen from './screens/AddressAddFromQrcode'
 import AddressEditScreen from './screens/AddressEdit'
+import AddressSelectScreen from './screens/AddressSelect'
 import SettingMeScreen from './screens/SettingMe'
 import SettingNetworkScreen from './screens/SettingNetwork'
 import SettingBulletinScreen from './screens/SettingBulletin'
@@ -165,6 +166,14 @@ class App extends React.Component {
             options={
               ({ route, navigation }) => ({
                 title: '编辑用户标记'
+              })
+            } />
+          <Stack.Screen
+            name="AddressSelect"
+            component={AddressSelectScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '选择好友'
               })
             } />
           <Stack.Screen

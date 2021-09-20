@@ -56,6 +56,20 @@ class SettingNetworkScreen extends React.Component {
   render() {
     return (
       <>
+        {
+          this.props.avatar.get('ConnStatus') ?
+            <View style={{ alignItems: 'center', backgroundColor: "green" }} >
+              <Text>
+                {`<在线>`}
+              </Text>
+            </View>
+            :
+            <View style={{ alignItems: 'center', backgroundColor: "red" }} >
+              <Text>
+                {`^断开^`}
+              </Text>
+            </View>
+        }
         <TextInput
           placeholder="ws://或者wss://"
           value={this.state.host_input}
@@ -81,20 +95,20 @@ class SettingNetworkScreen extends React.Component {
                   </View>
                   {
                     item.Address == this.props.avatar.get('CurrentHost') ?
-                      <View style={{ backgroundColor: "green", flex: 0.2 }} >
+                      <View style={{ backgroundColor: "yellow", flex: 0.2 }} >
                         <Text>
                           {`当前在用`}
                         </Text>
                       </View>
                       :
                       <>
-                        <View style={{ backgroundColor: "orange", flex: 0.1 }} >
+                        <View style={{ backgroundColor: "yellow", flex: 0.1 }} >
                           <Text style={my_styles.Link}
                             onPress={() => this.changeCurrentHost(item.Address)}>
                             {`使用`}
                           </Text>
                         </View>
-                        <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                        <View style={{ backgroundColor: "yellow", flex: 0.1 }} >
                           <Text style={my_styles.Link}
                             onPress={() => this.delHostAlert(item.Address)}>
                             {`删除`}

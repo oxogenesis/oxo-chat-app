@@ -28,6 +28,7 @@ export const actionType = {
     delFollow: 'DEL_FOLLOW',
 
     Conn: 'CONN',
+    setConnStatus: 'SET_CONN_STATUS',
     setHosts: 'SET_HOSTS',
     addHost: 'ADD_HOST',
     delHost: 'DEL_HOST',

@@ -17,6 +17,8 @@ function initialState() {
       Hosts: [],
       CurrentHost: null,
       WebSocket: null,
+      WebSocketChannel: null,
+      ConnStatus: false,
       MessageGenerator: null,
 
       AddressMap: {},
@@ -178,6 +180,7 @@ reducer.prototype[actionType.avatar.setHosts] = (state, action) => {
 
 reducer.prototype[actionType.avatar.setCurrentHost] = (state, action) => {
   return state.set('CurrentHost', action.current_host)
+    .set('CurrentHostTimestamp', action.current_host_timestamp)
 }
 
 reducer.prototype[actionType.avatar.setWebSocket] = (state, action) => {
@@ -186,6 +189,10 @@ reducer.prototype[actionType.avatar.setWebSocket] = (state, action) => {
 
 reducer.prototype[actionType.avatar.setWebSocketChannel] = (state, action) => {
   return state.set('WebSocketChannel', action.channel)
+}
+
+reducer.prototype[actionType.avatar.setConnStatus] = (state, action) => {
+  return state.set('ConnStatus', action.status)
 }
 
 reducer.prototype[actionType.avatar.setMessageGenerator] = (state, action) => {

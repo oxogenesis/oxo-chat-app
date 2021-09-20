@@ -33,14 +33,14 @@ function createWebSocket(url) {
   return new Promise((resolve, reject) => {
     let ws = new WebSocket(url)
     ws.onopen = () => {
-      // console.log(`======================================================createWebSocket-open`)
+      console.log(`======================================================createWebSocket-open`)
       resolve(ws)
     }
     ws.onerror = (error) => {
       //{"isTrusted": false, "message": "Connection reset"}
       //TODO: catch this error
-      // console.log(`======================================================createWebSocket-error`)
-      // console.log(error)
+      console.log(`======================================================createWebSocket-error`)
+      console.log(error)
       reject(error)
     }
   })
@@ -56,6 +56,7 @@ function createWebSocketChannel(ws) {
 
     // Close the channel as appropriate
     ws.onclose = () => {
+      console.log(`======================================================onclose`)
       emit(END)
     }
 
@@ -69,12 +70,15 @@ function createWebSocketChannel(ws) {
 export function* Conn(action) {
 
   // Get some basics together
-  const state = yield select()
-  const MessageGenerator = state.avatar.get('MessageGenerator')
-  const CurrentHost = state.avatar.get('CurrentHost')
-  const Address = state.avatar.get('Address')
+  let state = yield select()
+  let MessageGenerator = state.avatar.get('MessageGenerator')
+  let CurrentHost = state.avatar.get('CurrentHost')
+  let CurrentHostTimestamp = state.avatar.get('CurrentHostTimestamp')
+  let Address = state.avatar.get('Address')
 
-  if (CurrentHost == null) {
+  console.log(`======================================================CurrentHost`)
+  console.log(`${CurrentHost}==${action.host}==${CurrentHostTimestamp}==${action.timestamp}`)
+  if (CurrentHost == null || CurrentHostTimestamp != action.timestamp) {
     return
   }
 
@@ -83,12 +87,13 @@ export function* Conn(action) {
   try {
 
     // Make our connection
-    let ws = yield call(createWebSocket, CurrentHost)
+    let ws = yield call(createWebSocket, action.host)
     let channel = yield call(createWebSocketChannel, ws)
 
     yield put({ type: actionType.avatar.setWebSocketChannel, channel: channel })
 
     if (ws.readyState == WebSocket.OPEN) {
+      yield put({ type: actionType.avatar.setConnStatus, status: true })
       let msg = MessageGenerator.genDeclare()
       ws.send(msg)
       yield put({ type: actionType.avatar.setWebSocket, websocket: ws })
@@ -189,16 +194,22 @@ export function* Conn(action) {
     // }
     //{"isTrusted": false, "message": "failed to connect to /127.0.0.1 (port 3000) from /10.0.2.15 (port 36216) after 10000ms"}
   } finally {
+    console.log(`======================================================Conn-finally`)
+    CurrentHost = yield select(state => state.avatar.get('CurrentHost'))
+    CurrentHostTimestamp = yield select(state => state.avatar.get('CurrentHostTimestamp'))
+    console.log(`${CurrentHost}==${action.host}==${CurrentHostTimestamp}==${action.timestamp}`)
+    if (CurrentHost != null && CurrentHost == action.host && CurrentHostTimestamp == action.timestamp) {
+      yield put({ type: actionType.avatar.setConnStatus, status: false })
+    }
     // Clean up the connection
-    // console.log(`======================================================Conn-finally`)
     if (typeof channel !== 'undefined') {
       channel.close()
     }
     if (typeof ws !== 'undefined') {
       ws.close()
     }
-    yield call(DelayExec, 10 * 1000)
-    yield put({ type: actionType.avatar.Conn })
+    yield call(DelayExec, 3 * 1000)
+    yield put({ type: actionType.avatar.Conn, host: action.host, timestamp: action.timestamp })
     // console.log(`======================================================reconnect`)
     // if (yield cancelled()) {
     //   console.log(`================================================Conn-cancelled`)
@@ -325,6 +336,7 @@ export function* loadFromDB(action) {
 }
 
 export function* enableAvatar(action) {
+  let timestamp = Date.now()
   let keypair = DeriveKeypair(action.seed)
   let address = DeriveAddress(keypair.publicKey)
   yield put({ type: actionType.avatar.setAvatar, seed: action.seed, name: action.name, address: address, public_key: keypair.publicKey, private_key: keypair.privateKey })
@@ -348,7 +360,7 @@ export function* enableAvatar(action) {
     yield put({ type: actionType.avatar.setFriendRequests, friend_request_list: cache.friend_request_list })
     yield put({ type: actionType.avatar.setFollows, follow_list: cache.follow_list })
     yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
-    yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host })
+    yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host, current_host_timestamp: timestamp })
     yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
 
     let qrcode = mg.genQrcode(cache.current_host)
@@ -358,7 +370,7 @@ export function* enableAvatar(action) {
     yield put({ type: actionType.avatar.loadFromDB })
   }
 
-  yield put({ type: actionType.avatar.Conn })
+  yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
 
   sql = `SELECT * FROM SETTINGS LIMIT 1`
   let setting = yield call([db, db.getOne], sql)
@@ -406,8 +418,21 @@ VALUES ('${JSON.stringify(cache)}', ${timestamp})`
     yield call([db, db.runSQL], sql)
   }
 
+  // 关闭数据库
   yield call([db, db.closeDB])
   yield put({ type: actionType.avatar.resetAvatar })
+
+  // 关闭网络
+  let channel = yield select(state => state.avatar.get('WebSocketChannel'))
+  console.log(channel)
+  if (channel != null) {
+    yield call([channel, channel.close])
+  }
+  let ws = yield select(state => state.avatar.get('WebSocket'))
+  console.log(ws)
+  if (ws != null) {
+    yield call([ws, ws.close])
+  }
 }
 
 export function* setBulletinCacheSize(action) {
@@ -563,8 +588,6 @@ VALUES ('${action.host}', ${timestamp})`
   }
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 
-  yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host })
-
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let qrcode = MessageGenerator.genQrcode(action.host)
   yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
@@ -580,27 +603,29 @@ export function* delHost(action) {
 }
 
 export function* changeCurrentHost(action) {
+  console.log(`=====================================================================changeCurrentHost`)
+  let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
-  let sql = `UPDATE HOSTS SET updated_at = ${Date.now()} WHERE address = "${action.host}"`
+  let sql = `UPDATE HOSTS SET updated_at = ${timestamp} WHERE address = "${action.host}"`
   yield call([db, db.runSQL], sql)
 
   let channel = yield select(state => state.avatar.get('WebSocketChannel'))
+  console.log(channel)
+  if (channel != null) {
+    yield call([channel, channel.close])
+  }
   let ws = yield select(state => state.avatar.get('WebSocket'))
+  console.log(ws)
+  if (ws != null) {
+    yield call([ws, ws.close])
+  }
 
-  // let wm = yield select(state => state.avatar.get('WebSocketManager'))
-  // wm.initConn(action.host)
-  yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host })
+  yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host, current_host_timestamp: timestamp })
+  yield put({ type: actionType.avatar.Conn, host: action.host, timestamp: timestamp })
 
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let qrcode = MessageGenerator.genQrcode(action.host)
   yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
-  // let ws = yield select(state => state.avatar.get('WebSocketChannel'))
-  // console.log(`=====================================================================changeCurrentHost`)
-  // console.log(ws)
-  if (ws != null) {
-    yield call([ws, ws.close])
-  }
-  yield put({ type: actionType.avatar.Conn })
 }
 
 // Bulletin

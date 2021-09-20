@@ -36,6 +36,10 @@ import AddressEditScreen from './screens/AddressEdit'
 import SettingMeScreen from './screens/SettingMe'
 import SettingNetworkScreen from './screens/SettingNetwork'
 import SettingBulletinScreen from './screens/SettingBulletin'
+import SettingAddressScreen from './screens/SettingAddress'
+import SettingFriendScreen from './screens/SettingFriend'
+import SettingFollowScreen from './screens/SettingFollow'
+import SettingFriendRequestScreen from './screens/SettingFriendRequest'
 import BulletinCacheScreen from './screens/BulletinCache'
 import AvatarNameEditScreen from './screens/AvatarNameEdit'
 import AvatarSeedScreen from './screens/AvatarSeed'
@@ -217,6 +221,38 @@ class App extends React.Component {
             options={
               ({ route, navigation }) => ({
                 title: '公告缓存设置'
+              })
+            } />
+          <Stack.Screen
+            name="SettingAddress"
+            component={SettingAddressScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '地址设置'
+              })
+            } />
+          <Stack.Screen
+            name="SettingFriend"
+            component={SettingFriendScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '好友设置'
+              })
+            } />
+          <Stack.Screen
+            name="SettingFollow"
+            component={SettingFollowScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '关注设置'
+              })
+            } />
+          <Stack.Screen
+            name="SettingFriendRequest"
+            component={SettingFriendRequestScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '好友申请设置'
               })
             } />
         </Stack.Navigator>

@@ -52,7 +52,7 @@ class AvatarNameEditScreen extends React.Component {
   render() {
     return (
       <View>
-        <Text>地址: {this.state.address}</Text>
+        <Text> {this.state.address}</Text>
         <TextInput
           placeholder="昵称"
           value={this.state.name}

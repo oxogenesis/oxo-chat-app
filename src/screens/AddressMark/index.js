@@ -111,18 +111,39 @@ class AddressMarkScreen extends React.Component {
               value={this.props.avatar.get('CurrentAddressMark').Address}
               multiline={false}
             />
-            <TextInput
-              style={{ color: 'blue', fontWeight: 'bold' }}
-              value={this.props.avatar.get('CurrentAddressMark').Name}
-              multiline={false}
-            />
             {
               this.props.avatar.get('CurrentAddressMark').IsMark ?
                 <>
+                  <TextInput
+                    style={{ color: 'blue', fontWeight: 'bold' }}
+                    value={this.props.avatar.get('CurrentAddressMark').Name}
+                    multiline={false}
+                  />
                   <Button
                     title="修改昵称"
                     onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
                   <Button color='red' title="删除" onPress={() => this.delAddressMark()} />
+
+                  {
+                    this.props.avatar.get('CurrentAddressMark').IsFriend ?
+                      <>
+                        <Button title="开始聊天" onPress={() =>
+                          this.props.navigation.push('Session', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
+                        <Button color='orange' title="解除好友" onPress={() => this.delFriend()} />
+                      </>
+                      :
+                      <Button title="加为好友" onPress={() => this.addFriend()} />
+                  }
+                  {
+                    this.props.avatar.get('CurrentAddressMark').IsFollow ?
+                      <>
+                        <Button title="查看公告" onPress={() =>
+                          this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('CurrentAddressMark').Address })} />
+                        <Button color='orange' title="取消关注" onPress={() => this.delFollowAlert()} />
+                      </>
+                      :
+                      <Button title="关注公告" onPress={() => this.addFollow()} />
+                  }
                 </>
                 :
                 <>
@@ -130,26 +151,6 @@ class AddressMarkScreen extends React.Component {
                     title="标记地址"
                     onPress={() => this.props.navigation.navigate('AddressAdd', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
                 </>
-            }
-            {
-              this.props.avatar.get('CurrentAddressMark').IsFriend ?
-                <>
-                  <Button title="开始聊天" onPress={() =>
-                    this.props.navigation.push('Session', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                  <Button color='orange' title="解除好友" onPress={() => this.delFriend()} />
-                </>
-                :
-                <Button title="加为好友" onPress={() => this.addFriend()} />
-            }
-            {
-              this.props.avatar.get('CurrentAddressMark').IsFollow ?
-                <>
-                  <Button title="查看公告" onPress={() =>
-                    this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                  <Button color='orange' title="取消关注" onPress={() => this.delFollowAlert()} />
-                </>
-                :
-                <Button title="关注公告" onPress={() => this.addFollow()} />
             }
           </View>
         }

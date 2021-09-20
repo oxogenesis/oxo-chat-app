@@ -24,6 +24,10 @@ export default class Database {
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL
         )`)
+      await this.createTable('FRIEND_REQUESTS', `CREATE TABLE IF NOT EXISTS FRIEND_REQUESTS(
+          address VARCHAR(35) PRIMARY KEY,
+          updated_at INTEGER NOT NULL
+          )`)
       await this.createTable('FOLLOWS', `CREATE TABLE IF NOT EXISTS FOLLOWS(
         address VARCHAR(35) PRIMARY KEY,
         created_at INTEGER NOT NULL,

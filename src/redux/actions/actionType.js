@@ -20,6 +20,7 @@ export const actionType = {
     delAddressMark: 'DEL_ADDRESS_MARK',
     saveAddressName: 'SAVE_ADDRESS_NAME',
     setFriends: 'SET_FRIENDS',
+    setFriendRequests: 'SET_FRIEND_REQUESTS',
     addFriend: 'ADD_FRIEND',
     delFriend: 'DEL_FRIEND',
     setFollows: 'SET_FOLLOWS',

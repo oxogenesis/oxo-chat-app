@@ -246,6 +246,14 @@ export function* loadFromDB(action) {
   })
   yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
+  sql = `SELECT * FROM FRIEND_REQUESTS ORDER BY updated_at ASC`
+  items = yield call([db, db.getAll], sql)
+  let friend_request_list = []
+  items.forEach(item => {
+    friend_request_list.push({ Address: item.address, Timestamp: item.updated_at })
+  })
+  yield put({ type: actionType.avatar.setFriendRequests, friend_request_list: friend_request_list })
+
   // Follow
   sql = `SELECT * FROM FOLLOWS ORDER BY updated_at DESC`
   items = yield call([db, db.getAll], sql)
@@ -337,6 +345,7 @@ export function* enableAvatar(action) {
     console.log(cache)
     yield put({ type: actionType.avatar.setAddressBook, address_map: cache.address_map })
     yield put({ type: actionType.avatar.setFriends, friend_list: cache.friend_list })
+    yield put({ type: actionType.avatar.setFriendRequests, friend_request_list: cache.friend_request_list })
     yield put({ type: actionType.avatar.setFollows, follow_list: cache.follow_list })
     yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
     yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host })
@@ -372,6 +381,7 @@ export function* disableAvatar() {
   let cache = {}
   cache.address_map = yield select(state => state.avatar.get('AddressMap'))
   cache.friend_list = yield select(state => state.avatar.get('Friends'))
+  cache.friend_request_list = yield select(state => state.avatar.get('FriendRequests'))
   cache.follow_list = yield select(state => state.avatar.get('Follows'))
   cache.hosts = yield select(state => state.avatar.get('Hosts'))
   cache.current_host = yield select(state => state.avatar.get('CurrentHost'))
@@ -580,7 +590,7 @@ export function* changeCurrentHost(action) {
   // let wm = yield select(state => state.avatar.get('WebSocketManager'))
   // wm.initConn(action.host)
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host })
-  
+
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let qrcode = MessageGenerator.genQrcode(action.host)
   yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
@@ -1010,67 +1020,78 @@ export function* HandleFriendECDH(action) {
   if (!friend_list.includes(address)) {
     console.log('message is not from my friend...')
     //Strangers
-    // while (state.Strangers.size >= 10) {
-    //   state.Strangers.shift()
-    // }
-    // state.Strangers.push({ "address": address, "created_at": timestamp })
-    // return
-  }
-
-  //check dh(my-sk-pk pair-pk aes-key)
-
-  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${json.Division}" AND sequence = ${json.Sequence}`
-  let item = yield call([db, db.getOne], sql)
-
-  if (item == null) {
-    //self not ready, so pair could not be ready
-    //gen my-sk-pk and aes-key
-    let ecdh = crypto.createECDH('secp256k1')
-    let ecdh_pk = ecdh.generateKeys('hex')
-    let ecdh_sk = ecdh.getPrivateKey('hex')
-    let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
-
-    //gen message with my-pk, indicate self ready
-    let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
-
-    //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
-    sql = `INSERT INTO ECDHS (address, division, sequence, private_key, public_key, aes_key, self_json)
-VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
-    let reuslt = yield call([db, db.runSQL], sql)
-    if (reuslt.code != 0) {
-      yield put({ type: actionType.avatar.SendMessage, message: msg })
-    }
-  } else if (item.pair_json == null) {
-    //item not null => my-sk-pk, self-not-ready-json is exist
-    //gen aes
-    let ecdh = crypto.createECDH('secp256k1')
-    ecdh.setPrivateKey(item.private_key, 'hex')
-    let ecdh_pk = ecdh.getPublicKey('hex')
-    let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
-
-    //gen self-ready-json
-    let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
-
-    if (json.Pair == "") {
-      //pair not ready
-      //save pair-pk, aes-key, self-ready-json
-      sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+    let sql = `SELECT * FROM FRIEND_REQUESTS WHERE address = "${address}"`
+    let item = yield call([db, db.getOne], sql)
+    let result = { code: 0 }
+    if (item != null) {
+      sql = `UPDATE FRIEND_REQUESTS SET updated_at = ${timestamp} WHERE address = "${address}"`
+      result = yield call([db, db.runSQL], sql)
     } else {
-      //pair ready
-      //save pair-pk, aes-key, self-ready-json, pair-ready-json
-      sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      sql = `INSERT INTO FRIEND_REQUESTS (address, updated_at)
+VALUES ('${address}', ${timestamp})`
+      result = yield call([db, db.runSQL], sql)
     }
-    let reuslt = yield call([db, db.runSQL], sql)
-    if (reuslt.code != 0) {
-      yield put({ type: actionType.avatar.SendMessage, message: msg })
-      let current_session = yield select(state => state.avatar.get('CurrentSession'))
-      if (address == current_session.Address) {
-        yield put({ type: actionType.avatar.setCurrentSession, address: address, ecdh_sequence: json.Sequence, aes_key: aes_key })
+    if (result && result.code != 0) {
+      let friend_request_list = yield select(state => state.avatar.get('FriendRequests'))
+      friend_request_list.unshift({ Address: address, Timestamp: timestamp })
+      yield put({ type: actionType.avatar.setFriendRequests, friend_request_list: friend_request_list })
+    }
+  } else {
+    //check dh(my-sk-pk pair-pk aes-key)
+
+    let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${json.Division}" AND sequence = ${json.Sequence}`
+    let item = yield call([db, db.getOne], sql)
+
+    if (item == null) {
+      //self not ready, so pair could not be ready
+      //gen my-sk-pk and aes-key
+      let ecdh = crypto.createECDH('secp256k1')
+      let ecdh_pk = ecdh.generateKeys('hex')
+      let ecdh_sk = ecdh.getPrivateKey('hex')
+      let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
+
+      //gen message with my-pk, indicate self ready
+      let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
+
+      //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
+      sql = `INSERT INTO ECDHS (address, division, sequence, private_key, public_key, aes_key, self_json)
+VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
+      let reuslt = yield call([db, db.runSQL], sql)
+      if (reuslt.code != 0) {
+        yield put({ type: actionType.avatar.SendMessage, message: msg })
+      }
+    } else if (item.pair_json == null) {
+      //item not null => my-sk-pk, self-not-ready-json is exist
+      //gen aes
+      let ecdh = crypto.createECDH('secp256k1')
+      ecdh.setPrivateKey(item.private_key, 'hex')
+      let ecdh_pk = ecdh.getPublicKey('hex')
+      let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
+
+      //gen self-ready-json
+      let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
+
+      if (json.Pair == "") {
+        //pair not ready
+        //save pair-pk, aes-key, self-ready-json
+        sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      } else {
+        //pair ready
+        //save pair-pk, aes-key, self-ready-json, pair-ready-json
+        sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+      }
+      let reuslt = yield call([db, db.runSQL], sql)
+      if (reuslt.code != 0) {
+        yield put({ type: actionType.avatar.SendMessage, message: msg })
+        let current_session = yield select(state => state.avatar.get('CurrentSession'))
+        if (address == current_session.Address) {
+          yield put({ type: actionType.avatar.setCurrentSession, address: address, ecdh_sequence: json.Sequence, aes_key: aes_key })
+        }
       }
     }
+    //else: self and pair are ready, do nothing
+    //both ready to talk
   }
-  //else: self and pair are ready, do nothing
-  //both ready to talk
 }
 
 export function* HandleFriendMessage(action) {

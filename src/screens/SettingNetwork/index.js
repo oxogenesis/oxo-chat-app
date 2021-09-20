@@ -56,7 +56,6 @@ class SettingNetworkScreen extends React.Component {
   render() {
     return (
       <>
-        <Text>{`在用服务器：${this.props.avatar.get('CurrentHost')}`}</Text>
         <TextInput
           placeholder="ws://或者wss://"
           value={this.state.host_input}
@@ -80,27 +79,35 @@ class SettingNetworkScreen extends React.Component {
                   <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
                     <Text>{item.Address}</Text>
                   </View>
-                  <View style={{ backgroundColor: "orange", flex: 0.1 }} >
-                    <Text style={my_styles.Link}
-                      onPress={() => this.changeCurrentHost(item.Address)}>
-                      {`使用`}
-                    </Text>
-                  </View>
                   {
-                    item.Address != this.props.avatar.get('CurrentHost') &&
-                    <View style={{ backgroundColor: "red", flex: 0.1 }} >
-                      <Text style={my_styles.Link}
-                        onPress={() => this.delHostAlert(item.Address)}>
-                        {`删除`}
-                      </Text>
-                    </View>
+                    item.Address == this.props.avatar.get('CurrentHost') ?
+                      <View style={{ backgroundColor: "green", flex: 0.2 }} >
+                        <Text>
+                          {`当前在用`}
+                        </Text>
+                      </View>
+                      :
+                      <>
+                        <View style={{ backgroundColor: "orange", flex: 0.1 }} >
+                          <Text style={my_styles.Link}
+                            onPress={() => this.changeCurrentHost(item.Address)}>
+                            {`使用`}
+                          </Text>
+                        </View>
+                        <View style={{ backgroundColor: "red", flex: 0.1 }} >
+                          <Text style={my_styles.Link}
+                            onPress={() => this.delHostAlert(item.Address)}>
+                            {`删除`}
+                          </Text>
+                        </View>
+                      </>
                   }
                 </View>
               )
             }
           }
         >
-        </FlatList>
+        </FlatList >
       </>
     )
   }

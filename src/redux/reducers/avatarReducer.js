@@ -24,6 +24,7 @@ function initialState() {
       CurrentAddressMark: null,
 
       Friends: [],
+      FriendRequests: [],
       Follows: [],
 
       TabBulletinList: [],
@@ -69,6 +70,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('AddressArray', [])
     .set('CurrentAddressMark', null)
     .set('Friends', [])
+    .set('FriendRequests', [])
     .set('Follows', [])
     .set('TabBulletinList', [])
     .set('BulletinList', [])
@@ -107,6 +109,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('AddressArray', [])
     .set('CurrentAddressMark', null)
     .set('Friends', [])
+    .set('FriendRequests', [])
     .set('Follows', [])
     .set('TabBulletinList', [])
     .set('BulletinList', [])
@@ -159,6 +162,10 @@ reducer.prototype[actionType.avatar.setCurrentAddressMark] = (state, action) => 
 
 reducer.prototype[actionType.avatar.setFriends] = (state, action) => {
   return state.set('Friends', action.friend_list)
+}
+
+reducer.prototype[actionType.avatar.setFriendRequests] = (state, action) => {
+  return state.set('FriendRequests', action.friend_request_list)
 }
 
 reducer.prototype[actionType.avatar.setFollows] = (state, action) => {

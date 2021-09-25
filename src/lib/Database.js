@@ -61,6 +61,8 @@ export default class Database {
           json TEXT,
           confirmed BOOLEAN DEFAULT FALSE,
           readed BOOLEAN DEFAULT FALSE,
+          is_object BOOLEAN DEFAULT FALSE,
+          object_type TEXT,
           is_file BOOLEAN DEFAULT FALSE,
           file_saved BOOLEAN DEFAULT FALSE,
           file_sha1 VARCHAR(40)

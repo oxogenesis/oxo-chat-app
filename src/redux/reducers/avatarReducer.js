@@ -42,6 +42,7 @@ function initialState() {
       UnreadSessionMap: {},
       CurrentSession: {},
       CurrentMessageList: [],
+      MessageWhiteList: [],
       CountUnreadMessage: 0
     }
   )
@@ -85,6 +86,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('CurrentSession', {})
     .set('CurrentMessageList', [])
     .set('CountUnreadMessage', null)
+    .set('MessageWhiteList', [])
     .set('Setting', {})
 }
 
@@ -124,6 +126,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('CurrentSession', {})
     .set('CurrentMessageList', [])
     .set('CountUnreadMessage', null)
+    .set('MessageWhiteList', [])
     .set('Setting', {})
 }
 
@@ -300,4 +303,9 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
 reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => {
   console.log(action.message_list)
   return state.set('CurrentMessageList', action.message_list)
+}
+
+reducer.prototype[actionType.avatar.setMessageWhiteList] = (state, action) => {
+  console.log(action.message_white_list)
+  return state.set('MessageWhiteList', action.message_white_list)
 }

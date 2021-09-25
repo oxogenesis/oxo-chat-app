@@ -75,6 +75,7 @@ export const actionType = {
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
     HandleFriendSync: 'HANDLE_FRIEND_SYNC',
-    SendFriendMessage: 'SEND_FRIEND_MESSAGE'
+    SendFriendMessage: 'SEND_FRIEND_MESSAGE',
+    setMessageWhiteList: 'SET_MESSAGE_WHITE_LIST'
   }
 }

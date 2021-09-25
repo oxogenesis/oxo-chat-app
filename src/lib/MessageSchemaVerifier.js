@@ -500,24 +500,46 @@ let FileSchema = {
 }
 //end client schema
 
-var Ajv = require('ajv')
-var ajv = new Ajv({ allErrors: true })
+//local schema
+let ObjectSchema = {
+  "type": "object",
+  "required": ["ObjectType", "Address", "Sequence", "Hash"],
+  "maxProperties": 4,
+  "properties": {
+    "ObjectType": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "string"
+    },
+    "Sequence": {
+      "type": "number"
+    },
+    "Hash": {
+      "type": "string"
+    }
+  }
+}
+//end local schema
+
+let Ajv = require('ajv')
+let ajv = new Ajv({ allErrors: true })
 
 //client
-var vDeclare = ajv.compile(DeclareSchema)
-var vObjectResponseSchema = ajv.compile(ObjectResponseSchema)
+let vDeclare = ajv.compile(DeclareSchema)
+let vObjectResponseSchema = ajv.compile(ObjectResponseSchema)
 
-var vBulletinRequestSchema = ajv.compile(BulletinRequestSchema)
-var vFileRequestSchema = ajv.compile(FileRequestSchema)
+let vBulletinRequestSchema = ajv.compile(BulletinRequestSchema)
+let vFileRequestSchema = ajv.compile(FileRequestSchema)
 
-var vChatMessageSchema = ajv.compile(ChatMessageSchema)
-var vChatSyncSchema = ajv.compile(ChatSyncSchema)
-var vChatDHSchema = ajv.compile(ChatDHSchema)
+let vChatMessageSchema = ajv.compile(ChatMessageSchema)
+let vChatSyncSchema = ajv.compile(ChatSyncSchema)
+let vChatDHSchema = ajv.compile(ChatDHSchema)
 
-var vGroupManageSyncSchema = ajv.compile(GroupManageSyncSchema)
-var vGroupDHSchema = ajv.compile(GroupDHSchema)
-var vGroupMessageSyncSchema = ajv.compile(GroupMessageSyncSchema)
-var vGroupRequestSchema = ajv.compile(GroupRequestSchema)
+let vGroupManageSyncSchema = ajv.compile(GroupManageSyncSchema)
+let vGroupDHSchema = ajv.compile(GroupDHSchema)
+let vGroupMessageSyncSchema = ajv.compile(GroupMessageSyncSchema)
+let vGroupRequestSchema = ajv.compile(GroupRequestSchema)
 
 function checkJsonSchema(json) {
   if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vFileRequestSchema(json) || vChatMessageSchema(json) || vChatSyncSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
@@ -527,10 +549,9 @@ function checkJsonSchema(json) {
   }
 }
 
-var vBulletinSchema = ajv.compile(BulletinSchema)
+let vBulletinSchema = ajv.compile(BulletinSchema)
 
 function checkBulletinSchema(json) {
-  //console.log(json)
   try {
     if (vBulletinSchema(json)) {
       console.log(`Bulletin schema ok`)
@@ -544,10 +565,9 @@ function checkBulletinSchema(json) {
   }
 }
 
-var vFileChunkSchema = ajv.compile(FileChunkSchema)
+let vFileChunkSchema = ajv.compile(FileChunkSchema)
 
 function checkFileChunkSchema(json) {
-  //console.log(json)
   try {
     if (vFileChunkSchema(json)) {
       console.log(`File schema ok`)
@@ -561,10 +581,9 @@ function checkFileChunkSchema(json) {
   }
 }
 
-var vGroupManageSchema = ajv.compile(GroupManageSchema)
+let vGroupManageSchema = ajv.compile(GroupManageSchema)
 
 function checkGroupManageSchema(json) {
-  //console.log(json)
   try {
     if (vGroupManageSchema(json)) {
       console.log(`GroupManage schema ok`)
@@ -578,10 +597,9 @@ function checkGroupManageSchema(json) {
   }
 }
 
-var vGroupMessageSchema = ajv.compile(GroupMessageSchema)
+let vGroupMessageSchema = ajv.compile(GroupMessageSchema)
 
 function checkGroupMessageSchema(json) {
-  //console.log(json)
   try {
     if (vGroupMessageSchema(json)) {
       console.log(`GroupMessage schema ok`)
@@ -596,7 +614,6 @@ function checkGroupMessageSchema(json) {
 }
 
 function checkGroupRequestSchema(json) {
-  //console.log(json)
   try {
     if (vGroupRequestSchema(json)) {
       console.log(`GroupRequest schema ok`)
@@ -636,6 +653,22 @@ function checkFileSchema(json) {
   }
 }
 
+let vObjectSchema = ajv.compile(ObjectSchema)
+
+function checkObjectSchema(json) {
+  try {
+    if (vObjectSchema(json)) {
+      console.log(`Object schema ok`)
+      return true
+    } else {
+      console.log(`Object schema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
 module.exports = {
   deriveJson,
   checkJsonSchema,
@@ -644,5 +677,6 @@ module.exports = {
   checkGroupManageSchema,
   checkGroupRequestSchema,
   checkGroupMessageSchema,
-  checkFileSchema
+  checkFileSchema,
+  checkObjectSchema
 }

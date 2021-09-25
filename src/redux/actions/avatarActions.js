@@ -3,8 +3,8 @@ import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 
-import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
-import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema } from '../../lib/MessageSchemaVerifier'
+import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
+import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema } from '../../lib/MessageSchemaVerifier'
 import { DHSequence, AesEncrypt, AesDecrypt } from '../../lib/OXO'
 
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
@@ -365,12 +365,12 @@ export function* enableAvatar(action) {
 
     let qrcode = mg.genQrcode(cache.current_host)
     yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
+    yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
   } else {
     // Load from db, very slow
     yield put({ type: actionType.avatar.loadFromDB })
   }
 
-  yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
 
   sql = `SELECT * FROM SETTINGS LIMIT 1`
   let setting = yield call([db, db.getOne], sql)
@@ -685,6 +685,7 @@ export function* LoadCurrentBulletin(action) {
   } else {
     //fetch from network
     //action[address, sequence, to]
+    yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: null })
     console.log(action)
     yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: action.sequence, to: action.to })
   }
@@ -724,6 +725,20 @@ export function* PublishBulletin(action) {
   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
 VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${address}', 'FALSE')`
   yield call([db, db.runSQL], sql)
+  let bulletin = {
+    "Address": address,
+    "Timestamp": bulletin_json.Timestamp,
+    "CreatedAt": timestamp,
+    'Sequence': bulletin_json.Sequence,
+    "Content": bulletin_json.Content,
+    "Hash": hash,
+    "QuoteSize": bulletin_json.Quote.length,
+    "IsMark": false
+  }
+  //刷新TabBulletin页
+  let tab_bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
+  tab_bulletin_list.unshift(bulletin)
+  yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: tab_bulletin_list })
 
   yield put({ type: actionType.avatar.setQuoteList, quote_list: [] })
 
@@ -744,6 +759,7 @@ export function* SaveBulletin(action) {
     let db = yield select(state => state.avatar.get('Database'))
     let follow_list = yield select(state => state.avatar.get('Follows'))
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
+    let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
 
     console.log(quote_white_list)
 
@@ -787,6 +803,17 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
       yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
     } else if (quote_white_list.includes(hash)) {
       //bulletin from quote
+      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+      //save bulletin
+      yield call([db, db.runSQL], sql)
+      let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
+      if (current_bulletin == null) {
+        yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
+      }
+    } else if (message_white_list.includes(hash)) {
+      //bulletin from message
       let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
 VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
 
@@ -1002,32 +1029,58 @@ VALUES ('${address}', '${DefaultDivision}', ${ecdh_sequence}, '${ecdh_sk}', '${m
 }
 
 export function* LoadCurrentMessageList(action) {
-  let session_map = yield select(state => state.avatar.get('SessionMap'))
-  session_map[action.address].CountUnread = 0
-  yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
-
   let db = yield select(state => state.avatar.get('Database'))
-  let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC`
-  // let sql =`SELECT * FROM MESSAGES WHERE address = '${action.address}' ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}` 
-  let items = yield call([db, db.getAll], sql)
   let message_list = []
+
+  // session_flag?新的列表：延长列表
+  if (action.session_flag == true) {
+    yield put({ type: actionType.avatar.setCurrentMessageList, message_list: [] })
+
+    // 该session未读清零
+    let session_map = yield select(state => state.avatar.get('SessionMap'))
+    session_map[action.address].CountUnread = 0
+    yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+  } else {
+    message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+  }
+  let message_list_size = message_list.length
+  let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
+
+
+  let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size}`
+  let items = yield call([db, db.getAll], sql)
+  let tmp = []
   let current_sequence = 0
   items.forEach(item => {
     let confirmed = (item.confirmed == "TRUE")
-    message_list.push({
+    let is_object = (item.is_object == "TRUE")
+    let object_json = {}
+    if (is_object == true) {
+      object_json = JSON.parse(item.content)
+      if (object_json.ObjectType == 'Bulletin' && !message_white_list.includes(object_json.Hash)) {
+        message_white_list.push(object_json.Hash)
+      }
+    }
+    tmp.push({
       "SourAddress": item.sour_address,
       "Timestamp": item.timestamp,
       "Sequence": item.sequence,
-      "created_at": item.created_at,
+      "CreatedAt": item.created_at,
       "Content": item.content,
       "Confirmed": confirmed,
-      "Hash": item.hash
+      "Hash": item.hash,
+      "IsObject": is_object,
+      "ObjectJson": object_json
     })
     if (item.sour_address == action.address && item.sequence > current_sequence) {
       current_sequence = item.sequence
     }
   })
-  yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+  if (tmp.length != 0) {
+    message_list = message_list.concat(tmp)
+    yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+    yield put({ type: actionType.avatar.setMessageWhiteList, message_white_list: message_white_list })
+  }
 
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genFriendSync(current_sequence, action.address)
@@ -1127,7 +1180,7 @@ export function* HandleFriendMessage(action) {
   //check message from my friend
   let friend_list = yield select(state => state.avatar.get('Friends'))
   if (!friend_list.includes(sour_address)) {
-    console.log('message is not from my friend...')
+    // console.log('message is not from my friend...')
     return
   }
 
@@ -1154,7 +1207,6 @@ export function* HandleFriendMessage(action) {
     //pre-message exist
     yield put({ type: actionType.avatar.SaveFriendMessage, sour_address: sour_address, json: json })
   }
-
 }
 
 export function* SaveFriendMessage(action) {
@@ -1190,9 +1242,22 @@ export function* SaveFriendMessage(action) {
     let fileJson = null
     let fileSHA1 = null
 
+    // Parse Object Json
+    let is_object = 'FALSE'
+    let object_type = ''
+    let object_json = {}
+    try {
+      object_json = JSON.parse(content)
+      if (checkObjectSchema(object_json)) {
+        is_object = 'TRUE'
+        object_type = object_json.ObjectType
+      }
+    } catch (e) {
+    }
+
     //save message
-    let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
-      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}')`
+    let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1, is_object, object_type)
+VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}', '${is_object}', '${object_type}')`
 
     let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
@@ -1203,13 +1268,12 @@ export function* SaveFriendMessage(action) {
           "SourAddress": sour_address,
           "Timestamp": json.Timestamp,
           "Sequence": json.Sequence,
-          "created_at": created_at,
+          "CreatedAt": created_at,
           "Content": content,
           "Confirmed": false,
           "Hash": hash,
-          "is_file": is_file,
-          "file_saved": file_saved,
-          "file": fileJson
+          "IsObject": (is_object == "TRUE"),
+          "ObjectJson": object_json
         })
         yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
       } else {
@@ -1220,9 +1284,6 @@ export function* SaveFriendMessage(action) {
       session_map[sour_address].Timestamp = json.Timestamp
       session_map[sour_address].Content = content
       yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
-
-      //tray blink
-      // ipcRenderer.send('synchronous-message', 'new-private-message')
 
       //update db-message(confirmed)
       sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN (${Array2Str(json.PairHash)})`
@@ -1276,24 +1337,19 @@ export function* HandleFriendSync(action) {
   //check message from my friend
   let friend_list = yield select(state => state.avatar.get('Friends'))
   if (!friend_list.includes(sour_address)) {
-    console.log('message is not from my friend...')
+    // console.log('message is not from my friend...')
     return
   }
 
-  // let SQL = `SELECT * FROM MESSAGES WHERE dest_address = "${sour_address}" AND confirmed = false AND sequence > ${json.CurrentSequence} ORDER BY sequence ASC`
-  // state.DB.all(SQL, (err, items) => {
-  //   if (err) {
-  //     console.log(err)
-  //   } else {
-  //     let s = 0;
-  //     for (const item of items) {
-  //       DelayExec(s * MessageInterval).then(() => {
-  //         state.WS.send(item.json)
-  //       })
-  //       s = s + 1
-  //     }
-  //   }
-  // })
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM MESSAGES WHERE dest_address = "${sour_address}" AND confirmed = 'FALSE' AND sequence > ${json.CurrentSequence} ORDER BY sequence ASC`
+  let items = yield call([db, db.getAll], sql)
+  let s = 0
+  for (let i = 0; i < items.length; i++) {
+    yield call(DelayExec, s * 1000)
+    yield put({ type: actionType.avatar.SendMessage, message: items[i].json })
+    s = s + 1
+  }
 }
 
 export function* SendFriendMessage(action) {
@@ -1323,8 +1379,21 @@ export function* SendFriendMessage(action) {
   let file_saved = 'FALSE'
   let fileSHA1 = null
 
-  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
-VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${fileSHA1}')`
+  // Forward Bulletin
+  let is_object = 'FALSE'
+  let object_type = ''
+  let object_json = {}
+  try {
+    object_json = JSON.parse(action.message)
+    if (checkObjectSchema(object_json)) {
+      is_object = 'TRUE'
+      object_type = object_json.ObjectType
+    }
+  } catch (e) {
+  }
+
+  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1, is_object, object_type)
+VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${fileSHA1}', '${is_object}', '${object_type}')`
   reuslt = yield call([db, db.runSQL], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })
@@ -1336,12 +1405,12 @@ VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.mes
         "SourAddress": "",
         "Timestamp": timestamp,
         "Sequence": sequence,
-        "created_at": timestamp,
+        "CreatedAt": timestamp,
         "Content": action.message,
         "Confirmed": false,
         "Hash": hash,
-        "is_file": is_file,
-        "file_saved": file_saved
+        "IsObject": (is_object == "TRUE"),
+        "ObjectJson": object_json
       })
       yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
     }

@@ -25,7 +25,8 @@ class BulletinPublishScreen extends React.Component {
       content: content
     })
     this.setState({ content: '', error_msg: '' })
-    this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('Address') })
+    this.props.navigation.goBack()
+    // this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('Address') })
   }
 
   render() {

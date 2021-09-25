@@ -40,6 +40,14 @@ class SessionScreen extends React.Component {
     }
   }
 
+  loadMessageList(flag) {
+    this.props.dispatch({
+      type: actionType.avatar.LoadCurrentMessageList,
+      session_flag: flag,
+      address: this.props.route.params.address
+    })
+  }
+
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       let name = AddressToName(this.props.avatar.get('AddressMap'), this.props.route.params.address)
@@ -49,16 +57,15 @@ class SessionScreen extends React.Component {
         type: actionType.avatar.LoadCurrentSession,
         address: this.props.route.params.address
       })
-      this.props.dispatch({
-        type: actionType.avatar.LoadCurrentMessageList,
-        address: this.props.route.params.address
-      })
+
       let message_input = ''
       if (this.props.route.params.content != null) {
         message_input = JSON.stringify(this.props.route.params.content)
         console.log(message_input)
       }
       this.setState({ name: name, address: this.props.route.params.address, message_input: message_input })
+
+      this.loadMessageList(true)
     })
   }
 
@@ -122,10 +129,25 @@ class SessionScreen extends React.Component {
                               </Text>
                               <View style={{ flexDirection: "row" }} >
                                 {
-                                  item.Confirmed ?
-                                    <Text style={{ backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                  item.IsObject ?
+                                    <Text style={{
+                                      color: 'blue',
+                                      fontWeight: 'bold'
+                                    }} onPress={() => this.props.navigation.push('Bulletin', {
+                                      address: item.ObjectJson.Address,
+                                      sequence: item.ObjectJson.Sequence,
+                                      hash: item.ObjectJson.Hash,
+                                      to: this.props.route.params.address
+                                    })}>
+                                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
+                                    </Text>
                                     :
-                                    <Text style={{ backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                    (
+                                      item.Confirmed ?
+                                        <Text style={{ backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                        :
+                                        <Text style={{ backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                    )
                                 }
                               </View>
                             </View>
@@ -144,10 +166,26 @@ class SessionScreen extends React.Component {
                               </Text>
                               <View style={{ flexDirection: "row-reverse" }} >
                                 {
-                                  item.Confirmed ?
-                                    <Text style={{ textAlign: "auto", backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                  item.IsObject ?
+                                    <Text style={{
+                                      textAlign: "auto",
+                                      color: 'blue',
+                                      fontWeight: 'bold'
+                                    }} onPress={() => this.props.navigation.push('Bulletin', {
+                                      address: item.ObjectJson.Address,
+                                      sequence: item.ObjectJson.Sequence,
+                                      hash: item.ObjectJson.Hash,
+                                      to: this.props.route.params.address
+                                    })}>
+                                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
+                                    </Text>
                                     :
-                                    <Text style={{ textAlign: "auto", backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                    (
+                                      item.Confirmed ?
+                                        <Text style={{ textAlign: "auto", backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                        :
+                                        <Text style={{ textAlign: "auto", backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                    )
                                 }
                               </View>
                             </View>
@@ -159,7 +197,7 @@ class SessionScreen extends React.Component {
               }
             }
             onEndReachedThreshold={0.01}
-            onEndReached={() => { }}
+            onEndReached={() => { this.loadMessageList(false) }}
           >
           </FlatList>
         </View>

@@ -36,15 +36,6 @@ class BulletinListScreen extends React.Component {
     })
   }
 
-  quoteBulletin(address, sequence, hash) {
-    this.props.dispatch({
-      type: actionType.avatar.addQuote,
-      address: address,
-      sequence: sequence,
-      hash: hash
-    })
-  }
-
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadBulletinList(true)

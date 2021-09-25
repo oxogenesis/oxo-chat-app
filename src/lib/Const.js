@@ -73,6 +73,9 @@ const BulletinMarkSession = '<BM>'
 const BulletinHistorySession = '<BH>'
 const BulletinAddressSession = '<BA>'
 
+//Message
+const MessagePageSize = 10
+
 export {
   DefaultHost,
   Epoch,
@@ -89,5 +92,6 @@ export {
   BulletinTabSession,
   BulletinMarkSession,
   BulletinHistorySession,
-  BulletinAddressSession
+  BulletinAddressSession,
+  MessagePageSize
 }

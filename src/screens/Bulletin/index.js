@@ -65,7 +65,7 @@ class BulletinScreen extends React.Component {
       }]}>
         {
           this.props.avatar.get('CurrentBulletin') == null ?
-            <Text>公告不存在...</Text>
+            <Text>公告不存在，正在获取中，请稍后查看...</Text>
             :
             <>
               <View style={{ flexDirection: "row" }} >

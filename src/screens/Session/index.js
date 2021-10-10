@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, TextInput, Button, FlatList } from 'react-native'
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { timestamp_format, AddressToName } from '../../lib/Util'
@@ -8,6 +8,7 @@ import { DHSequence } from '../../lib/OXO'
 import { actionType } from '../../redux/actions/actionType'
 
 import { connect } from 'react-redux'
+import Clipboard from '@react-native-clipboard/clipboard'
 
 //聊天会话界面
 class SessionScreen extends React.Component {
@@ -46,6 +47,10 @@ class SessionScreen extends React.Component {
       session_flag: flag,
       address: this.props.route.params.address
     })
+  }
+
+  copyToClipboard(content) {
+    Clipboard.setString(content)
   }
 
   componentDidMount() {
@@ -144,9 +149,17 @@ class SessionScreen extends React.Component {
                                     :
                                     (
                                       item.Confirmed ?
-                                        <Text style={{ backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
+                                          <Text style={{ backgroundColor: '#2edfa3' }}>
+                                            {`${item.Content}`}
+                                          </Text>
+                                        </TouchableOpacity>
                                         :
-                                        <Text style={{ backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
+                                          <Text style={{ backgroundColor: '#c2ccd0' }}>
+                                            {`${item.Content}`}
+                                          </Text>
+                                        </TouchableOpacity>
                                     )
                                 }
                               </View>
@@ -182,9 +195,17 @@ class SessionScreen extends React.Component {
                                     :
                                     (
                                       item.Confirmed ?
-                                        <Text style={{ textAlign: "auto", backgroundColor: '#2edfa3' }}>{`${item.Content}`}</Text>
+                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
+                                          <Text style={{ textAlign: "auto", backgroundColor: '#2edfa3' }}>
+                                            {`${item.Content}`}
+                                          </Text>
+                                        </TouchableOpacity>
                                         :
-                                        <Text style={{ textAlign: "auto", backgroundColor: '#c2ccd0' }}>{`${item.Content}`}</Text>
+                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
+                                          <Text style={{ textAlign: "auto", backgroundColor: '#c2ccd0' }}>
+                                            {`${item.Content}`}
+                                          </Text>
+                                        </TouchableOpacity>
                                     )
                                 }
                               </View>

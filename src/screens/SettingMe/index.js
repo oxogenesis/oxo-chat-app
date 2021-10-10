@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { View, Text, Button, Alert, TextInput } from 'react-native'
+import { View, Text, Button, Alert, TouchableOpacity } from 'react-native'
 
 import QRCode from 'react-native-qrcode-svg'
 
 import { connect } from 'react-redux'
 
 import { actionType } from '../../redux/actions/actionType'
-import { my_styles } from '../../theme/style'
+import Clipboard from '@react-native-clipboard/clipboard'
 
 //设置
 class SettingMeScreen extends React.Component {
@@ -16,6 +16,10 @@ class SettingMeScreen extends React.Component {
       address: this.props.avatar.get('Address'),
       name: this.props.avatar.get('name')
     }
+  }
+
+  copyToClipboard() {
+    Clipboard.setString(this.state.address)
   }
 
   loadState() {
@@ -57,16 +61,14 @@ class SettingMeScreen extends React.Component {
   render() {
     return (
       <View>
-        <TextInput
-          style={{ color: 'blue', fontWeight: 'bold' }}
-          value={this.state.address}
-          multiline={false}
-        />
-        <TextInput
-          style={{ color: 'blue', fontWeight: 'bold' }}
-          value={this.state.name}
-          multiline={false}
-        />
+        <TouchableOpacity onPress={() => { this.copyToClipboard() }}>
+          <Text style={{ color: 'blue', fontWeight: 'bold' }}>
+            {this.state.address}
+          </Text>
+        </TouchableOpacity>
+        <Text style={{ color: 'blue', fontWeight: 'bold' }}>
+          {this.state.name}
+        </Text>
         <View style={{ alignItems: 'center' }}>
           <QRCode
             value={this.props.avatar.get('Qrcode')}

@@ -17,15 +17,21 @@ class TabHomeScreen extends React.Component {
   render() {
     return (
       <Tab.Navigator
-        tabBarOptions={{
-          activeTintColor: 'red',
-          inactiveTintColor: 'white',
-          activeBackgroundColor: 'pink',
-          inactiveBackgroundColor: 'grey',
-          style: { height: 50 }
+        screenOptions={{
+          "tabBarActiveTintColor": "red",
+          "tabBarInactiveTintColor": "white",
+          "tabBarActiveBackgroundColor": "pink",
+          "tabBarInactiveBackgroundColor": "grey",
+          "tabBarStyle": [
+            {
+              "display": "flex"
+            },
+            null
+          ]
         }}>
         <Tab.Screen name="TabSession" component={TabSessionScreen} options={{
           tabBarLabel: '聊天',
+          headerShown: false,
           tabBarBadge: this.props.avatar.get("CountUnreadMessage"),
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
@@ -36,6 +42,7 @@ class TabHomeScreen extends React.Component {
         }} />
         <Tab.Screen name="TabBulletin" component={TabBulletinScreen} options={{
           tabBarLabel: '公告',
+          headerShown: false,
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'notification'}
@@ -45,6 +52,7 @@ class TabHomeScreen extends React.Component {
         }} />
         <Tab.Screen name="TabAddressBook" component={TabAddressBookScreen} options={{
           tabBarLabel: '地址薄',
+          headerShown: false,
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'contacts'}
@@ -54,6 +62,7 @@ class TabHomeScreen extends React.Component {
         }} />
         <Tab.Screen name="TabSetting" component={TabSettingScreen} options={{
           tabBarLabel: '设置',
+          headerShown: false,
           tabBarIcon: (tintColor, focusd) => (
             <IconAnt
               name={'setting'}

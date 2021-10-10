@@ -34,6 +34,7 @@ import AddressAddScreen from './screens/AddressAdd'
 import AddressAddFromQrcodeScreen from './screens/AddressAddFromQrcode'
 import AddressEditScreen from './screens/AddressEdit'
 import AddressSelectScreen from './screens/AddressSelect'
+import AddressScanScreen from './screens/AddressScan'
 import SettingMeScreen from './screens/SettingMe'
 import SettingNetworkScreen from './screens/SettingNetwork'
 import SettingBulletinScreen from './screens/SettingBulletin'
@@ -262,6 +263,14 @@ class App extends React.Component {
             options={
               ({ route, navigation }) => ({
                 title: '好友申请设置'
+              })
+            } />
+          <Stack.Screen
+            name="AddressScan"
+            component={AddressScanScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '地址扫描'
               })
             } />
         </Stack.Navigator>

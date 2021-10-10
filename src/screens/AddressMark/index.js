@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { View, Text, Button, Alert, TextInput } from 'react-native'
+import { View, Text, Button, Alert, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../lib/Const'
+import Clipboard from '@react-native-clipboard/clipboard'
 
 //地址标记
 class AddressMarkScreen extends React.Component {
@@ -90,6 +91,10 @@ class AddressMarkScreen extends React.Component {
     })
   }
 
+  copyToClipboard(content) {
+    Clipboard.setString(content)
+  }
+
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.loadAddressMark()
@@ -106,19 +111,17 @@ class AddressMarkScreen extends React.Component {
         {
           this.props.avatar.get('CurrentAddressMark') &&
           <View>
-            <TextInput
-              style={{ color: 'blue', fontWeight: 'bold' }}
-              value={this.props.avatar.get('CurrentAddressMark').Address}
-              multiline={false}
-            />
+            <TouchableOpacity onPress={() => { this.copyToClipboard(this.props.avatar.get('CurrentAddressMark').Address) }}>
+              <Text style={{ color: 'blue', fontWeight: 'bold' }}>
+                {this.props.avatar.get('CurrentAddressMark').Address}
+              </Text>
+            </TouchableOpacity>
             {
               this.props.avatar.get('CurrentAddressMark').IsMark ?
                 <>
-                  <TextInput
-                    style={{ color: 'blue', fontWeight: 'bold' }}
-                    value={this.props.avatar.get('CurrentAddressMark').Name}
-                    multiline={false}
-                  />
+                  <Text style={{ color: 'blue', fontWeight: 'bold' }}>
+                    {this.props.avatar.get('CurrentAddressMark').Name}
+                  </Text>
                   <Button
                     title="修改昵称"
                     onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.props.avatar.get('CurrentAddressMark').Address })} />

@@ -8,6 +8,7 @@ import { actionType } from '../../redux/actions/actionType'
 import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
+import Clipboard from '@react-native-clipboard/clipboard'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
 import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
@@ -39,6 +40,10 @@ class BulletinScreen extends React.Component {
       sequence: sequence,
       hash: hash
     })
+  }
+
+  copyToClipboard() {
+    Clipboard.setString(this.props.avatar.get('CurrentBulletin').Content)
   }
 
   componentDidMount() {
@@ -134,6 +139,14 @@ class BulletinScreen extends React.Component {
                         Hash: this.props.avatar.get('CurrentBulletin').Hash
                       }
                     })}
+                />
+                <IconMaterialIcons
+                  name={'content-copy'}
+                  size={24}
+                  color='blue'
+                  onPress={() =>
+                    this.copyToClipboard()
+                  }
                 />
               </View>
               <ScrollView>

@@ -11,16 +11,18 @@ class AddressAddFromQrcodeScreen extends React.Component {
     this.state = { address: '', relay: '' }
   }
 
-  // parseQrcode(text) {
-  //   this.setState({ qrcode: text })
-  //   let result = ParseQrcode(this.state.qrcode)
-  //   console.log(result)
-  //   if (result != false) {
-  //     this.setState({ address: result.Address, relay: result.Relay, error_msg: '' })
-  //   } else {
-  //     this.setState({ address: '', relay: '', error_msg: 'invalid qrcode...' })
-  //   }
-  // }
+  addHost() {
+    let host = this.state.relay
+    let regx = /^ws[s]?:\/\/.+/
+    let rs = regx.exec(host)
+    if (rs != null) {
+      this.props.dispatch({
+        type: actionType.avatar.addHost,
+        host: host
+      })
+    }
+    this.props.navigation.navigate('AddressAdd', { address: this.state.address })
+  }
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
@@ -28,8 +30,6 @@ class AddressAddFromQrcodeScreen extends React.Component {
         this.setState({ address: this.props.route.params.qrcode.Address, relay: this.props.route.params.qrcode.Relay })
       } else {
         this.props.navigation.goBack()
-        // this.setState({ qrcode: this.props.avatar.get('Qrcode') })
-        // console.log(this.state.qrcode)
       }
     })
   }
@@ -50,6 +50,9 @@ class AddressAddFromQrcodeScreen extends React.Component {
         <Button
           title="标记地址"
           onPress={() => this.props.navigation.navigate('AddressAdd', { address: this.state.address })} />
+        <Button
+          title="保持服务器网址+标记地址"
+          onPress={() => this.addHost()} />
       </>
     )
   }

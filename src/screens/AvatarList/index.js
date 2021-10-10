@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, Image, Button, FlatList } from 'react-native'
+import { View, Text, Image, Button, FlatList, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { AvatarDerive } from '../../lib/OXO'
@@ -71,17 +71,18 @@ class AvatarListScreen extends React.Component {
           renderItem={
             ({ item }) => {
               return (
-                <View style={{ flexDirection: "row" }} >
+                <TouchableOpacity
+                  style={{ flexDirection: "row" }}
+                  onPress={() => this.enableAvatar(item.Address, item.Name)}>
                   <View>
                     <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
                   </View>
                   <View>
-                    <Text style={my_styles.Link}
-                      onPress={() => this.enableAvatar(item.Address, item.Name)}>
+                    <Text style={my_styles.Link}>
                       {`${item.Name}`}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               )
             }
           }

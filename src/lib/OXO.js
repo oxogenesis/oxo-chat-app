@@ -118,6 +118,33 @@ async function AvatarCreateNew(name, password) {
   }
 }
 
+async function AvatarCreateWithSeed(name, seed, password) {
+  let keypair = oxoKeyPairs.deriveKeypair(seed)
+  let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
+  let salt = crypto.randomBytes(16).toString('hex')
+  let key = halfSHA512(salt + password).toString('hex').slice(0, 32)
+  let iv = crypto.randomBytes(8).toString('hex')
+  let msg = { "seed": seed }
+  let crypted = encrypt(key, iv, JSON.stringify(msg))
+  let save = { "salt": salt, "iv": iv, "ct": crypted }
+
+  try {
+    const result = await AsyncStorage.getItem('<#Avatars#>')
+    console.log(result)
+    let avatarList = []
+    if (result != null) {
+      avatarList = JSON.parse(result)
+    }
+    avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
+    console.log(avatarList)
+    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 async function AvatarNameEdit(name, seed, password) {
   let keypair = oxoKeyPairs.deriveKeypair(seed)
   let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
@@ -156,17 +183,6 @@ async function AvatarNameEdit(name, seed, password) {
   }
 }
 
-function AvatarCreateWithSeed(seed, password) {
-  let keypair = oxoKeyPairs.deriveKeypair(seed)
-  //let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
-  let salt = crypto.randomBytes(16).toString('hex')
-  let key = halfSHA512(salt + password).toString('hex').slice(0, 32)
-  let iv = crypto.randomBytes(8).toString('hex')
-  let msg = { "seed": seed }
-  let crypted = encrypt(key, iv, JSON.stringify(msg))
-  let save = { "salt": salt, "iv": iv, "ct": crypted }
-}
-
 async function AvatarDerive(strSave, masterKey) {
   try {
     let jsonSave = JSON.parse(strSave)
@@ -180,11 +196,22 @@ async function AvatarDerive(strSave, masterKey) {
   }
 }
 
-function ParseQrcode(qrcode) {
+function ParseQrcodeAddress(qrcode) {
   try {
     let json = JSON.parse(qrcode)
     let address = oxoKeyPairs.deriveAddress(json.PublicKey)
     return { Relay: json.Relay, Address: address }
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
+function ParseQrcodeSeed(qrcode) {
+  try {
+    let json = JSON.parse(qrcode)
+    let keypair = oxoKeyPairs.deriveKeypair(json.Seed)
+    return { Name: json.Name, Seed: json.Seed }
   } catch (e) {
     console.log(e)
     return false
@@ -258,6 +285,7 @@ export {
   AvatarCreateWithSeed,
   AvatarDerive,
   AvatarNameEdit,
-  ParseQrcode,
+  ParseQrcodeAddress,
+  ParseQrcodeSeed,
   DHSequence
 }

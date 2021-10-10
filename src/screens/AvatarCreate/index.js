@@ -25,6 +25,7 @@ class AvatarCreateScreen extends React.Component {
         }
       })
   }
+  
   render() {
     return (
       <>

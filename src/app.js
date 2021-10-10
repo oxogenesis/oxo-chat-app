@@ -23,6 +23,10 @@ import MasterKeyScreen from './screens/MasterKey'
 import UnlockScreen from './screens/Unlock'
 import AvatarListScreen from './screens/AvatarList'
 import AvatarCreateScreen from './screens/AvatarCreate'
+import AvatarNameEditScreen from './screens/AvatarNameEdit'
+import AvatarSeedScreen from './screens/AvatarSeed'
+import AvatarSeedQrcodeScreen from './screens/AvatarSeedQrcode'
+import AvatarCreateFromScanSeedQrcodeScreen from './screens/AvatarCreateFromScanSeedQrcode'
 import TabHomeScreen from './screens/TabHome'
 import BulletinScreen from './screens/Bulletin'
 import BulletinInfoScreen from './screens/BulletinInfo'
@@ -43,8 +47,6 @@ import SettingFriendScreen from './screens/SettingFriend'
 import SettingFollowScreen from './screens/SettingFollow'
 import SettingFriendRequestScreen from './screens/SettingFriendRequest'
 import BulletinCacheScreen from './screens/BulletinCache'
-import AvatarNameEditScreen from './screens/AvatarNameEdit'
-import AvatarSeedScreen from './screens/AvatarSeed'
 
 class App extends React.Component {
   render() {
@@ -80,9 +82,17 @@ class App extends React.Component {
                   <IconAnt
                     name={'qrcode'}
                     size={24}
-                    onPress={() => alert('ToDo:qrcode')
+                    onPress={() => navigation.navigate('AvatarCreateFromScanSeedQrcode')
                     }
                   />)
+              })
+            } />
+          <Stack.Screen
+            name="AvatarCreateFromScanSeedQrcode"
+            component={AvatarCreateFromScanSeedQrcodeScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '种子扫描'
               })
             } />
           <Stack.Screen
@@ -199,6 +209,14 @@ class App extends React.Component {
             options={
               ({ route, navigation }) => ({
                 title: '！！！查看种子！！！'
+              })
+            } />
+          <Stack.Screen
+            name="AvatarSeedQrcode"
+            component={AvatarSeedQrcodeScreen}
+            options={
+              ({ route, navigation }) => ({
+                title: '！！！种子二维码！！！'
               })
             } />
           <Stack.Screen

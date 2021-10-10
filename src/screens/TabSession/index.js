@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, Text, FlatList, Image } from 'react-native'
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 
@@ -32,14 +32,16 @@ class TabSessionScreen extends React.Component {
           renderItem={
             ({ item }) => {
               return (
-                <View style={{ flexDirection: "row" }} >
+                <TouchableOpacity
+                  style={{ flexDirection: "row" }}
+                  onPress={() => this.props.navigation.push('Session', { address: item.Address })}>
                   <View>
                     <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
                   </View>
                   <View style={{ backgroundColor: "grey", flex: 1 }} >
                     <View style={{ flexDirection: "row" }}>
                       <View style={{ backgroundColor: "yellow", flex: 0.5, flexDirection: "row" }} >
-                        <Text onPress={() => this.props.navigation.push('Session', { address: item.Address })}>
+                        <Text>
                           {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
                         </Text>
                         {
@@ -57,7 +59,7 @@ class TabSessionScreen extends React.Component {
                       {`${item.Content}`}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               )
             }
           }

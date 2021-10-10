@@ -2,15 +2,21 @@ import * as React from 'react'
 
 import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 
+import { connect } from 'react-redux'
 import QRCodeScanner from 'react-native-qrcode-scanner'
 import { RNCamera } from 'react-native-camera'
-import { ParseQrcodeAddress } from '../../lib/OXO'
+import { ParseQrcodeSeed, AvatarCreateWithSeed } from '../../lib/OXO'
 
-class AddressScanScreen extends React.Component {
+class AvatarCreateFromScanSeedQrcode extends React.Component {
   onSuccess(e) {
-    let result = ParseQrcodeAddress(e.data)
+    let result = ParseQrcodeSeed(e.data)
     if (result != false) {
-      this.props.navigation.replace('AddressAddFromQrcode', { qrcode: result })
+      AvatarCreateWithSeed(result.Name, result.Seed, this.props.master.get('MasterKey'))
+        .then(result => {
+          if (result) {
+            this.props.navigation.replace('AvatarList')
+          }
+        })
     }
   }
 
@@ -19,7 +25,7 @@ class AddressScanScreen extends React.Component {
       <QRCodeScanner
         onRead={(e) => (this.onSuccess(e))}
         reactivate={true}
-        reactivateTimeout={1500}
+        reactivateTimeout={3000}
         flashMode={RNCamera.Constants.FlashMode.auto}
         showMarker={true}
         topContent={
@@ -56,4 +62,10 @@ const styles = StyleSheet.create({
   }
 })
 
-export default AddressScanScreen
+const ReduxAvatarCreateFromScanSeedQrcode = connect((state) => {
+  return {
+    master: state.master
+  }
+})(AvatarCreateFromScanSeedQrcode)
+
+export default ReduxAvatarCreateFromScanSeedQrcode

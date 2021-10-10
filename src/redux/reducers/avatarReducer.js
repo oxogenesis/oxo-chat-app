@@ -9,7 +9,6 @@ function initialState() {
       Address: null,
       PublicKey: null,
       PrivateKey: null,
-      Qrcode: null,
       Setting: {},
 
       Database: null,
@@ -62,7 +61,6 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('Address', action.address)
     .set('PublicKey', action.public_key)
     .set('PrivateKey', action.private_key)
-    .set('Qrcode', "")
     .set('Setting', action.setting)
     .set('Database', null)
     .set('Hosts', [])
@@ -103,7 +101,6 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('Address', null)
     .set('PublicKey', null)
     .set('PrivateKey', null)
-    .set('Qrcode', "")
     .set('Database', null)
     .set('Hosts', [])
     .set('CurrentHost', null)
@@ -132,10 +129,6 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
 
 reducer.prototype[actionType.avatar.setSetting] = (state, action) => {
   return state.set('Setting', action.setting)
-}
-
-reducer.prototype[actionType.avatar.setQrcode] = (state, action) => {
-  return state.set('Qrcode', action.qrcode)
 }
 
 reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {

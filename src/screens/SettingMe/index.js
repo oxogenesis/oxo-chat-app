@@ -14,7 +14,8 @@ class SettingMeScreen extends React.Component {
     super(props)
     this.state = {
       address: this.props.avatar.get('Address'),
-      name: this.props.avatar.get('name')
+      name: this.props.avatar.get('name'),
+      qrcode: "xxx"
     }
   }
 
@@ -22,20 +23,13 @@ class SettingMeScreen extends React.Component {
     Clipboard.setString(this.state.address)
   }
 
-  loadState() {
-    this.setState({
-      address: this.props.avatar.get('Address'),
-      name: this.props.avatar.get('Name')
-    })
-  }
-
-  viewSeedAlert() {
+  viewSeedQrcodeAlert() {
     Alert.alert(
       '提示',
-      `查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
-确定要查看种子吗？`,
+      `确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
+确定要查看种子二维码吗？`,
       [
-        { text: '确认', onPress: () => this.props.navigation.navigate('AvatarSeed') },
+        { text: '确认', onPress: () => this.props.navigation.navigate('AvatarSeedQrcode') },
         { text: '取消', style: 'cancel' },
       ],
       { cancelable: false }
@@ -50,7 +44,12 @@ class SettingMeScreen extends React.Component {
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadState()
+      let json = { "Relay": this.props.avatar.get('CurrentHost'), "PublicKey": this.props.avatar.get('PublicKey') }
+      this.setState({
+        address: this.props.avatar.get('Address'),
+        name: this.props.avatar.get('Name'),
+        qrcode: JSON.stringify(json)
+      })
     })
   }
 
@@ -71,7 +70,7 @@ class SettingMeScreen extends React.Component {
         </Text>
         <View style={{ alignItems: 'center' }}>
           <QRCode
-            value={this.props.avatar.get('Qrcode')}
+            value={this.state.qrcode}
             size={350}
             logo={require('../../assets/app.png')}
             logoSize={50}
@@ -80,7 +79,7 @@ class SettingMeScreen extends React.Component {
         </View>
         <Button title="修改昵称" onPress={() => { this.props.navigation.navigate('AvatarNameEdit') }} />
         <Button title="应用异常退出，导致数据显示：重载" onPress={() => { this.loadFromDB() }} />
-        <Button color="red" title="查看种子" onPress={() => { this.viewSeedAlert() }} />
+        <Button color="red" title="查看种子二维码" onPress={() => { this.viewSeedQrcodeAlert() }} />
       </View >
     )
   }

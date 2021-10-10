@@ -289,10 +289,6 @@ export function* loadFromDB(action) {
   let current_host = hosts[0].Address || DefaultHost
   yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host })
 
-  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let qrcode = MessageGenerator.genQrcode(current_host)
-  yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
-
   // SessionList
   sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
   let recent_message_receive = []
@@ -362,10 +358,6 @@ export function* enableAvatar(action) {
     yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
     yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host, current_host_timestamp: timestamp })
     yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
-
-    let qrcode = mg.genQrcode(cache.current_host)
-    yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
-    yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
   } else {
     // Load from db, very slow
     yield put({ type: actionType.avatar.loadFromDB })
@@ -587,10 +579,6 @@ VALUES ('${action.host}', ${timestamp})`
     hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
   }
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
-
-  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let qrcode = MessageGenerator.genQrcode(action.host)
-  yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
 }
 
 export function* delHost(action) {
@@ -622,10 +610,6 @@ export function* changeCurrentHost(action) {
 
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host, current_host_timestamp: timestamp })
   yield put({ type: actionType.avatar.Conn, host: action.host, timestamp: timestamp })
-
-  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let qrcode = MessageGenerator.genQrcode(action.host)
-  yield put({ type: actionType.avatar.setQrcode, qrcode: qrcode })
 }
 
 // Bulletin

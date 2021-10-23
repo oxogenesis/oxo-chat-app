@@ -288,7 +288,7 @@ export function* loadFromDB(action) {
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 
   let current_host = hosts[0].Address
-  yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host })
+  yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host, current_host_timestamp: timestamp })
   yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
 
   // SessionList

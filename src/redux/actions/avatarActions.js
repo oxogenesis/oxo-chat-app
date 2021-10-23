@@ -235,6 +235,7 @@ export function* SendMessage(action) {
 // Avatar
 export function* loadFromDB(action) {
   let db = yield select(state => state.avatar.get('Database'))
+  let timestamp = Date.now()
   let address = yield select(state => state.avatar.get('Address'))
   let name = yield select(state => state.avatar.get('Name'))
 
@@ -282,12 +283,13 @@ export function* loadFromDB(action) {
     hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
   })
   if (hosts.length == 0) {
-    hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
+    hosts.push({ Address: DefaultHost, UpdatedAt: timestamp })
   }
   yield put({ type: actionType.avatar.setHosts, hosts: hosts })
 
-  let current_host = hosts[0].Address || DefaultHost
+  let current_host = hosts[0].Address
   yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host })
+  yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
 
   // SessionList
   sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
@@ -358,6 +360,7 @@ export function* enableAvatar(action) {
     yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
     yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host, current_host_timestamp: timestamp })
     yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
+    yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
   } else {
     // Load from db, very slow
     yield put({ type: actionType.avatar.loadFromDB })

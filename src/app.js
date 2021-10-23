@@ -17,7 +17,6 @@ import IconFontisto from 'react-native-vector-icons/Fontisto'
 
 import { connect } from 'react-redux'
 
-const Stack = createStackNavigator()
 
 import MasterKeyScreen from './screens/MasterKey'
 import UnlockScreen from './screens/Unlock'
@@ -47,6 +46,8 @@ import SettingFriendScreen from './screens/SettingFriend'
 import SettingFollowScreen from './screens/SettingFollow'
 import SettingFriendRequestScreen from './screens/SettingFriendRequest'
 import BulletinCacheScreen from './screens/BulletinCache'
+
+const Stack = createStackNavigator()
 
 class App extends React.Component {
   render() {

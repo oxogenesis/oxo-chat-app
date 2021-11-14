@@ -461,7 +461,7 @@ export function* delAddressMark(action) {
   let sql = `DELETE FROM ADDRESS_MARKS WHERE address = "${action.address}"`
   yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
-  address_map[action.address] = null
+  delete address_map[action.address]
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 }
 

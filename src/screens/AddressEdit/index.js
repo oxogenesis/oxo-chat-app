@@ -16,8 +16,8 @@ class AddressEditScreen extends React.Component {
   saveAddressName() {
     let address = this.state.address
     let name = this.state.name.trim()
-    if (name == '') {
-      this.setState({ error_msg: 'name could not be blank...' })
+    if (name == '' || address == name) {
+      this.setState({ error_msg: '昵称不能为空，且昵称不能与地址相同......' })
       return
     }
     this.props.dispatch({

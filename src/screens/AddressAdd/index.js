@@ -14,8 +14,8 @@ class AddressAddScreen extends React.Component {
   addAddressMark() {
     let address = this.state.address.trim()
     let name = this.state.name.trim()
-    if (address == '' || name == '') {
-      this.setState({ error_msg: '地址或昵称不能为空...' })
+    if (address == '' || name == '' || address == name) {
+      this.setState({ error_msg: '地址或昵称不能为空，且地址与昵称不能相同...' })
       return
     } else if (address == this.props.avatar.get('Address')) {
       this.setState({ error_msg: '不能标记自己...' })

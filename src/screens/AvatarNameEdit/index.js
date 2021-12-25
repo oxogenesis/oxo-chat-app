@@ -1,75 +1,76 @@
-import * as React from 'react'
-import { View, Text, Button, TextInput } from 'react-native'
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-
 import { connect } from 'react-redux'
 import { AvatarNameEdit } from '../../lib/OXO'
 import { actionType } from '../../redux/actions/actionType'
+import { WhiteSpace, Button } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
 
 //地址标记
-class AvatarNameEditScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { address: '', name: '', error_msg: '' }
-  }
+const AvatarNameEditScreen = (props) => {
+  const [address, setAddress] = useState(props.avatar.get('Address'))
+  const [name, setName] = useState(props.avatar.get('Name'))
+  const [error_msg, setMsg] = useState('')
+  const { theme } = useContext(ThemeContext);
 
-  saveName() {
-    let name = this.state.name.trim()
+  const saveName = () => {
+    let newName = name.trim()
     if (name == '') {
-      this.setState({ error_msg: 'name could not be blank...' })
+      setMsg('name could not be blank...')
       return
     }
-    AvatarNameEdit(this.state.name, this.props.avatar.get('Seed'), this.props.master.get('MasterKey'))
+    AvatarNameEdit(newName, props.avatar.get('Seed'),
+      props.master.get('MasterKey'))
       .then(result => {
         if (result) {
-          this.setState({ name: '', error_msg: '' })
-          this.props.dispatch({
+          setName('')
+          setMsg('')
+          props.dispatch({
             type: actionType.avatar.setAvatarName,
-            name: name
+            name: newName
           })
-          this.props.navigation.goBack()
+          props.navigation.goBack()
         }
       })
   }
 
-  loadState() {
-    this.setState({
-      address: this.props.avatar.get('Address'),
-      name: this.props.avatar.get('Name')
-    })
-  }
-
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadState()
-    })
-  }
-
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
-
-  render() {
-    return (
-      <View>
-        <Text> {this.state.address}</Text>
-        <TextInput
-          placeholder="昵称"
-          value={this.state.name}
-          multiline={false}
-          onChangeText={text => this.setState({ name: text })}
-        />
-        {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
-        <Button
-          title="保存"
-          onPress={() => this.saveName()}
-        />
-      </View>
-    )
-  }
+  return (
+    <View style={{
+      ...styles.base_view,
+      backgroundColor: theme.base_body
+    }}>
+      <Text style={{
+        color: theme.text1
+      }}>地址：{address}</Text>
+      <WhiteSpace size='lg' />
+      <TextInput
+         placeholderTextColor={theme.text2}
+         style={{
+           ...styles.input_view,
+           color: theme.text1
+         }}
+        placeholder="昵称"
+        value={name}
+        multiline={false}
+        onChangeText={text => setName(text)}
+      />
+      <WhiteSpace size='lg' />
+      {
+        error_msg.length > 0 &&
+        <View>
+          <Text style={styles.required_text}>{error_msg}</Text>
+          <WhiteSpace size='lg' />
+        </View>
+      }
+      <Button
+        style={styles.btn_high}
+        type='primary'
+        onPress={saveName}
+      >保存</Button>
+    </View>
+  )
 }
 
 const ReduxAvatarNameEditScreen = connect((state) => {

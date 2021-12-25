@@ -1,24 +1,24 @@
-import * as React from 'react'
-import { View, Text, Image, Button, FlatList, TouchableOpacity } from 'react-native'
+import React, { useContext, useState, useEffect } from 'react';
+import { Button, List, WhiteSpace, Flex, WingBlank } from '@ant-design/react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
 import { AvatarDerive } from '../../lib/OXO'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { my_styles } from '../../theme/style'
+import { styles } from '../../theme/style'
+import EmptyView from '../EmptyView'
+import { ThemeContext } from '../../theme/theme-context';
 
 //登录界面
-class AvatarListScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { avatarList: [] }
-  }
+const AvatarListScreen = props => {
+  const { theme } = useContext(ThemeContext);
+  const [avatarList, setList] = useState([])
 
-  loadAvatarList() {
+  const loadAvatarList = () => {
     try {
       AsyncStorage.getItem('<#Avatars#>').then(result => {
         if (result != null) {
-          this.setState({ avatarList: JSON.parse(result) })
+          setList(JSON.parse(result))
         }
       })
     } catch (e) {
@@ -26,73 +26,81 @@ class AvatarListScreen extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadAvatarList()
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      loadAvatarList()
     })
-  }
+  })
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
 
-  enableAvatar(address, name) {
-    let avatar = this.state.avatarList.filter(item => item.Address == address)[0]
-    AvatarDerive(avatar.save, this.props.master.get('MasterKey'))
+  const enableAvatar = (address, name) => {
+    let avatar = avatarList.filter(item => item.Address == address)[0]
+    AvatarDerive(avatar.save, props.master.get('MasterKey'))
       .then(result => {
         if (result) {
-          this.props.dispatch({
+          props.dispatch({
             type: actionType.avatar.enableAvatar,
             seed: result,
             name: name
           })
-          this.props.navigation.navigate('TabHome')
+          props.navigation.navigate('TabHome')
         }
       })
   }
 
-  lock() {
-    this.props.dispatch({
+  const lock = () => {
+    props.dispatch({
       type: actionType.master.setMasterKey,
       MasterKey: null
     })
-    this.props.navigation.navigate('Unlock')
+    props.navigation.navigate('Unlock')
   }
 
-  render() {
-    return (
-      <View>
-        <FlatList
-          data={this.state.avatarList}
-          keyExtractor={item => item.Name}
-          ListEmptyComponent={
-            <Text>暂无账户...</Text>
-          }
-          renderItem={
-            ({ item }) => {
-              return (
-                <TouchableOpacity
-                  style={{ flexDirection: "row" }}
-                  onPress={() => this.enableAvatar(item.Address, item.Name)}>
-                  <View>
-                    <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
-                  </View>
-                  <View>
-                    <Text style={my_styles.Link}>
-                      {`${item.Name}`}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )
-            }
-          }
-        >
-        </FlatList>
-        <Button color="red" title="安全退出" onPress={() => this.lock()} />
+  return (
+    <View style={{
+      ...styles.base_view_r,
+      backgroundColor: theme.base_view
+    }}>
+      <ScrollView
+        style={styles.scroll_view}
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
+          <WhiteSpace />
+        {
+          avatarList.length > 0 ? avatarList.map((item, index) => (
+            <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
+              <View style={{
+                ...styles.avatar_list,
+                backgroundColor: theme.base_body
+              }}
+              >
+                <Flex>
+                  <Flex.Item style={{ flex: 0.1 }}>
+                    <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                  </Flex.Item>
+                  <Flex.Item >
+                    <Text style={{
+                      ...styles.base_text_md,
+                      color: theme.text1
+                    }}>{item.Name}</Text>
+                    <Text style={styles.base_text_id}>{item.Address}</Text>
+                  </Flex.Item>
+                </Flex>
+              </View>
+            </TouchableOpacity>
+
+          )) : <EmptyView pTop={1} />
+        }
+        <WhiteSpace size='lg' />
+      </ScrollView>
+      <View style={styles.base_view_a}>
+        <Button style={styles.btn_high} type="warning" onPress={() => lock()}>安全退出</Button>
       </View>
-    )
-  }
+    </View>
+  )
 }
+
 
 const ReduxAvatarListScreen = connect((state) => {
   return {

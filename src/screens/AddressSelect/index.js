@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { View, Text, FlatList, Image } from 'react-native'
-
-
 import { connect } from 'react-redux'
-
 import { AddressToName } from '../../lib/Util'
 import { my_styles } from '../../theme/style'
 

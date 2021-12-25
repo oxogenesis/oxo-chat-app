@@ -1,59 +1,35 @@
-import * as React from 'react'
-import { View, Text, FlatList, Image } from 'react-native'
-
-
+import React, { useContext, useState } from 'react';
+import { View, Text, Image } from 'react-native'
 import { connect } from 'react-redux'
-
 import { AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
+import EmptyView from '../EmptyView'
+import { List, WhiteSpace } from '@ant-design/react-native';
+import { ThemeContext } from '../../theme/theme-context';
+import BaseAvatarList from '../BaseAvatarList';
+const Item = List.Item
+//关注设置
+const SettingFollowScreen = props => {
+  const { theme } = useContext(ThemeContext);
 
-//设置
-class SettingFollowScreen extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+  const lists = props.avatar.get('Follows').map(item => ({
+    title: `${AddressToName(props.avatar.get('AddressMap'), item)}`,
+    onpress: () => props.navigation.push('AddressMark', { address: item })
+  }))
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      //   this.loadState()
-    })
-  }
+  return (
+    <View style={{
+      height: '100%',
+      backgroundColor: theme.base_view
+    }}>
+       <WhiteSpace size='lg' />
+      {
+        props.avatar.get('Follows').length > 0 ? <View>
+          <BaseAvatarList data={lists} />
+        </View> : <EmptyView />
+      }
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
-
-  render() {
-    return (
-      <View style={my_styles.TabSheet}>
-        <FlatList
-          data={this.props.avatar.get('Follows')}
-          keyExtractor={item => item}
-          ListEmptyComponent={
-            <Text>暂未关注...</Text>
-          }
-          renderItem={
-            ({ item }) => {
-              return (
-                <View style={{ flexDirection: "row" }} >
-                  <View>
-                    <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
-                  </View>
-                  <View>
-                    <Text style={my_styles.Link}
-                      onPress={() => this.props.navigation.push('AddressMark', { address: item })}>
-                      {`${AddressToName(this.props.avatar.get('AddressMap'), item)}`}
-                    </Text>
-                  </View>
-                </View>
-              )
-            }
-          }
-        >
-        </FlatList>
-      </View >
-    )
-  }
+    </View >
+  )
 }
 
 const ReduxSettingFollowScreen = connect((state) => {

@@ -11,7 +11,7 @@ import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
 
-const SettingJson = { "BulletinCacheSize": 0 }
+const SettingJson = { "BulletinCacheSize": 0, "ThemeFlag": 'light' }
 
 function DelayExec(ms) {
   return new Promise(resolve => {
@@ -435,6 +435,21 @@ export function* setBulletinCacheSize(action) {
   let timestamp = Date.now()
   let setting = yield select(state => state.avatar.get('Setting'))
   setting.BulletinCacheSize = action.cache_size
+  console.log(setting)
+  let sql = `DELETE FROM SETTINGS`
+  yield call([db, db.runSQL], sql)
+  sql = `INSERT INTO SETTINGS (content, updated_at)
+VALUES ('${JSON.stringify(setting)}', ${timestamp})`
+  yield call([db, db.runSQL], sql)
+  yield put({ type: actionType.avatar.setSetting, setting: setting })
+}
+
+
+export function* setThemeFlag(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let timestamp = Date.now()
+  let setting = yield select(state => state.avatar.get('Setting'))
+  setting.ThemeFlag = action.theme_flag
   console.log(setting)
   let sql = `DELETE FROM SETTINGS`
   yield call([db, db.runSQL], sql)

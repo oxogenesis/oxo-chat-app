@@ -1,131 +1,204 @@
-import * as React from 'react'
-import { View, Text, TextInput, Button, FlatList, Alert } from 'react-native'
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput, FlatList, Alert } from 'react-native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { my_styles } from '../../theme/style'
+import { my_styles, styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
+import AlertView from '../AlertView'
+import BaseList from '../BaseList'
 
-//登录界面
-class SettingNetworkScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { host_input: '', error_msg: '' }
-  }
+import { Button, WhiteSpace } from '@ant-design/react-native';
 
-  addHost() {
-    let host_input = this.state.host_input.trim()
+//网络设置
+const SettingNetworkScreen = (props) => {
+  const [host_input, setHost] = useState('')
+  const [error_msg, setMsg] = useState('')
+  const [visible, showModal] = useState(false)
+  const [host1, setHostData] = useState()
+  const { theme } = useContext(ThemeContext);
+
+  const addHost = () => {
+    let host_input1 = host_input.trim()
     let regx = /^ws[s]?:\/\/.+/
-    let rs = regx.exec(host_input)
+    let rs = regx.exec(host_input1)
     if (rs == null) {
-      this.setState({ error_msg: '地址格式无效...' })
+      setMsg('地址格式无效...')
     } else {
-      this.props.dispatch({
+      props.dispatch({
         type: actionType.avatar.addHost,
-        host: host_input
+        host: host_input1
       })
-      this.setState({ host_input: '', error_msg: '' })
+      setHost('')
+      setMsg('')
     }
   }
 
-  changeCurrentHost(host) {
-    this.props.dispatch({
+  const changeCurrentHost = (host) => {
+    props.dispatch({
       type: actionType.avatar.changeCurrentHost,
       host: host
     })
   }
 
-  delHostAlert(host) {
-    Alert.alert(
-      '提示',
-      `确定要删除${host}吗？`,
-      [
-        { text: '确认', onPress: () => this.delHost(host) },
-        { text: '取消', style: 'cancel' },
-      ],
-      { cancelable: false }
-    )
+  const delHostAlert = (host) => {
+    showModal(true)
+    setHostData(host)
+    // Alert.alert(
+    //   '提示',
+    //   `确定要删除${host}吗？`,
+    //   [
+    //     { text: '确认', onPress: () => delHost(host) },
+    //     { text: '取消', style: 'cancel' },
+    //   ],
+    //   { cancelable: false }
+    // )
   }
 
-  delHost(host) {
-    this.props.dispatch({
+  const delHost = (host) => {
+    props.dispatch({
       type: actionType.avatar.delHost,
       host: host
     })
   }
 
-  render() {
-    return (
-      <>
-        {
-          this.props.avatar.get('ConnStatus') ?
-            <View style={{ alignItems: 'center', backgroundColor: "green" }} >
-              <Text>
-                {`<在线>`}
-              </Text>
-            </View>
-            :
-            <View style={{ alignItems: 'center', backgroundColor: "red" }} >
-              <Text>
-                {`^断开^`}
-              </Text>
-            </View>
+  const onClose = () => {
+    showModal(false)
+  }
+
+  return (
+    <View style={{
+      ...styles.base_view,
+      backgroundColor: theme.base_view,
+      padding: 0,
+    }}>
+      {
+        !props.avatar.get('ConnStatus') && <View style={{
+          alignItems: 'center',
+          backgroundColor: theme.off_line_view,
+          height: 55,
+          lineHeight: 55,
+        }} >
+          <Text style={{
+            lineHeight: 55,
+            fontSize: 16,
+            color: theme.off_line_text
+          }}>
+            当前网络不可用，请检查你的网络设置
+          </Text>
+        </View>
+      }
+
+      <WhiteSpace size='md' />
+      <View style={{
+        paddingLeft: 6,
+        paddingRight: 6
+      }}>
+      <TextInput
+        placeholder="ws://或者wss://"
+        value={host_input}
+        onChangeText={setHost}
+        placeholderTextColor={theme.text2}
+        style={{
+          ...styles.input_view,
+          color: theme.text1,
+          backgroundColor: theme.base_body
+        }}
+      />
+      <WhiteSpace size='md' />
+      {
+        error_msg.length > 0 &&
+        <View>
+          <Text style={{ color: 'red' }}>{error_msg}</Text>
+          <WhiteSpace size='lg' />
+        </View>
+      }
+      <Button type='primary' style={{
+        height: 55
+      }} onPress={addHost}>设置</Button>
+      <WhiteSpace size='md' />
+      <FlatList
+        data={props.avatar.get('Hosts')}
+        keyExtractor={item => item.Address}
+        ListEmptyComponent={
+          <Text>暂未设置服务器地址...</Text>
         }
-        <TextInput
-          placeholder="ws://或者wss://"
-          value={this.state.host_input}
-          onChangeText={text => this.setState({ host_input: text })}
-        />
-        {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
-        <Button title="设置" onPress={() => this.addHost()} />
-        <FlatList
-          data={this.props.avatar.get('Hosts')}
-          keyExtractor={item => item.Address}
-          ListEmptyComponent={
-            <Text>暂未设置服务器地址...</Text>
-          }
-          renderItem={
-            ({ item }) => {
-              return (
-                <View style={{ flexDirection: "row" }} >
-                  <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
-                    <Text>{item.Address}</Text>
-                  </View>
-                  {
-                    item.Address == this.props.avatar.get('CurrentHost') ?
-                      <View style={{ backgroundColor: "yellow", flex: 0.2 }} >
-                        <Text>
-                          {`当前在用`}
+        renderItem={
+          ({ item }) => {
+            return (
+              <View style={{
+                flexDirection: "row",
+                paddingTop: 5,
+                height: 55,
+                borderBottomWidth: 1,
+                borderColor: theme.line,
+                backgroundColor: theme.base_body,
+                paddingLeft: 6,
+                paddingRight: 6
+              }} >
+                <View style={{
+                  flex: 0.7,
+                }} >
+                  <Text style={{
+                    lineHeight: 55,
+                    color: theme.text1,
+                  }}>{item.Address}</Text>
+                </View>
+                {
+                  item.Address == props.avatar.get('CurrentHost') ?
+                    <View style={{ flex: 0.25 }} >
+                      <Text style={{
+                        lineHeight: 45,
+                        color: 'green',
+                        textAlign: 'right'
+                      }}>
+                        当前正在使用
+                      </Text>
+                    </View>
+                    :
+                    <>
+                      <View style={{ flex: 0.25 }} >
+                        <Text style={{
+                          textAlign: 'right'
+                        }}>
+                          <Button type='primary' onPress={() => changeCurrentHost(item.Address)} style={{
+                            height: 40,
+                            marginTop: 4,
+                            width: 70,
+                          }}>使用</Button>
                         </Text>
                       </View>
-                      :
-                      <>
-                        <View style={{ backgroundColor: "yellow", flex: 0.1 }} >
-                          <Text style={my_styles.Link}
-                            onPress={() => this.changeCurrentHost(item.Address)}>
-                            {`使用`}
-                          </Text>
-                        </View>
-                        <View style={{ backgroundColor: "yellow", flex: 0.1 }} >
-                          <Text style={my_styles.Link}
-                            onPress={() => this.delHostAlert(item.Address)}>
-                            {`删除`}
-                          </Text>
-                        </View>
-                      </>
-                  }
-                </View>
-              )
-            }
+                      <View style={{ flex: 0.25 }} >
+                        <Text style={{
+                          textAlign: 'right'
+                        }}>
+                          <Button onPress={() => delHostAlert(item.Address)} type='warning' style={{
+                            height: 40,
+                            marginTop: 4,
+                            width: 70,
+                          }}>删除</Button>
+                        </Text>
+                      </View>
+                    </>
+                }
+              </View>
+            )
           }
-        >
-        </FlatList >
-      </>
-    )
-  }
+        }
+      >
+      </FlatList >
+      </View>
+      <AlertView
+        visible={visible}
+        onClose={onClose}
+        msg={`你确定要删除${host1}吗?`}
+        onPress={() => delHost(host1)}
+      />
+    </View>
+  )
+
 }
+
 
 const ReduxSettingNetworkScreen = connect((state) => {
   return {

@@ -1,67 +1,80 @@
-import * as React from 'react'
-import { View, Text, TextInput, Button } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TextInput, Appearance } from 'react-native'
+import { Button, WhiteSpace, Popover, Icon } from '@ant-design/react-native';
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { MasterKeyDerive } from '../../lib/OXO'
+import { ThemeContext } from '../../theme/theme-context';
+import { styles } from '../../theme/style'
 
 //Unlock界面
-class UnlockScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { master_key: '', error_msg: '' }
-  }
+const UnlockScreen = (props) => {
+  const { theme, toggle } = useContext(ThemeContext);
+  const [master_key, setKey] = useState('')
+  const [error_msg, setMsg] = useState('')
 
-  unlock() {
-    MasterKeyDerive(this.state.master_key)
+  const unlock = () => {
+    MasterKeyDerive(master_key)
       .then(result => {
         if (result) {
-          this.props.dispatch({
+          props.dispatch({
             type: actionType.master.setMasterKey,
-            master_key: this.state.master_key
+            master_key: master_key
           })
-          this.setState({ master_key: '', error_msg: '' })
-          this.props.navigation.navigate('AvatarList')
+          setKey('')
+          setMsg('')
+          props.navigation.navigate('AvatarList')
         } else {
-          this.setState({ master_key: '', error_msg: 'invalid MasterKey...' })
+          setKey('')
+          setMsg('invalid MasterKey...')
         }
       })
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      if (this.props.master.get('MasterKey') != null) {
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      if (props.master.get('MasterKey') != null) {
         // 强制安全退出：加载此页面，置空MasterKey
-        this.props.dispatch({
+        props.dispatch({
           type: actionType.master.setMasterKey,
           MasterKey: null
         })
       }
-      this.setState({ master_key: '', error_msg: '' })
+      setKey('')
+      setMsg('')
     })
-  }
+  })
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
 
-  render() {
-    return (
-      <>
-        <TextInput
-          secureTextEntry={true}
-          placeholder="口令"
-          value={this.state.master_key}
-          onChangeText={text => this.setState({ master_key: text })}
-        />
-        {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
-        <Button title="解锁" onPress={() => this.unlock()} />
-      </>
-    )
-  }
+  return (
+    <View style={{
+      ...styles.base_view,
+      backgroundColor: theme.base_view
+    }}>
+      <TextInput
+         placeholderTextColor={theme.text1}
+         style={{
+           ...styles.input_view,
+           color: theme.text1,
+           borderColor: theme.border_color
+         }}
+        secureTextEntry={true}
+        placeholder="口令"
+        value={master_key}
+        onChangeText={text => setKey(text)}
+      />
+
+      <WhiteSpace size='lg' />
+      {
+        error_msg.length > 0 &&
+        <View>
+          <Text style={styles.required_text}>{error_msg}</Text>
+          <WhiteSpace size='lg' />
+        </View>
+      }
+      <Button style={styles.btn_high} type='primary' onPress={unlock}><Text>解锁</Text></Button>
+    </View>
+  )
 }
 
 const ReduxUnlockScreen = connect((state) => {

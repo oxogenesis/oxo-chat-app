@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Text, Button, TextInput } from 'react-native'
+import { View, Text, TextInput } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
 import { MasterKeySet } from '../../lib/OXO'
-
 import { connect } from 'react-redux'
+import { Button, WhiteSpace } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
 
 //主口令设置界面
 class MasterKeyScreen extends React.Component {
@@ -50,32 +50,35 @@ class MasterKeyScreen extends React.Component {
 
   render() {
     return (
-      <>
+      <View style={styles.base_view}>
         <TextInput
+          style={styles.input_view}
           secureTextEntry={true}
           placeholder="口令"
           value={this.state.masterKey}
           onChangeText={text => this.setState({ masterKey: text })}
         />
+        <WhiteSpace size='lg' />
         <TextInput
+          style={styles.input_view}
           secureTextEntry={true}
           placeholder="口令确认"
           value={this.state.confirm}
           onChangeText={text => this.setState({ confirm: text })}
         />
-        {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
-        <Button
-          title="设置"
-          onPress={() => this.setMasterKey()}
-        />
-        <Text>{`说明：
+        <WhiteSpace size='lg' />
+
+        <Button style={styles.btn_high} type='primary' onPress={() => this.setMasterKey()}>设置</Button>
+
+        <WhiteSpace size='lg' />
+        <Text style={{
+          color: 'red',
+          paddingTop: 0
+        }}>{`说明：
 1、口令用于在本设备上加密/解密账户的种子。
 2、账户的种子是账户的唯一凭证，不可泄漏、灭失，应做好备份。
 3、本地存储的聊天和公告，未进行加密，如需销毁，请删除应用或相关数据。`}</Text>
-      </>
+      </View>
     )
   }
 }

@@ -1,230 +1,279 @@
-import * as React from 'react'
-import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { Button, Flex, Toast } from '@ant-design/react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { DefaultDivision } from '../../lib/Const'
 import { DHSequence } from '../../lib/OXO'
 import { actionType } from '../../redux/actions/actionType'
-
 import { connect } from 'react-redux'
 import Clipboard from '@react-native-clipboard/clipboard'
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
 
 //聊天会话界面
-class SessionScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { address: '', name: '', message_list: [], message_input: '', error_msg: '' }
-  }
+const SessionScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
+  const [address, setAddress] = useState(props.route.params.address)
+  const [name, setName] = useState('')
+  const [message_input, setMsgInput] = useState('')
 
-  sendMessage() {
+  const sendMessage = () => {
     let timestamp = Date.now()
-    let message_input = this.state.message_input.trim()
+    let newMessage_input = message_input.trim()
     if (message_input == "") {
-      this.setState({ error_msg: '消息不能为空...' })
+      Toast.success('消息不能为空...', 1);
     } else {
-      let ecdh_sequence = DHSequence(DefaultDivision, timestamp, this.props.avatar.get("Address"), this.state.address)
-      let current_session = this.props.avatar.get("CurrentSession")
-      console.log(current_session)
-      console.log(ecdh_sequence)
+      let ecdh_sequence = DHSequence(DefaultDivision, timestamp, props.avatar.get("Address"), address)
+      let current_session = props.avatar.get("CurrentSession")
       if (ecdh_sequence != current_session.EcdhSequence) {
-        this.setState({ error_msg: '握手未完成...' })
+        Toast.success('握手未完成...', 1);
       } else {
-        this.props.dispatch({
+        props.dispatch({
           type: actionType.avatar.SendFriendMessage,
-          address: this.state.address,
-          message: message_input,
+          address: address,
+          message: newMessage_input,
           timestamp: timestamp
         })
-        this.setState({ message_input: '', error_msg: '' })
+        setMsgInput('')
       }
     }
   }
 
-  loadMessageList(flag) {
-    this.props.dispatch({
+  const loadMessageList = (flag) => {
+    props.dispatch({
       type: actionType.avatar.LoadCurrentMessageList,
       session_flag: flag,
-      address: this.props.route.params.address
+      address: props.route.params.address
     })
   }
 
-  copyToClipboard(content) {
+  const copyToClipboard = (content) => {
     Clipboard.setString(content)
+    Toast.success('拷贝成功！', 1);
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      let name = AddressToName(this.props.avatar.get('AddressMap'), this.props.route.params.address)
-      this.setState({ name: name, address: this.props.route.params.address })
-      this.props.navigation.setOptions({ title: name })
-      this.props.dispatch({
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      let name = AddressToName(props.avatar.get('AddressMap'), props.route.params.address)
+      setAddress(props.route.params.address)
+      setName(name)
+      props.navigation.setOptions({ title: name })
+      props.dispatch({
         type: actionType.avatar.LoadCurrentSession,
-        address: this.props.route.params.address
+        address: props.route.params.address
       })
 
       let message_input = ''
-      if (this.props.route.params.content != null) {
-        message_input = JSON.stringify(this.props.route.params.content)
+      if (props.route.params.content != null) {
+        message_input = JSON.stringify(props.route.params.content)
         console.log(message_input)
       }
-      this.setState({ name: name, address: this.props.route.params.address, message_input: message_input })
+      setAddress(props.route.params.address)
+      setName(name)
+      setMsgInput(message_input)
 
-      this.loadMessageList(true)
+      loadMessageList(true)
     })
-  }
+  })
 
-  componentWillUnmount() {
-    this._unsubscribe()
-    this.props.dispatch({
-      type: actionType.avatar.setCurrentSession
-    })
-  }
-
-  render() {
-    return (
-      <View style={{ flexDirection: "column" }}>
-        <View style={{ flexDirection: "row-reverse" }}>
-          {
-            this.props.avatar.get("CurrentSession").AesKey ?
-              <Button
-                style={{ flex: 0.2 }}
-                title="发送"
-                onPress={() => this.sendMessage()}
-              />
-              :
-              <Button
-                style={{ flex: 0.2 }}
-                title="发送"
-                disabled={true}
-              />
-          }
-          <TextInput
-            placeholder="消息"
-            value={this.state.message_input}
-            multiline={true}
-            style={{ flex: 1 }}
-            onChangeText={text => this.setState({ message_input: text })}
-          />
-        </View>
-
+  const data = props.avatar.get("CurrentMessageList")
+  return (
+    <View
+      style={{
+        ...styles.base_body2,
+        backgroundColor: theme.base_view,
+      }}>
+      <ScrollView
+        style={{
+          ...styles.scroll_view,
+          padding: 12,
+        }}
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
+          data.length > 0 && data.map(item => {
+            if (item.SourAddress == address) {
+              return (
+                <View key={item.Hash}>
+                  <Flex justify="start" align="start">
+                    <View>
+                      <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                    </View>
+                    <View
+                      style={styles.view1}
+                    >
+                      <Text>
+                        <View>
+                          <Text style={{
+                            ...styles.text1,
+                            color: theme.link_color,
+                          }}
+                          >{name}&nbsp;</Text>
+                        </View>
+                        <View style={{
+                          borderWidth: 1,
+                          borderColor: theme.border_color,
+                          borderRadius: 6,
+                          paddingLeft: 6,
+                          paddingRight: 6,
+                        }}>
+                          <Text style={{
+                            color: theme.text1,
+                            fontSize: 16
+                          }}>{item.Sequence}</Text>
+                        </View>
+                      </Text>
+                      <View style={{
+                        ...styles.mess_content,
+                        borderTopLeftRadius: 0,
+                        backgroundColor: item.Confirmed ? '#73d13d' : theme.base_body,
+                      }}>
+                        <View style={styles.text3}>
+                          {
+                            item.IsObject ?
+                              <Text style={{
+                                ...styles.text4,
+                                color: theme.text1
+                              }} onPress={() => props.navigation.push('Bulletin', {
+                                address: item.ObjectJson.Address,
+                                sequence: item.ObjectJson.Sequence,
+                                hash: item.ObjectJson.Hash,
+                                to: props.route.params.address
+                              })}>
+                                {`${AddressToName(props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
 
-        <View style={{ paddingBottom: 100 }}>
-          <FlatList
-            data={this.props.avatar.get("CurrentMessageList")}
-            keyExtractor={item => item.Hash}
-            ListEmptyComponent={
-              <Text>暂无消息...</Text>
-            }
-            renderItem={
-              ({ item }) => {
-                return (
-                  <>
-                    {
-                      item.SourAddress == this.state.address ?
-                        <View style={{ flexDirection: "row" }} >
-                          <View style={{ flex: 0.8 }}>
-                            <View>
-                              <Text style={{ color: 'grey' }}>
-                                {`${this.state.name}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
                               </Text>
-                              <View style={{ flexDirection: "row" }} >
-                                {
-                                  item.IsObject ?
-                                    <Text style={{
-                                      color: 'blue',
-                                      fontWeight: 'bold'
-                                    }} onPress={() => this.props.navigation.push('Bulletin', {
-                                      address: item.ObjectJson.Address,
-                                      sequence: item.ObjectJson.Sequence,
-                                      hash: item.ObjectJson.Hash,
-                                      to: this.props.route.params.address
-                                    })}>
-                                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
-                                    </Text>
-                                    :
-                                    (
-                                      item.Confirmed ?
-                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
-                                          <Text style={{ backgroundColor: '#2edfa3' }}>
-                                            {`${item.Content}`}
-                                          </Text>
-                                        </TouchableOpacity>
-                                        :
-                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
-                                          <Text style={{ backgroundColor: '#c2ccd0' }}>
-                                            {`${item.Content}`}
-                                          </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }
-                              </View>
-                            </View>
-                          </View>
-                          <View style={{ flex: 0.2 }}>
-                          </View>
+                              : <TouchableOpacity onPress={() => { copyToClipboard(item.Content) }}>
+                                <Text style={{
+                                  ...styles.date_text,
+                                  color: item.Confirmed ? '#434343' : theme.text2
+                                }}>{timestamp_format(item.Timestamp)}</Text>
+                                <Text style={{
+                                  color: item.Confirmed ? '#141414' : theme.text1
+                                }}>{item.Content}</Text>
+                              </TouchableOpacity>
+
+                          }
                         </View>
-                        :
-                        <View style={{ flexDirection: "row" }} >
-                          <View style={{ flex: 0.2 }}>
-                          </View>
-                          <View style={{ flex: 0.8, flexDirection: "row-reverse" }}>
-                            <View>
-                              <Text style={{ color: 'grey', textAlign: "right" }}>
-                                {`${this.props.avatar.get('Name')}#${item.Sequence}@${timestamp_format(item.Timestamp)}`}
-                              </Text>
-                              <View style={{ flexDirection: "row-reverse" }} >
-                                {
-                                  item.IsObject ?
-                                    <Text style={{
-                                      textAlign: "auto",
-                                      color: 'blue',
-                                      fontWeight: 'bold'
-                                    }} onPress={() => this.props.navigation.push('Bulletin', {
-                                      address: item.ObjectJson.Address,
-                                      sequence: item.ObjectJson.Sequence,
-                                      hash: item.ObjectJson.Hash,
-                                      to: this.props.route.params.address
-                                    })}>
-                                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
-                                    </Text>
-                                    :
-                                    (
-                                      item.Confirmed ?
-                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
-                                          <Text style={{ textAlign: "auto", backgroundColor: '#2edfa3' }}>
-                                            {`${item.Content}`}
-                                          </Text>
-                                        </TouchableOpacity>
-                                        :
-                                        <TouchableOpacity onPress={() => { this.copyToClipboard(item.Content) }}>
-                                          <Text style={{ textAlign: "auto", backgroundColor: '#c2ccd0' }}>
-                                            {`${item.Content}`}
-                                          </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }
-                              </View>
-                            </View>
-                          </View>
-                        </View>
-                    }
-                  </>
-                )
-              }
+                      </View>
+                    </View>
+                  </Flex>
+                </View>
+              )
             }
-            onEndReachedThreshold={0.01}
-            onEndReached={() => { this.loadMessageList(false) }}
-          >
-          </FlatList>
-        </View>
+
+            return (
+              <View
+                key={item.Hash}>
+                <Flex justify="end" align="start">
+                  <View style={styles.view1}>
+                    <Text style={{
+                      ...styles.view5,
+                    }}>
+                      <View>
+                        <Text style={{
+                          color: theme.link_color
+                        }}
+                        >{props.avatar.get('Name')}&nbsp;</Text>
+                      </View>
+
+                      <View style={{
+                        borderWidth: 1,
+                        borderColor: theme.border_color,
+                        borderRadius: 6,
+                        paddingLeft: 6,
+                        paddingRight: 6,
+                      }}>
+                        <Text style={{
+                          color: theme.text1,
+                          fontSize: 16
+                        }}>{item.Sequence}</Text>
+                      </View>
+                    </Text>
+                    <View style={{
+                      ...styles.mess_content,
+                      marginRight: 12,
+                      borderTopRightRadius: 0,
+                      ...styles.my_mess,
+                      backgroundColor: item.Confirmed ? '#73d13d' : theme.base_body,
+                    }}>
+                      <View style={styles.text3}>
+                        {
+                          item.IsObject ?
+                            <Text style={styles.text4} onPress={() => props.navigation.push('Bulletin', {
+                              address: item.ObjectJson.Address,
+                              sequence: item.ObjectJson.Sequence,
+                              hash: item.ObjectJson.Hash,
+                              to: props.route.params.address
+                            })}>
+                              {`${AddressToName(props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
+                            </Text>
+                            : <TouchableOpacity onPress={() => { copyToClipboard(item.Content) }}>
+                              <Text style={{
+                                ...styles.date_text,
+                                textAlign: 'right',
+                                color: item.Confirmed ? '#434343' : theme.text2
+                              }}>{timestamp_format(item.Timestamp)}</Text>
+                              <Text style={{
+                                color: item.Confirmed ? '#141414' : theme.text1
+                              }}>{item.Content}</Text>
+                            </TouchableOpacity>
+                        }
+
+                      </View>
+                    </View>
+                  </View>
+                  <View>
+                    <Image style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 5,
+                    }} source={require('../../assets/app.png')}></Image>
+                  </View>
+                </Flex>
+
+              </View>
+            )
+          })
+        }
+      </ScrollView>
+
+      <View style={styles.send_view}>
+        {
+          props.avatar.get("CurrentSession").AesKey ?
+            <Button
+              style={{ flex: 0.2, ...styles.btn_high, borderRadius: 0 }}
+              type='primary'
+              onPress={() => sendMessage()}
+            >发送</Button>
+            :
+            <Button
+              style={{ flex: 0.2, ...styles.btn_high, borderRadius: 0 }}
+              disabled={true}
+            >发送</Button>
+        }
+        <TextInput
+          placeholderTextColor={theme.text2}
+          style={{
+            ...styles.input_view,
+            color: theme.text1,
+            flex: 1,
+            borderRadius: 0,
+            backgroundColor: theme.base_body
+          }}
+          placeholder="消息"
+          value={message_input}
+          multiline={true}
+          onChangeText={text => setMsgInput(text)}
+        />
       </View>
-    )
-  }
+    </View>
+  )
+
+
 }
 
 const ReduxSessionScreen = connect((state) => {

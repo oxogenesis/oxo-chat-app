@@ -1,165 +1,308 @@
-import * as React from 'react'
-import { View, Text, Button, Alert, TouchableOpacity } from 'react-native'
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, Alert } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
+import { Button, List, Switch, WhiteSpace, Toast, Modal } from '@ant-design/react-native';
+import { Icon } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
+import AlertView from '../AlertView'
+import BaseList from '../BaseList'
 
+const Item = List.Item
+const Brief = Item.Brief
 //地址标记
-class AddressMarkScreen extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+const AddressMarkScreen = (props) => {
+  const [isFriend, setFriend] = useState(undefined)
+  const [isFollow, setFollow] = useState(undefined)
+  const { theme } = useContext(ThemeContext);
+  const [visible1, showModal1] = useState(false)
+  const [visible2, showModal2] = useState(false)
+  const [visible3, showModal3] = useState(false)
+  const [visible4, showModal4] = useState(false)
+  const [visible5, showModal5] = useState(false)
 
-  delAddressMark() {
-    if (this.props.avatar.get('CurrentAddressMark').IsFollow || this.props.avatar.get('CurrentAddressMark').IsFriend) {
-      Alert.alert(
-        '错误',
-        '删除账户标记前，请先解除好友并取消关注，谢谢。',
-        [
-          { text: '确认', style: 'cancel' }
-        ],
-        { cancelable: false }
-      )
+  const delAddressMark = () => {
+    if (props.avatar.get('CurrentAddressMark').IsFollow || props.avatar.get('CurrentAddressMark').IsFriend) {
+      showModal1(true)
+      // Alert.alert(
+      //   '错误',
+      //   '删除账户标记前，请先解除好友并取消关注，谢谢。',
+      //   [
+      //     { text: '确认', style: 'cancel' }
+      //   ],
+      //   { cancelable: false }
+      // )
     } else {
-      this.props.dispatch({
+      props.dispatch({
         type: actionType.avatar.delAddressMark,
-        address: this.props.avatar.get('CurrentAddressMark').Address
+        address: props.avatar.get('CurrentAddressMark').Address
       })
-      this.props.navigation.goBack()
+      props.navigation.goBack()
     }
   }
 
-  addFriend() {
-    this.props.dispatch({
+  const onClose = () => {
+    showModal1(false)
+    showModal2(false)
+    showModal3(false)
+    showModal4(false)
+    showModal5(false)
+  }
+
+  const addFriend = () => {
+    props.dispatch({
       type: actionType.avatar.addFriend,
-      address: this.props.avatar.get('CurrentAddressMark').Address
+      address: props.avatar.get('CurrentAddressMark').Address
     })
   }
 
-  delFriendAlert() {
-    Alert.alert(
-      '提示',
-      '解除好友关系后，历史聊天记录将会被删除，并拒绝接收该账户的消息。',
-      [
-        { text: '确认', onPress: () => this.delFriend() },
-        { text: '取消', style: 'cancel' },
-      ],
-      { cancelable: false }
-    )
+  const delFriendAlert = () => {
+    showModal2(true)
+    // Alert.alert(
+    //   '提示',
+    //   '解除好友关系后，历史聊天记录将会被删除，并拒绝接收该账户的消息。',
+    //   [
+    //     { text: '确认', onPress: delFriend },
+    //     { text: '取消', style: 'cancel' },
+    //   ],
+    //   { cancelable: false }
+    // )
   }
 
-  delFriend() {
-    this.props.dispatch({
+  const delFriend = () => {
+    setFriend(false)
+    props.dispatch({
       type: actionType.avatar.delFriend,
-      address: this.props.avatar.get('CurrentAddressMark').Address
+      address: props.avatar.get('CurrentAddressMark').Address
     })
   }
 
-  addFollow() {
-    this.props.dispatch({
+  const addFollow = () => {
+    props.dispatch({
       type: actionType.avatar.addFollow,
-      address: this.props.avatar.get('CurrentAddressMark').Address
+      address: props.avatar.get('CurrentAddressMark').Address
     })
   }
 
-  delFollowAlert() {
-    Alert.alert(
-      '提示',
-      '取消关注账户后，该账户的公告都将会被设置为缓存。',
-      [
-        { text: '确认', onPress: () => this.delFollow() },
-        { text: '取消', style: 'cancel' },
-      ],
-      { cancelable: false }
-    )
+  const delFollowAlert = () => {
+    showModal3(true)
+    setFollow(false)
+    // Alert.alert(
+    //   '提示',
+    //   '取消关注账户后，该账户的公告都将会被设置为缓存。',
+    //   [
+    //     { text: '确认', onPress: delFollow },
+    //     { text: '取消', style: 'cancel' },
+    //   ],
+    //   { cancelable: false }
+    // )
   }
 
-  delFollow() {
-    this.props.dispatch({
+  const delFollow = () => {
+    props.dispatch({
       type: actionType.avatar.delFollow,
-      address: this.props.avatar.get('CurrentAddressMark').Address
+      address: props.avatar.get('CurrentAddressMark').Address
     })
   }
 
-  loadAddressMark() {
-    this.props.dispatch({
+  const loadAddressMark = () => {
+    props.dispatch({
       type: actionType.avatar.setCurrentAddressMark,
-      address: this.props.route.params.address
+      address: props.route.params.address
     })
   }
 
-  copyToClipboard(content) {
+  const copyToClipboard = (content) => {
     Clipboard.setString(content)
+    Toast.success('拷贝成功！', 1);
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadAddressMark()
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      loadAddressMark()
     })
+  })
+
+  const onSwitchChange = async value => {
+    if (value) {
+      await addFriend()
+      setFriend(value)
+    } else {
+      showModal4(true)
+      // Alert.alert(
+      //   '提示',
+      //   `确定要删除好友吗？`,
+      //   [
+      //     {
+      //       text: '确认', onPress: () => {
+      //         delFriend()
+      //         setFriend(value)
+
+      //       }
+      //     },
+      //     { text: '取消', style: 'cancel' },
+      //   ],
+      //   { cancelable: false }
+      // )
+    }
+   
+  };
+
+  const onSwitchChangeFollow = async value => {
+    if (value) {
+      await addFollow()
+      setFollow(value)
+    } else {
+      showModal5(true)
+      // Alert.alert(
+      //   '提示',
+      //   `确定要取消关注吗？`,
+      //   [
+      //     {
+      //       text: '确认', onPress: () => {
+      //         delFollowAlert()
+      //         setFollow(value)
+      //       }
+      //     },
+      //     { text: '取消', style: 'cancel' },
+      //   ],
+      //   { cancelable: false }
+      // )
+    }
+    
   }
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
+  const current = props.avatar.get('CurrentAddressMark')
+  const { Name, Address, IsMark, IsFriend, IsFollow } = current || {}
+  const currentFriend = isFriend === undefined ? IsFriend : isFriend
+  const currentFollow = isFollow === undefined ? IsFollow : isFollow
 
-  render() {
-    return (
-      <>
-        {
-          this.props.avatar.get('CurrentAddressMark') &&
-          <View>
-            <TouchableOpacity onPress={() => { this.copyToClipboard(this.props.avatar.get('CurrentAddressMark').Address) }}>
-              <Text style={{ color: 'blue', fontWeight: 'bold' }}>
-                {this.props.avatar.get('CurrentAddressMark').Address}
-              </Text>
-            </TouchableOpacity>
-            {
-              this.props.avatar.get('CurrentAddressMark').IsMark ?
-                <>
-                  <Text style={{ color: 'blue', fontWeight: 'bold' }}>
-                    {this.props.avatar.get('CurrentAddressMark').Name}
-                  </Text>
-                  <Button
-                    title="修改昵称"
-                    onPress={() => this.props.navigation.navigate('AddressEdit', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                  <Button color='red' title="删除" onPress={() => this.delAddressMark()} />
+  return (
+    <View style={{
+      height: '100%',
+      backgroundColor: theme.base_view
+    }}>
+      <WhiteSpace size='lg' />
+      {
+        current &&
+        <>
+          <BaseList data={[
+            { title: Address, icon: 'block', onpress: copyToClipboard },
+            { title: Name, onpress: () => props.navigation.navigate('AddressEdit', { address: Address }) },
+          ]} />
 
-                  {
-                    this.props.avatar.get('CurrentAddressMark').IsFriend ?
-                      <>
-                        <Button title="开始聊天" onPress={() =>
-                          this.props.navigation.push('Session', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                        <Button color='orange' title="解除好友" onPress={() => this.delFriend()} />
-                      </>
-                      :
-                      <Button title="加为好友" onPress={() => this.addFriend()} />
-                  }
-                  {
-                    this.props.avatar.get('CurrentAddressMark').IsFollow ?
-                      <>
-                        <Button title="查看公告" onPress={() =>
-                          this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                        <Button color='orange' title="取消关注" onPress={() => this.delFollowAlert()} />
-                      </>
-                      :
-                      <Button title="关注公告" onPress={() => this.addFollow()} />
-                  }
-                </>
-                :
-                <>
-                  <Button
-                    title="标记地址"
-                    onPress={() => this.props.navigation.navigate('AddressAdd', { address: this.props.avatar.get('CurrentAddressMark').Address })} />
-                </>
-            }
-          </View>
-        }
-      </>
-    )
-  }
+          <WhiteSpace size='lg' />
+         
+          {
+            IsMark && <BaseList data={[
+              {
+                title: '添加好友',
+                type: 'switch',
+                checked: currentFriend,
+                onChange: onSwitchChange,
+              },
+              {
+                title: '关注公告',
+                type: 'switch',
+                checked: currentFollow,
+                onChange: onSwitchChangeFollow,
+              },
+            ]} />
+          }
+
+          {
+            currentFollow &&
+            <BaseList data={[
+              {
+                title: '查看公告', onpress: () =>
+                  props.navigation.push('BulletinList',
+                    { session: BulletinAddressSession, address: Address })
+              },
+            ]} />
+          }
+
+          {
+            IsMark && <WhiteSpace size='lg' />
+          }
+
+          {
+            IsMark && <Button style={{
+              height: 55,
+              backgroundColor: theme.base_body,
+              borderColor: theme.line,
+            }}
+              onPress={delAddressMark}
+            ><Text style={{
+              color: 'red',
+            }}>删除</Text></Button>
+          }
+          {
+            IsMark && <WhiteSpace size='lg' />
+          }
+          {
+            IsMark && currentFriend && <Button
+              style={{
+                height: 55,
+                backgroundColor: theme.base_body,
+                borderColor: theme.line,
+              }}
+              onPress={() =>
+                props.navigation.push('Session', { address: Address })}
+            ><Text style={{
+              color: '#389e0d'
+            }}>开始聊天</Text></Button>
+          }
+          {
+            !IsMark && <Button
+              style={{
+                height: 55
+              }}
+              onPress={() => props.navigation.navigate('AddressAdd',
+                { address: Address })}
+            ><Text style={{
+              color: 'red'
+            }}>标记地址</Text></Button>
+          }
+        </>
+      }
+      <AlertView
+        visible={visible1}
+        onPress={onClose}
+        onClose={onClose}
+        title='错误'
+        msg='删除账户标记前，请先解除好友并取消关注，谢谢。'
+      />
+      <AlertView
+        visible={visible2}
+        onClose={onClose}
+        msg='解除好友关系后，历史聊天记录将会被删除，并拒绝接收该账户的消息。'
+        onPress={delFriend}
+      />
+      <AlertView
+        visible={visible3}
+        onClose={onClose}
+        msg="取消关注账户后，该账户的公告都将会被设置为缓存。"
+        onPress={delFollow}
+      />
+      <AlertView
+        visible={visible4}
+        onClose={onClose}
+        msg='确定要删除好友吗？'
+        onPress={delFriend}
+      />
+      <AlertView
+        visible={visible5}
+        onClose={onClose}
+        msg="确定要取消关注吗？"
+        onPress={delFollowAlert}
+      />
+    </View>
+  )
+
 }
 
 const ReduxAddressMarkScreen = connect((state) => {

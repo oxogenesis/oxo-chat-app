@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Text, TextInput, Button } from 'react-native'
-
+import { Text } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
+import { WhiteSpace, Button } from '@ant-design/react-native';
 
 //登录界面
 class AddressAddFromQrcodeScreen extends React.Component {
@@ -44,15 +44,22 @@ class AddressAddFromQrcodeScreen extends React.Component {
         <Text style={{ color: 'blue', fontWeight: 'bold' }}>
           {this.state.address}
         </Text>
+        <WhiteSpace size='lg' />
         <Text style={{ color: 'blue', fontWeight: 'bold' }}>
           {this.state.relay}
         </Text>
+        <WhiteSpace size='lg' />
         <Button
-          title="标记地址"
-          onPress={() => this.props.navigation.navigate('AddressAdd', { address: this.state.address })} />
+          style={{
+            height: 55
+          }}
+          onPress={() => this.props.navigation.navigate('AddressAdd', { address: this.state.address })}>标记地址</Button>
+        <WhiteSpace size='lg' />
         <Button
-          title="保持服务器网址+标记地址"
-          onPress={() => this.addHost()} />
+          style={{
+            height: 55
+          }}
+          onPress={() => this.addHost()} >保持服务器网址+标记地址</Button>
       </>
     )
   }

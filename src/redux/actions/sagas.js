@@ -6,6 +6,7 @@ import * as avatarActions from './avatarActions'
 
 export default function* rootSaga() {
   //avatar
+  yield takeEvery(actionType.avatar.setThemeFlag, avatarActions.setThemeFlag)
   yield takeEvery(actionType.avatar.enableAvatar, avatarActions.enableAvatar)
   yield takeEvery(actionType.avatar.disableAvatar, avatarActions.disableAvatar)
   yield takeEvery(actionType.avatar.loadFromDB, avatarActions.loadFromDB)

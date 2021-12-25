@@ -10,8 +10,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@ant-design/react-native": "^4.2.0",
     "@react-native-async-storage/async-storage": "^1.15.9",
     "@react-native-clipboard/clipboard": "^1.9.0",
+    "@react-native-community/cameraroll": "^4.1.2",
+    "@react-native-community/segmented-control": "^2.2.2",
+    "@react-native-community/slider": "^4.1.12",
+    "@react-native-picker/picker": "^2.2.1",
     "@react-navigation/bottom-tabs": "^6.0.7",
     "@react-navigation/native": "^6.0.4",
     "@react-navigation/stack": "^6.0.9",
@@ -37,6 +42,7 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-level-fs": "^3.0.0",
     "react-native-os": "^1.2.6",
+    "react-native-pager-view": "^5.4.9",
     "react-native-permissions": "^3.0.5",
     "react-native-qrcode-scanner": "^1.5.4",
     "react-native-qrcode-svg": "^6.1.1",
@@ -61,6 +67,7 @@
     "vm-browserify": "0.0.4"
   },
   "devDependencies": {
+    "@ant-design/icons-react-native": "^2.3.2",
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",

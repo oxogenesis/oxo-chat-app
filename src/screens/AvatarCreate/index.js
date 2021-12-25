@@ -1,49 +1,64 @@
-import * as React from 'react'
-import { Text, Button, TextInput } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TextInput } from 'react-native'
+import { Button, WhiteSpace } from '@ant-design/react-native';
 import { AvatarCreateNew } from '../../lib/OXO'
-
 import { connect } from 'react-redux'
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
 
 //口令创建账户
-class AvatarCreateScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { name: '', error_msg: '' }
-  }
+const AvatarCreateScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
+  const [name, setName] = useState('')
+  const [error_msg, setMsg] = useState('')
 
-  createAvatar() {
-    if (this.state.name.trim() == '') {
-      this.setState({ error_msg: '昵称不能为空...' })
+  const createAvatar = () => {
+    if (name == '') {
+      setMsg('昵称不能为空...')
       return
     }
-    AvatarCreateNew(this.state.name, this.props.master.get('MasterKey'))
+    AvatarCreateNew(name, props.master.get('MasterKey'))
       .then(result => {
         if (result) {
-          this.setState({ name: '', error_msg: '' })
-          this.props.navigation.navigate('AvatarList')
+          setMsg('')
+          setName('')
+          props.navigation.navigate('AvatarList')
         }
       })
   }
-  
-  render() {
-    return (
-      <>
-        <TextInput
-          placeholder="昵称"
-          value={this.state.name}
-          onChangeText={text => this.setState({ name: text })}
-        />
-        {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
-        <Button title="生成" onPress={() => this.createAvatar()}
-        />
-        <Button title="取消" onPress={() => this.props.navigation.navigate('AvatarList')} />
-      </>
-    )
-  }
+
+  return (
+    <View style={{
+      ...styles.base_view,
+      backgroundColor: theme.base_view
+    }}>
+      <WhiteSpace />
+      <TextInput
+        placeholder="昵称"
+        placeholderTextColor={theme.text2}
+        style={{
+          ...styles.input_view,
+          color: theme.text1,
+        }}
+        value={name}
+        onChangeText={text => setName(text)}
+      />
+      <WhiteSpace size='lg' />
+      {
+        error_msg.length > 0 &&
+        <View>
+          <Text style={{ color: 'red' }}>{error_msg}</Text>
+          <WhiteSpace size='lg' />
+        </View>
+      }
+      <Button style={{
+        height: 55
+      }} type='primary' onPress={() => createAvatar()}>
+        生成
+      </Button>
+    </View>
+  )
+
 }
 
 const ReduxAvatarCreateScreen = connect((state) => {

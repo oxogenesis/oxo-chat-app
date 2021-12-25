@@ -1,70 +1,89 @@
-import * as React from 'react'
-import { Text, TextInput, Button } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
+import { Button, WhiteSpace } from '@ant-design/react-native';
+import { ThemeContext } from '../../theme/theme-context';
+import { styles } from '../../theme/style'
 
 //登录界面
-class AddressAddScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { name: '', address: '', error_msg: '' }
-  }
+const AddressAddScreen = (props) => {
+  const [name, setName] = useState(undefined)
+  const [address, setAddress] = useState(undefined)
+  const [error_msg, setMsg] = useState('')
+  const { theme } = useContext(ThemeContext);
 
-  addAddressMark() {
-    let address = this.state.address.trim()
-    let name = this.state.name.trim()
-    if (address == '' || name == '' || address == name) {
-      this.setState({ error_msg: '地址或昵称不能为空，且地址与昵称不能相同...' })
+  const addAddressMark = () => {
+    console.log('地址：',address)
+    let newAddress = address.trim()
+    let newName = name.trim()
+    if (newAddress == '' || newName == '' || newAddress == newName) {
+      setMsg('地址或昵称不能为空，地址与昵称不能相同...')
       return
-    } else if (address == this.props.avatar.get('Address')) {
-      this.setState({ error_msg: '不能标记自己...' })
+    } else if (newAddress == props.avatar.get('Address')) {
+      setMsg('不能标记自己...')
       return
     }
-    this.props.dispatch({
+    props.dispatch({
       type: actionType.avatar.addAddressMark,
-      address: address,
-      name: name
+      address: newAddress,
+      name: newName
     })
-    this.props.navigation.navigate('TabAddressBook')
+    props.navigation.goBack()
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      if (this.props.route.params && this.props.route.params.address) {
-        this.setState({ address: this.props.route.params.address })
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      if (props.route.params && props.route.params.address) {
+        setAddress(props.route.params.address)
       }
     })
-  }
+  })
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
 
-  render() {
-    return (
-      <>
-        <TextInput
-          placeholder="地址"
-          value={this.state.address}
-          onChangeText={text => this.setState({ address: text })}
-        />
-        <TextInput
-          placeholder="昵称"
-          value={this.state.name}
-          onChangeText={text => this.setState({ name: text })}
-        />
-        {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
-        }
-        <Button
-          title="标记"
-          onPress={() => this.addAddressMark()}
-        />
-      </>
-    )
-  }
+  return (
+    <View style={{
+      ...styles.base_view,
+      backgroundColor: theme.base_view
+    }}>
+      <TextInput
+         placeholderTextColor={theme.text2}
+         style={{
+           ...styles.input_view,
+           color: theme.text1
+         }}
+        placeholder="地址"
+        value={address}
+        onChangeText={text => setAddress(text)}
+      />
+      <WhiteSpace size='lg' />
+      <TextInput
+         placeholderTextColor={theme.text2}
+         style={{
+           ...styles.input_view,
+           color: theme.text1
+         }}
+        placeholder="昵称"
+        value={name}
+        onChangeText={text => setName(text)}
+      />
+      <WhiteSpace size='lg' />
+      {
+        error_msg.length > 0 &&
+        <View>
+          <Text style={styles.required_text}>{error_msg}</Text>
+          <WhiteSpace size='lg' />
+        </View>
+      }
+      <Button
+        style={styles.btn_high}
+        type='primary'
+        onPress={addAddressMark}
+      >
+        标记
+      </Button>
+    </View>
+  )
 }
 
 const ReduxAddressAddScreen = connect((state) => {

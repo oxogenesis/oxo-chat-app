@@ -1,54 +1,75 @@
-import * as React from 'react'
-import { View, Text, Alert, Button } from 'react-native'
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, Alert } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-
 import { connect } from 'react-redux'
 import QRCode from 'react-native-qrcode-svg'
+import { WhiteSpace, Button } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
+import AlertView from '../AlertView'
 
 //地址标记
-class AvatarSeedQrcodeScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { qrcode: "xxx" }
+const AvatarSeedQrcodeScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
+  const [qrcode, seQrcode] = useState('xxx')
+  const [visible, showModal] = useState(false)
+
+  const viewSeedAlert = () => {
+    showModal(true)
+    //     Alert.alert(
+    //       '提示',
+    //       `查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
+    // 确定要查看种子吗？`,
+    //       [
+    //         { text: '确认', onPress: () => this.props.navigation.navigate('AvatarSeed') },
+    //         { text: '取消', style: 'cancel' },
+    //       ],
+    //       { cancelable: false }
+    //     )
   }
 
-  viewSeedAlert() {
-    Alert.alert(
-      '提示',
-      `查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
-确定要查看种子吗？`,
-      [
-        { text: '确认', onPress: () => this.props.navigation.navigate('AvatarSeed') },
-        { text: '取消', style: 'cancel' },
-      ],
-      { cancelable: false }
-    )
+  const onClose = () => {
+    showModal(false)
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      let json = { "Name": this.props.avatar.get('Name'), "Seed": this.props.avatar.get('Seed') }
-      this.setState({ qrcode: JSON.stringify(json) })
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      let json = { "Name": props.avatar.get('Name'), "Seed": props.avatar.get('Seed') }
+      seQrcode(JSON.stringify(json))
     })
-  }
+  })
 
-  render() {
-    return (
-      <View>
-        <View style={{ alignItems: 'center' }}>
-          <QRCode
-            value={this.state.qrcode}
-            size={350}
-            logo={require('../../assets/app.png')}
-            logoSize={50}
-            logoBackgroundColor='grey'
-          />
-        </View>
-        <Text>{`注意：查看种子二维码，应回避具备视觉的生物或设备，应在私密可控环境下。`}</Text>
-        <Button color="red" title="查看种子" onPress={() => { this.viewSeedAlert() }} />
-      </View >
-    )
-  }
+  return (
+    <View style={{
+      ...styles.base_body,
+      backgroundColor: theme.base_body
+    }}>
+      <View style={{ alignItems: 'center' }}>
+        <QRCode
+          value={qrcode}
+          size={350}
+          logo={require('../../assets/app.png')}
+          logoSize={50}
+          backgroundColor={theme.QR_code_view}
+          color={theme.QR_code_text}
+          logoBackgroundColor='grey'
+        />
+      </View>
+      <WhiteSpace size='lg' />
+      <Text style={{
+        color: theme.text2
+      }}>{`注意：查看种子二维码，应回避具备视觉的生物或设备，应在私密可控环境下。`}</Text>
+      <WhiteSpace size='lg' />
+      <Button type='primary' onPress={viewSeedAlert}>查看种子</Button>
+      <AlertView
+        visible={visible}
+        onClose={onClose}
+        msg="查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
+  确定要查看种子吗？"
+        onPress={() => props.navigation.navigate('AvatarSeed')}
+      />
+    </View >
+  )
 }
 
 const ReduxAvatarSeedQrcodeScreen = connect((state) => {

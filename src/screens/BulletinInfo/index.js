@@ -1,82 +1,92 @@
-import * as React from 'react'
+import React, { useEffect, useContext } from 'react';
 import { View, ScrollView, Text, FlatList } from 'react-native'
-
 import { useNavigation, useRoute } from '@react-navigation/native'
-
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
+import { my_styles, styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
+import EmptyView from '../EmptyView';
+import { WhiteSpace } from '@ant-design/react-native';
 
 //公告列表
-class BulletinInfoScreen extends React.Component {
+const BulletinInfoScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
 
-  constructor(props) {
-    super(props)
-  }
-
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      console.log(this.props.route.params.hash)
-      this.props.dispatch({
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      props.dispatch({
         type: actionType.avatar.LoadCurrentBulletin,
-        address: this.props.route.params.address,
-        sequence: this.props.route.params.sequence,
-        hash: this.props.route.params.hash,
-        to: this.props.route.params.to
+        address: props.route.params.address,
+        sequence: props.route.params.sequence,
+        hash: props.route.params.hash,
+        to: props.route.params.to
       })
     })
-  }
+  })
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
-
-  render() {
-    return (
-      <View style={[my_styles.container, {
-        flexDirection: "column"
-      }]}>
-        {
-          this.props.avatar.get('CurrentBulletin') == null ?
-            <Text>not found...</Text>
-            :
-            <>
-              <Text>{`哈希：${this.props.route.params.hash}`}</Text>
-              <Text>{`地址：${this.props.avatar.get('CurrentBulletin').Address}`}</Text>
-              <Text>{`昵称：${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}</Text>
-              <Text>{`序号：${this.props.avatar.get('CurrentBulletin').Sequence}`}</Text>
-              <Text>{`时间：${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
-              <Text>{`引用：${this.props.avatar.get('CurrentBulletin').QuoteSize}`}</Text>
-              <ScrollView>
-                <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
-              </ScrollView>
-              <FlatList
-                data={this.props.avatar.get('CurrentBulletin').QuoteList}
-                keyExtractor={item => item.Hash}
-                renderItem={
-                  ({ item }) => {
-                    return (
-                      <View>
-                        <Text style={my_styles.Link} onPress={() =>
-                          this.props.navigation.push('Bulletin', {
-                            address: item.Address,
-                            sequence: item.Sequence,
-                            hash: item.Hash,
-                            to: this.props.avatar.get('CurrentBulletin').Address
-                          })}>
-                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                        </Text>
-                      </View>)
-                  }
+  const data = [{
+    name: 'zhss',
+    num: 1
+  }]
+  return (
+    <View style={[my_styles.container, {
+      flexDirection: "column",
+      backgroundColor: theme.base_view
+    }]}>
+      {
+        props.avatar.get('CurrentBulletin') == null ?
+          <EmptyView />
+          :
+          <>
+            <Text style={{
+              color: theme.text1
+            }}>{`哈希：${props.route.params.hash}`}</Text>
+            <Text style={{
+              color: theme.text1
+            }}>{`地址：${props.avatar.get('CurrentBulletin').Address}`}</Text>
+            <Text style={{
+              color: theme.text1
+            }}>{`昵称：${AddressToName(props.avatar.get('AddressMap'), props.avatar.get('CurrentBulletin').Address)}`}</Text>
+            <Text style={{
+              color: theme.text1
+            }}>{`序号：${props.avatar.get('CurrentBulletin').Sequence}`}</Text>
+            <Text style={{
+              color: theme.text1
+            }}>{`时间：${timestamp_format(props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
+            <Text style={{
+              color: theme.text1
+            }}>{`引用：${props.avatar.get('CurrentBulletin').QuoteSize}`}</Text>
+            <ScrollView>
+              <Text style={{
+                color: theme.text1
+              }}>{props.avatar.get('CurrentBulletin').Content}</Text>
+              <WhiteSpace size='lg' />
+              {
+                  props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
+                    <Text key={index} style={{
+                      ...styles.link_list_text,
+                      color: theme.link_color,
+                      borderColor: theme.line,
+                    }} onPress={() => props.navigation.push('Bulletin', {
+                      address: item.Address,
+                      sequence: item.Sequence,
+                      hash: item.Hash,
+                      to: props.avatar.get('CurrentBulletin').Address
+                    })}>
+                      {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                      {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
+                    </Text>
+                  ))
                 }
-              >
-              </FlatList>
-            </>
-        }
-      </View>
-    )
-  }
+            </ScrollView>
+            
+
+          </>
+      }
+    </View>
+  )
+
 }
 
 const ReduxBulletinInfoScreen = connect((state) => {

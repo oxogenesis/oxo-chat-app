@@ -1,109 +1,136 @@
-import * as React from 'react'
-import { View, Text, FlatList } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, ScrollView, Image } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
+import { Flex, WhiteSpace } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
+import { ThemeContext, themes } from '../../theme/theme-context';
+import BaseList from '../BaseList'
+import EmptyView from '../EmptyView';
+
 
 //公告列表
-class BulletinListScreen extends React.Component {
 
-  constructor(props) {
-    super(props)
-  }
+const BulletinListScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
 
-  loadBulletinList(flag) {
-    if (this.props.route.params.session == BulletinMarkSession) {
-      this.props.navigation.setOptions({ title: '收藏公告' })
-    } else if (this.props.route.params.session == BulletinHistorySession) {
-      this.props.navigation.setOptions({ title: '公告浏览历史' })
-    } else if (this.props.route.params.session == BulletinAddressSession) {
-      if (this.props.route.params.address == this.props.avatar.get('Address')) {
-        this.props.navigation.setOptions({ title: '我的公告' })
+  const loadBulletinList = (flag) => {
+    if (props.route.params.session == BulletinMarkSession) {
+      props.navigation.setOptions({ title: '收藏公告' })
+    } else if (props.route.params.session == BulletinHistorySession) {
+      props.navigation.setOptions({ title: '公告浏览历史' })
+    } else if (props.route.params.session == BulletinAddressSession) {
+      if (props.route.params.address == props.avatar.get('Address')) {
+        props.navigation.setOptions({ title: '我的公告' })
       } else {
-        this.props.navigation.setOptions({ title: `公告：${AddressToName(this.props.avatar.get('AddressMap'), this.props.route.params.address)}` })
+        props.navigation.setOptions({ title: `公告：${AddressToName(props.avatar.get('AddressMap'), props.route.params.address)}` })
       }
     }
-    this.props.dispatch({
+
+    props.dispatch({
       type: actionType.avatar.LoadBulletinList,
       session_flag: flag,
-      session: this.props.route.params.session,
-      address: this.props.route.params.address
+      session: props.route.params.session,
+      address: props.route.params.address
     })
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadBulletinList(true)
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      loadBulletinList(true)
     })
-  }
+  })
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
+  return (
+    <ScrollView
+      style={{
+        backgroundColor: theme.base_body
+      }}
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}>
+      {
+        props.avatar.get('BulletinList').length > 0 ? props.avatar.get('BulletinList').map((item, index) => (
+          <View
+            key={index}
+            style={{
+              ...styles.list_border,
+              borderBottomColor: theme.split_line
+            }}>
+            <Flex justify="start" align="start">
+              <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+              <View style={{
+                marginLeft: 8,
+              }}>
+                <Text style={{
+                  marginBottom: 6
+                }}>
+                  {
+                    props.avatar.get('Address') == item.Address ? <View>
+                      <Text style={{
+                        ...styles.name2,
+                        color: theme.link_color,
+                      }}
+                      >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
+                    </View> : <View>
+                      <Text style={{
+                        ...styles.name2,
+                        color: theme.link_color,
+                      }}
+                        onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
+                      >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
+                    </View>
+                  }
+                  <Text onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
+                    <View style={{
+                      borderWidth: 1,
+                      borderColor: theme.split_line,
+                      borderRadius: 6,
+                      paddingLeft: 6,
+                      paddingRight: 6,
 
-  render() {
-    return (
-      <View>
-        <FlatList
-          data={this.props.avatar.get('BulletinList')}
-          keyExtractor={item => item.Hash}
-          ListEmptyComponent={
-            <Text>暂无公告...</Text>
-          }
-          renderItem={
-            ({ item }) => {
-              return (
-                <View>
-                  <View style={{ flexDirection: "row" }} >
-                    {
-                      this.props.avatar.get('Address') == item.Address ?
-                        <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
-                          <Text style={my_styles.Link}>
-                            {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
-                          </Text>
-                        </View>
-                        :
-                        <View style={{ backgroundColor: "yellow", flex: 0.8 }} >
-                          <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
-                            {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
-                          </Text>
-                        </View>
-                    }
-                    <View style={{ backgroundColor: "orange", flex: 0.2 }} >
-                      <Text style={{ color: 'blue', fontWeight: 'bold', textAlign: "right" }}
-                        onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
-                        {`#${item.Sequence}`}
-                      </Text>
+                    }}>
+                      <Text style={{
+                        color: theme.text1,
+                        fontSize: 16
+                      }}>{item.Sequence}</Text>
                     </View>
-                  </View>
-                  <View style={{ flexDirection: "row" }} >
-                    <View style={{ backgroundColor: "green", flex: 0.8 }} >
-                      <Text>{`@${timestamp_format(item.Timestamp)}`}</Text>
-                    </View>
-                    {
-                      item.QuoteSize != 0 &&
-                      <View style={{ backgroundColor: "red", flex: 0.2 }} >
-                        <Text style={{ textAlign: "right" }}>{`◀${item.QuoteSize}`}</Text>
-                      </View>
-                    }
-                  </View>
-                  <Text style={my_styles.BulletinContentHeader} ellipsizeMode={"tail"} numberOfLines={2}>{item.Content}</Text>
+                  </Text>
+                </Text>
+
+
+                <View style={styles.content_view}>
+                  <WhiteSpace size='lg' />
+                  <Text style={{
+                    ...styles.format_text1,
+                    color: theme.text2
+                  }}>{timestamp_format(item.Timestamp)}</Text>
+                  {
+                    item.QuoteSize != 0 && <Text style={{
+                      ...styles.format_text2,
+                      color: theme.text2
+                    }}>
+                      来自：◀{item.QuoteSize}</Text>
+                  }
                 </View>
-              )
-            }
-          }
-          onEndReachedThreshold={0.01}
-          onEndReached={() => { this.loadBulletinList(false) }}
-        >
-        </FlatList>
-      </View>
-    )
-  }
+                <View style={styles.content_view}>
+                  <Text style={{
+                    ...styles.content_text,
+                    color: theme.text1
+                  }}
+                  onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                  >{item.Content}</Text>
+                </View>
+              </View>
+            </Flex>
+          </View>
+        )) : <EmptyView />
+      }
+    </ScrollView >
+  )
 }
 
 const ReduxBulletinListScreen = connect((state) => {

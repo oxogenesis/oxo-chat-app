@@ -1,63 +1,38 @@
-import * as React from 'react'
-import { View, Text, FlatList, Image } from 'react-native'
-
-
+import React, { useContext, useState } from 'react';
+import { View, Text, Image } from 'react-native'
 import { connect } from 'react-redux'
-
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
+import { List, WhiteSpace } from '@ant-design/react-native';
+import EmptyView from '../EmptyView'
+import { ThemeContext } from '../../theme/theme-context';
+import BaseAvatarList from '../BaseAvatarList';
 
-//设置
-class SettingFriendRequestScreen extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+const Item = List.Item
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      //   this.loadState()
-      console.log(this.props.avatar.get('FriendRequests'))
-    })
-  }
+//好友申请
+const SettingFriendRequestScreen = props => {
+  const { theme } = useContext(ThemeContext);
+  const data = props.avatar.get('FriendRequests')
+  const lists = data.map(item => ({
+    title: `${AddressToName(props.avatar.get('AddressMap'), item.Address)}`,
+    desc: timestamp_format(item.Timestamp),
+    onpress: () => props.navigation.push('AddressMark', { address: item.Address })
+  }))
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
+  return (
+    <View style={{
+      height: '100%',
+      backgroundColor: theme.base_view
+    }}>
 
-  render() {
-    return (
-      <View style={my_styles.TabSheet}>
-        <FlatList
-          data={this.props.avatar.get('FriendRequests')}
-          keyExtractor={item => item.Address}
-          ListEmptyComponent={
-            <Text>暂无好友申请...</Text>
-          }
-          renderItem={
-            ({ item }) => {
-              return (
-                <View style={{ flexDirection: "row" }} >
-                  <View>
-                    <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
-                  </View>
-                  <View>
-                    <Text style={my_styles.Link}
-                      onPress={() => this.props.navigation.push('AddressMark', { address: item.Address })}>
-                      {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
-                    </Text>
-                    <Text>
-                      {`@${timestamp_format(item.Timestamp)}`}
-                    </Text>
-                  </View>
-                </View>
-              )
-            }
-          }
-        >
-        </FlatList>
-      </View >
-    )
-  }
+      <WhiteSpace size='lg' />
+      {
+        data.length > 0 ? <View>
+          <BaseAvatarList data={lists} />
+        </View> : <EmptyView />
+      }
+    </View >
+  )
 }
 
 const ReduxSettingFriendRequestScreen = connect((state) => {

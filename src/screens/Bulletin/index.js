@@ -1,40 +1,37 @@
-import * as React from 'react'
-import { View, ScrollView, Text, FlatList } from 'react-native'
-
+import React, { useContext, useEffect } from 'react';
+import { View, ScrollView, Text, Image, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
+import { Icon, WhiteSpace, Tag, Toast, Popover } from '@ant-design/react-native';
 import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
 import Clipboard from '@react-native-clipboard/clipboard'
-import IconFontisto from 'react-native-vector-icons/Fontisto'
-import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { Flex } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
+import BaseList from '../BaseList';
 
 //公告列表
-class BulletinScreen extends React.Component {
+const BulletinScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
 
-  constructor(props) {
-    super(props)
-  }
-
-  markBulletin(hash) {
-    this.props.dispatch({
+  const markBulletin = (hash) => {
+    props.dispatch({
       type: actionType.avatar.MarkBulletin,
       hash: hash
     })
   }
 
-  unmarkBulletin(hash) {
-    this.props.dispatch({
+  const unmarkBulletin = (hash) => {
+    props.dispatch({
       type: actionType.avatar.UnmarkBulletin,
       hash: hash
     })
   }
 
-  quoteBulletin(address, sequence, hash) {
-    this.props.dispatch({
+  const quoteBulletin = (address, sequence, hash) => {
+    props.dispatch({
       type: actionType.avatar.addQuote,
       address: address,
       sequence: sequence,
@@ -42,142 +39,268 @@ class BulletinScreen extends React.Component {
     })
   }
 
-  copyToClipboard() {
-    Clipboard.setString(this.props.avatar.get('CurrentBulletin').Content)
+  const copyToClipboard = () => {
+    Clipboard.setString(props.avatar.get('CurrentBulletin').Content)
+    Toast.success('拷贝成功！', 1);
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      console.log(this.props.route.params.hash)
-      this.props.dispatch({
+  const quote = () => {
+    Toast.success('引用成功！', 1);
+  }
+
+
+  useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      console.log(props.route.params.hash)
+      props.dispatch({
         type: actionType.avatar.LoadCurrentBulletin,
-        address: this.props.route.params.address,
-        sequence: this.props.route.params.sequence,
-        hash: this.props.route.params.hash,
-        to: this.props.route.params.to
+        address: props.route.params.address,
+        sequence: props.route.params.sequence,
+        hash: props.route.params.hash,
+        to: props.route.params.to
       })
     })
+  })
+
+
+  const handleCollection = () => {
+    markBulletin(props.avatar.get('CurrentBulletin').Hash)
+    Toast.success('收藏成功！', 1);
   }
 
-  componentWillUnmount() {
-    this._unsubscribe()
+  const cancelCollection = () => {
+    unmarkBulletin(props.avatar.get('CurrentBulletin').Hash)
+    Toast.success('取消收藏！', 1);
   }
 
-  render() {
-    return (
-      <View style={[my_styles.container, {
-        flexDirection: "column"
-      }]}>
-        {
-          this.props.avatar.get('CurrentBulletin') == null ?
-            <Text>公告不存在，正在获取中，请稍后查看...</Text>
-            :
-            <>
-              <View style={{ flexDirection: "row" }} >
-                <View style={{ backgroundColor: "yellow", flex: 0.9 }} >
-                  <Text style={my_styles.Link} onPress={() => this.props.navigation.push('AddressMark', { address: this.props.avatar.get('CurrentBulletin').Address })}>
-                    {`${AddressToName(this.props.avatar.get('AddressMap'), this.props.avatar.get('CurrentBulletin').Address)}`}
+
+  return (
+    <View style={{
+      ...styles.base_body,
+      backgroundColor: theme.base_body
+    }}>
+      {
+        props.avatar.get('CurrentBulletin') == null ?
+          <Text style={{ color: theme.text2 }}>公告不存在，正在获取中，请稍后查看...</Text>
+          :
+          <ScrollView>
+            <View style={{
+              backgroundColor: theme.base_body
+            }}>
+              <Flex justify="start" align="start">
+                <TouchableOpacity 
+                onPress={() => props.navigation.push('AddressMark',
+                { address: props.avatar.get('CurrentBulletin').Address })}
+                 >
+                  <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                </TouchableOpacity>
+
+                <View style={{
+                  marginLeft: 8
+                }}>
+                  <Text>
+                    <View>
+                      <Text style={{
+                        ...styles.name2,
+                        color: theme.link_color,
+                      }}
+                        onPress={() => props.navigation.push('AddressMark',
+                          { address: props.avatar.get('CurrentBulletin').Address })}
+                      >{AddressToName(props.avatar.get('AddressMap'), props.avatar.get('CurrentBulletin').Address)}&nbsp;&nbsp;</Text>
+                    </View>
+                    <Text
+                    // onPress={() => props.navigation.push('Bulletin', { hash: props.avatar.get('CurrentBulletin').Hash })}
+                    >
+                      <View style={{
+                        borderWidth: 1,
+                        borderColor: theme.split_line,
+                        borderRadius: 6,
+                        paddingLeft: 6,
+                        paddingRight: 6,
+
+                      }}>
+                        <Text style={{
+                          color: theme.text1,
+                          fontSize: 18
+                        }}>{props.avatar.get('CurrentBulletin').Sequence}</Text>
+                      </View>
+                    </Text>
                   </Text>
-                </View>
-                <View style={{ backgroundColor: "orange", flex: 0.1 }} >
-                  <Text style={{ color: 'blue', fontWeight: 'bold', textAlign: "right" }}
-                    onPress={() => this.props.navigation.push('Bulletin', { hash: this.props.avatar.get('CurrentBulletin').Hash })}>
-                    {`#${this.props.avatar.get('CurrentBulletin').Sequence}`}
+                  <Text style={styles.desc_view}>
+                    {timestamp_format(props.avatar.get('CurrentBulletin').Timestamp)}
                   </Text>
-                </View>
-              </View>
-              <Text>{`@${timestamp_format(this.props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
-              <View style={{ flexDirection: "row" }} >
-                {
-                  this.props.avatar.get('CurrentBulletin').IsMark == "TRUE" ?
-                    <IconFontisto
-                      name={'bookmark-alt'}
-                      size={24}
-                      color='red'
-                      onPress={() => this.unmarkBulletin(this.props.avatar.get('CurrentBulletin').Hash)}
-                    />
-                    :
-                    <IconFontisto
-                      name={'bookmark'}
-                      size={24}
-                      onPress={() => this.markBulletin(this.props.avatar.get('CurrentBulletin').Hash)}
-                    />
-                }
-                {
-                  this.props.avatar.get('CurrentBulletin').PreHash != GenesisHash &&
-                  <IconMaterialIcons
-                    name={'skip-previous'}
-                    size={24}
-                    color='blue'
-                    onPress={() => this.props.navigation.push('Bulletin', {
-                      address: this.props.avatar.get('CurrentBulletin').Address,
-                      sequence: this.props.avatar.get('CurrentBulletin').Sequence - 1,
-                      hash: this.props.avatar.get('CurrentBulletin').PreHash,
-                      to: this.props.avatar.get('CurrentBulletin').Address
-                    })}
-                  />
-                }
-                <IconMaterialIcons
-                  name={'format-quote'}
-                  size={24}
-                  color='blue'
-                  onPress={() =>
-                    this.quoteBulletin(this.props.avatar.get('CurrentBulletin').Address,
-                      this.props.avatar.get('CurrentBulletin').Sequence,
-                      this.props.avatar.get('CurrentBulletin').Hash)}
-                />
-                <IconMaterialIcons
-                  name={'send'}
-                  size={24}
-                  color='blue'
-                  onPress={() =>
-                    this.props.navigation.push('AddressSelect', {
-                      content: {
-                        ObjectType: "Bulletin",
-                        Address: this.props.avatar.get('CurrentBulletin').Address,
-                        Sequence: this.props.avatar.get('CurrentBulletin').Sequence,
-                        Hash: this.props.avatar.get('CurrentBulletin').Hash
+
+                  <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}>
+                      {props.avatar.get('CurrentBulletin').Content}
+                    </Text>
+                  </View>
+                  <WhiteSpace size='lg' />
+                  <View style={styles.content_view}>
+                    <Text style={styles.desc_view}>
+                    </Text>
+                    <Popover
+                      overlay={
+                        <Popover.Item style={{
+                          backgroundColor: '#434343',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                          borderRadius: 5,
+                          borderColor: '#434343'
+                        }}>
+                          {
+                            props.avatar.get('CurrentBulletin').IsMark == "TRUE" &&
+                            <TouchableOpacity onPress={cancelCollection}>
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  color='red'
+                                  name="star" size="md"
+                                />
+                                <Text style={styles.icon_text}>收藏</Text>
+                              </View>
+                            </TouchableOpacity>
+                          }
+                          {
+                            props.avatar.get('CurrentBulletin').IsMark == "FALSE" &&
+                            <TouchableOpacity onPress={handleCollection}>
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  name='star'
+                                  size="md"
+                                  color='#fff'
+                                />
+                                <Text style={styles.icon_text}>收藏</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                          }
+                          {
+                            props.avatar.get('CurrentBulletin').PreHash != GenesisHash &&
+                            <TouchableOpacity onPress={() => props.navigation.push('Bulletin', {
+                              address: props.avatar.get('CurrentBulletin').Address,
+                              sequence: props.avatar.get('CurrentBulletin').Sequence - 1,
+                              hash: props.avatar.get('CurrentBulletin').PreHash,
+                              to: props.avatar.get('CurrentBulletin').Address
+                            })}>
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  name='backward'
+                                  size="md"
+                                  color='#fff'
+                                  style={{
+                                    textAlign: 'center'
+                                  }}
+                                />
+                                <Text style={styles.icon_text}>上一个</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                          }
+
+                          <TouchableOpacity onPress={() => {
+                            quoteBulletin(props.avatar.get('CurrentBulletin').Address,
+                            props.avatar.get('CurrentBulletin').Sequence,
+                            props.avatar.get('CurrentBulletin').Hash)
+                            quote()
+                          }
+                            }
+                              >
+                            <View style={styles.icon_view}>
+                              <Icon
+                                name='link'
+                                size="md"
+                                color='#fff' />
+                              <Text style={styles.icon_text}>引用</Text>
+                            </View>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity onPress={() =>
+                            props.navigation.push('AddressSelect', {
+                              content: {
+                                ObjectType: "Bulletin",
+                                Address: props.avatar.get('CurrentBulletin').Address,
+                                Sequence: props.avatar.get('CurrentBulletin').Sequence,
+                                Hash: props.avatar.get('CurrentBulletin').Hash
+                              }
+                            })}>
+                            <View style={styles.icon_view}>
+                              <Icon
+                                name='branches'
+                                size="md"
+                                color='#fff'
+
+                              />
+                              <Text style={styles.icon_text}>分享</Text>
+                            </View>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => {
+                            copyToClipboard();
+                          }}>
+                            <View style={styles.icon_view}>
+                              <Icon
+                                name='block'
+                                color='#fff'
+                                size="md"
+                              />
+                              <Text style={styles.icon_text}>拷贝</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </Popover.Item>
                       }
-                    })}
-                />
-                <IconMaterialIcons
-                  name={'content-copy'}
-                  size={24}
-                  color='blue'
-                  onPress={() =>
-                    this.copyToClipboard()
-                  }
-                />
-              </View>
-              <ScrollView>
-                <Text>{this.props.avatar.get('CurrentBulletin').Content}</Text>
-              </ScrollView>
-              <FlatList
-                data={this.props.avatar.get('CurrentBulletin').QuoteList}
-                keyExtractor={item => item.Hash}
-                renderItem={
-                  ({ item }) => {
-                    return (
-                      <View>
-                        <Text style={my_styles.Link} onPress={() => this.props.navigation.push('Bulletin', {
-                          address: item.Address,
-                          sequence: item.Sequence,
-                          hash: item.Hash,
-                          to: this.props.avatar.get('CurrentBulletin').Address
-                        })}>
-                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                        </Text>
-                      </View>)
-                  }
+                    >
+                      <Text style={{
+                        fontSize: 24,
+                        backgroundColor: theme.icon_view,
+                        lineHeight: 20,
+                        width: 32,
+                        height: 25,
+                        textAlign: 'center',
+                        color: theme.text1
+                      }}>...</Text>
+                    </Popover>
+                  </View>
+                  <WhiteSpace />
+
+
+                </View>
+              </Flex>
+            </View>
+
+
+            {
+              props.avatar.get('CurrentBulletin').QuoteList.length > 0 && <View style={{
+                ...styles.link_list,
+                backgroundColor: theme.tab_view
+              }}>
+                {
+                  props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
+                    <Text key={index} style={{
+                      ...styles.link_list_text,
+                      color: theme.link_color,
+                      borderColor: theme.line,
+                    }} onPress={() => props.navigation.push('Bulletin', {
+                      address: item.Address,
+                      sequence: item.Sequence,
+                      hash: item.Hash,
+                      to: props.avatar.get('CurrentBulletin').Address
+                    })}>
+                      {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                      {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
+                    </Text>
+                  ))
                 }
-              >
-              </FlatList>
-            </>
-        }
-      </View>
-    )
-  }
+              </View>
+            }
+
+          </ScrollView>
+      }
+    </View>
+  )
 }
+
 
 const ReduxBulletinScreen = connect((state) => {
   return {

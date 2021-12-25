@@ -3,6 +3,7 @@ export const actionType = {
     setMasterKey: 'SET_MASTER_KEY'
   },
   avatar: {
+    setThemeFlag:'SET_THEME_FLAG',
     setAvatar: 'SET_AVATAR',
     setAvatarName: 'SET_AVATAR_NAME',
     setDatabase: 'SET_DATABASE',

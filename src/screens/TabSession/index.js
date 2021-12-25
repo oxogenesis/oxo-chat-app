@@ -1,74 +1,115 @@
-import * as React from 'react'
-import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
+import React, { useContext, useState } from 'react';
+import { ScrollView, View, Text, Image, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import { actionType } from '../../redux/actions/actionType'
-
+import { List, Badge } from '@ant-design/react-native';
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
+import EmptyView from '../EmptyView'
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
+const Item = List.Item;
 
 //聊天对象列表
-class TabSessionScreen extends React.Component {
+const TabSessionScreen = (props) => {
+  const { theme } = useContext(ThemeContext);
+  return (
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme.base_view }}
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+    >
+      {
+        !props.avatar.get('ConnStatus') && <View style={{
+          alignItems: 'center',
+          backgroundColor: theme.off_line_view,
+          height: 55,
+          lineHeight: 55,
+        }} >
+          <Text style={{
+            lineHeight: 55,
+            fontSize: 16,
+            color: theme.off_line_text
+          }}>
+            当前网络不可用，请检查你的网络设置
+          </Text>
+        </View>
+      }
 
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      {
+        props.avatar.get('SessionList').length > 0 ? props.avatar.get('SessionList').map((item, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => props.navigation.push('Session', { address: item.Address })}>
+              <View style={{
+                flex: 1,
+                flexDirection: "row",
+                backgroundColor: theme.base_body,
+                borderBottomWidth: 1,
+                borderColor: theme.line,
+                padding: 12
+              }}
 
-    })
-  }
+              >
+                <View style={{
+                  flex: 0.16
+                }}>
+                  {
+                    item.CountUnread != null && item.CountUnread != 0 ?
+                      <Badge text={item.CountUnread} overflowCount={99} size='small'><View style={{
+                        width: 55,
+                        height: 55,
+                      }}>
+                        <Image style={{
+                          ...styles.msg_img,
+                        }} source={require('../../assets/app.png')}>
 
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
-
-  render() {
-    return (
-      <View style={my_styles.TabSheet}>
-        <FlatList
-          data={this.props.avatar.get('SessionList')}
-          keyExtractor={item => item.Address}
-          ListEmptyComponent={
-            <Text>暂未设置好友...</Text>
-          }
-          renderItem={
-            ({ item }) => {
-              return (
-                <TouchableOpacity
-                  style={{ flexDirection: "row" }}
-                  onPress={() => this.props.navigation.push('Session', { address: item.Address })}>
-                  <View>
-                    <Image style={my_styles.Avatar} source={require('../../assets/app.png')}></Image>
-                  </View>
-                  <View style={{ backgroundColor: "grey", flex: 1 }} >
-                    <View style={{ flexDirection: "row" }}>
-                      <View style={{ backgroundColor: "yellow", flex: 0.5, flexDirection: "row" }} >
-                        <Text>
-                          {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}`}
-                        </Text>
-                        {
-                          item.CountUnread != null && item.CountUnread != 0 &&
-                          <Text style={{ color: 'red' }}>{`==>${item.CountUnread}`}</Text>
-                        }
+                        </Image>
                       </View>
-                      <View style={{ backgroundColor: "orange", flex: 0.5 }} >
-                        <Text style={{ textAlign: "right" }}>
-                          {timestamp_format(item.Timestamp)}
-                        </Text>
-                      </View>
+                      </Badge> : <Image style={{
+                        ...styles.msg_img,
+                      }} source={require('../../assets/app.png')}></Image>
+                  }
+                </View>
+                <View style={{
+                  flex: 0.84
+                }}>
+                  <View style={{
+                    flex: 1,
+                    flexDirection: "row",
+                  }}>
+                    <View style={{
+                      flex: 0.6
+                    }}>
+                      <Text style={{
+                        color: theme.text1,
+                        fontSize: 20
+                      }} ellipsizeMode={"tail"} numberOfLines={1}>{`${AddressToName(props.avatar.get('AddressMap'), item.Address)}`}</Text>
                     </View>
-                    <Text style={{ backgroundColor: "green", flex: 0.5 }} ellipsizeMode={"tail"} numberOfLines={1}>
-                      {`${item.Content}`}
+                    <View style={{
+                      flex: 0.4
+                    }}>
+                      <Text style={{
+                        color: theme.text2,
+                        textAlign: 'right'
+                      }}>{timestamp_format(item.Timestamp)}</Text>
+                    </View>
+                  </View>
+                  <View>
+                    <Text style={styles.text5} ellipsizeMode={"tail"} numberOfLines={1}>
+                      {item.Content}
                     </Text>
                   </View>
-                </TouchableOpacity>
-              )
-            }
-          }
-        >
-        </FlatList>
-      </View >
-    )
-  }
+                </View>
+              </View>
+            </TouchableOpacity>
+
+          )
+        }) : <EmptyView />
+      }
+    </ScrollView>
+  )
 }
+
 
 const ReduxTabSessionScreen = connect((state) => {
   return {

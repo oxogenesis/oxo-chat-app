@@ -1,76 +1,105 @@
-import * as React from 'react'
-import { Text, TextInput, Button, FlatList, View } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { Text, TextInput, View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { AddressToName } from '../../lib/Util'
-import { my_styles } from '../../theme/style'
-import { BulletinAddressSession } from '../../lib/Const'
+import { Button, List, WhiteSpace } from '@ant-design/react-native';
+import { styles } from '../../theme/style'
+import { ThemeContext } from '../../theme/theme-context';
 
-//登录界面
-class BulletinPublishScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { content: '', error_msg: '' }
-  }
+//发布公告页面
+const Item = List.Item;
+const BulletinPublishScreen = props => {
+  const { theme } = useContext(ThemeContext);
+  const [content, setContent] = useState('')
+  const [error_msg, setMsg] = useState('')
 
-  publishBulletin() {
-    let content = this.state.content.trim()
-    if (content == '') {
-      this.setState({ error_msg: '公告不能为空...' })
+  const publishBulletin = () => {
+    let newContent = content.trim()
+    if (newContent == '') {
+      setMsg('公告不能为空...')
       return
     }
-    this.props.dispatch({
+    props.dispatch({
       type: actionType.avatar.PublishBulletin,
-      content: content
+      content: newContent
     })
-    this.setState({ content: '', error_msg: '' })
-    this.props.navigation.goBack()
-    // this.props.navigation.push('BulletinList', { session: BulletinAddressSession, address: this.props.avatar.get('Address') })
+    setContent('')
+    setMsg('')
+    props.navigation.goBack()
   }
 
-  render() {
-    return (
-      <>
+  return (
+    <View style={{
+      ...styles.base_body1,
+      backgroundColor: theme.base_view
+    }}>
+      <View style={{
+        padding: 6
+      }}>
         <TextInput
           placeholder="内容"
-          value={this.state.content}
+          value={content}
           multiline={true}
-          onChangeText={text => this.setState({ content: text })}
+          onChangeText={text => setContent(text)}
+          placeholderTextColor={theme.text2}
+          numberOfLines={4}
+          style={{
+            ...styles.input_view,
+            color: theme.text1,
+            height: 200,
+            textAlignVertical: 'top'
+          }}
         />
         {
-          this.state.error_msg.length > 0 &&
-          <Text>{this.state.error_msg}</Text>
+          error_msg.length > 0 &&
+          <View>
+            <Text style={styles.required_text}>{error_msg}</Text>
+            <WhiteSpace size='lg' />
+          </View>
         }
+        <WhiteSpace size='lg' />
+      </View>
+
+      {
+        props.avatar.get('QuoteList').map((item, index) => (
+          <View key={item.Hash}>
+
+            <Text style={{
+              ...styles.link_list_text,
+              color: theme.link_color,
+              borderColor: theme.line,
+            }} onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
+              {AddressToName(props.avatar.get('AddressMap'), item.Address)}#{item.Sequence};
+              {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
+            </Text>
+            <WhiteSpace size='lg' />
+            <View style={{
+              padding: 6,
+            }}>
+              <Text
+                onPress={() => props.dispatch({
+                  type: actionType.avatar.delQuote,
+                  hash: item.Hash
+                })}
+                style={{
+                  ...styles.cancel_text,
+                  color: theme.link_color
+                }}>取消引用</Text>
+            </View>
+            <WhiteSpace size='lg' />
+          </View>
+        ))
+      }
+      <View style={styles.base_view_a}>
         <Button
-          title="发布"
-          onPress={() => this.publishBulletin()}
-        />
-        <FlatList
-          data={this.props.avatar.get('QuoteList')}
-          keyExtractor={item => item.Hash}
-          renderItem={
-            ({ item }) => {
-              return (
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ backgroundColor: "yellow", flex: 0.8, color: 'blue', fontWeight: 'bold' }} onPress={() => this.props.navigation.push('Bulletin', { hash: item.Hash })}>
-                    {`${AddressToName(this.props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                  </Text>
-                  <Text style={{ backgroundColor: "orange", flex: 0.2, color: 'blue', fontWeight: 'bold', textAlign: "right" }}
-                    onPress={() => this.props.dispatch({
-                      type: actionType.avatar.delQuote,
-                      hash: item.Hash
-                    })}>
-                    取消引用
-                  </Text>
-                </View>)
-            }
-          }
-        >
-        </FlatList>
-      </>
-    )
-  }
+          style={styles.btn_high}
+          type='primary'
+          onPress={() => publishBulletin()}
+        >发布</Button>
+      </View>
+    </View>
+  )
 }
 
 const ReduxBulletinPublishScreen = connect((state) => {

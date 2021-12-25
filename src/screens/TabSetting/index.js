@@ -1,54 +1,73 @@
-import * as React from 'react'
-import { View, Text, Button } from 'react-native'
-
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text } from 'react-native'
 import { connect } from 'react-redux'
-
 import { actionType } from '../../redux/actions/actionType'
-import { my_styles } from '../../theme/style'
+import { Button, WhiteSpace, Radio } from '@ant-design/react-native';
+import { ThemeContext } from '../../theme/theme-context';
+import BaseList from '../BaseList'
+import { styles } from '../../theme/style'
 
+const RadioItem = Radio.RadioItem;
 //设置
-class TabSettingScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      address: this.props.avatar.get('Address'),
-      name: this.props.avatar.get('name')
+
+const TabSettingScreen = (props) => {
+  const { theme, toggle } = useContext(ThemeContext);
+
+  const setThemeLight = (type) => {
+    toggle(type)
+
+    props.dispatch({
+      type: actionType.avatar.setThemeFlag,
+      theme_flag: type
+    })
+  }
+
+  const onSwitchChange = (value) => {
+    if (value) {
+      setThemeLight('dark')
+    } else {
+      setThemeLight('light')
     }
   }
 
-  loadState() {
-    this.setState({
-      address: this.props.avatar.get('Address'),
-      name: this.props.avatar.get('Name')
-    })
-  }
+  return (
+    <View style={{
+      ...styles.base_view,
+      backgroundColor: theme.base_view,
+    }}>
+      <WhiteSpace size='lg' />
+      <BaseList data={[{ title: '账号设置', onpress: () => { props.navigation.navigate('SettingMe') } }]} />
+      <WhiteSpace size='lg' />
+      <BaseList data={[
+        { title: '网络设置', onpress: () => { props.navigation.navigate('SettingNetwork') } },
+        { title: '公告设置', onpress: () => { props.navigation.navigate('SettingBulletin') } },
+        { title: '地址管理', onpress: () => { props.navigation.navigate('SettingAddress') } },
+      ]} />
+      <WhiteSpace size='lg' />
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.loadState()
-    })
-  }
-
-  componentWillUnmount() {
-    this._unsubscribe()
-  }
-
-  render() {
-    return (
-      <View style={my_styles.TabSheet}>
-        <Button title="我" onPress={() => { this.props.navigation.navigate('SettingMe') }} />
-        <Button title="网络设置" onPress={() => { this.props.navigation.navigate('SettingNetwork') }} />
-        <Button title="公告设置" onPress={() => { this.props.navigation.navigate('SettingBulletin') }} />
-        <Button title="地址管理" onPress={() => { this.props.navigation.navigate('SettingAddress') }} />
-        <Button color="orange" title="切换账户" onPress={() => {
-          this.props.dispatch({
-            type: actionType.avatar.disableAvatar
-          })
-          this.props.navigation.navigate('AvatarList')
-        }} />
-      </View >
-    )
-  }
+      <BaseList data={[
+        {
+          title: '切换主题',
+          type: 'switch',
+          checked: props.avatar.get('Setting').ThemeFlag === 'dark',
+          onChange: onSwitchChange,
+        },
+      ]} />
+      <WhiteSpace size='lg' />
+      <Button style={{
+        ...styles.btn_high,
+        backgroundColor: theme.base_body,
+        borderColor: theme.line,
+      }} onPress={() => {
+        props.dispatch({
+          type: actionType.avatar.disableAvatar
+        })
+        props.navigation.navigate('AvatarList')
+      }}><Text style={{
+        color: 'red'
+      }}>切换账户</Text></Button>
+    </View >
+  )
 }
 
 const ReduxTabSettingScreen = connect((state) => {

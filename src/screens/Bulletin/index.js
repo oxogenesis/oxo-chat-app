@@ -1,20 +1,21 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react'
 import { View, ScrollView, Text, Image, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { Icon, WhiteSpace, Tag, Toast, Popover } from '@ant-design/react-native';
+import { Icon, WhiteSpace, Tag, Toast, Popover } from '@ant-design/react-native'
 import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Flex } from '@ant-design/react-native';
+import { Flex } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
-import BaseList from '../BaseList';
+import { ThemeContext } from '../../theme/theme-context'
+import BaseList from '../BaseList'
 
 //公告列表
 const BulletinScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
+  const current = props.avatar.get('CurrentBulletin')
 
   const markBulletin = (hash) => {
     props.dispatch({
@@ -40,17 +41,18 @@ const BulletinScreen = (props) => {
   }
 
   const copyToClipboard = () => {
-    Clipboard.setString(props.avatar.get('CurrentBulletin').Content)
-    Toast.success('拷贝成功！', 1);
+    Clipboard.setString(current.Content)
+    Toast.success('拷贝成功！', 1)
   }
 
   const quote = () => {
-    Toast.success('引用成功！', 1);
+    Toast.success('引用成功！', 1)
   }
 
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
+      console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<BulletinScreen focus`)
       console.log(props.route.params.hash)
       props.dispatch({
         type: actionType.avatar.LoadCurrentBulletin,
@@ -64,15 +66,14 @@ const BulletinScreen = (props) => {
 
 
   const handleCollection = () => {
-    markBulletin(props.avatar.get('CurrentBulletin').Hash)
-    Toast.success('收藏成功！', 1);
+    markBulletin(current.Hash)
+    Toast.success('收藏成功！', 1)
   }
 
   const cancelCollection = () => {
-    unmarkBulletin(props.avatar.get('CurrentBulletin').Hash)
-    Toast.success('取消收藏！', 1);
+    unmarkBulletin(current.Hash)
+    Toast.success('取消收藏！', 1)
   }
-
 
   return (
     <View style={{
@@ -80,7 +81,7 @@ const BulletinScreen = (props) => {
       backgroundColor: theme.base_body
     }}>
       {
-        props.avatar.get('CurrentBulletin') == null ?
+        current == null ?
           <Text style={{ color: theme.text2 }}>公告不存在，正在获取中，请稍后查看...</Text>
           :
           <ScrollView>
@@ -88,10 +89,10 @@ const BulletinScreen = (props) => {
               backgroundColor: theme.base_body
             }}>
               <Flex justify="start" align="start">
-                <TouchableOpacity 
-                onPress={() => props.navigation.push('AddressMark',
-                { address: props.avatar.get('CurrentBulletin').Address })}
-                 >
+                <TouchableOpacity
+                  onPress={() => props.navigation.push('AddressMark',
+                    { address: current.Address })}
+                >
                   <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
                 </TouchableOpacity>
 
@@ -105,11 +106,11 @@ const BulletinScreen = (props) => {
                         color: theme.link_color,
                       }}
                         onPress={() => props.navigation.push('AddressMark',
-                          { address: props.avatar.get('CurrentBulletin').Address })}
-                      >{AddressToName(props.avatar.get('AddressMap'), props.avatar.get('CurrentBulletin').Address)}&nbsp;&nbsp;</Text>
+                          { address: current.Address })}
+                      >{AddressToName(props.avatar.get('AddressMap'), current.Address)}&nbsp;&nbsp;</Text>
                     </View>
                     <Text
-                    // onPress={() => props.navigation.push('Bulletin', { hash: props.avatar.get('CurrentBulletin').Hash })}
+                    // onPress={() => props.navigation.push('Bulletin', { hash: current.Hash })}
                     >
                       <View style={{
                         borderWidth: 1,
@@ -117,17 +118,16 @@ const BulletinScreen = (props) => {
                         borderRadius: 6,
                         paddingLeft: 6,
                         paddingRight: 6,
-
                       }}>
                         <Text style={{
                           color: theme.text1,
                           fontSize: 18
-                        }}>{props.avatar.get('CurrentBulletin').Sequence}</Text>
+                        }}>{`#${current.Sequence}`}</Text>
                       </View>
                     </Text>
                   </Text>
                   <Text style={styles.desc_view}>
-                    {timestamp_format(props.avatar.get('CurrentBulletin').Timestamp)}
+                    {timestamp_format(current.Timestamp)}
                   </Text>
 
                   <View style={styles.content_view}>
@@ -135,7 +135,7 @@ const BulletinScreen = (props) => {
                       ...styles.content_text,
                       color: theme.text1
                     }}>
-                      {props.avatar.get('CurrentBulletin').Content}
+                      {current.Content}
                     </Text>
                   </View>
                   <WhiteSpace size='lg' />
@@ -152,7 +152,7 @@ const BulletinScreen = (props) => {
                           borderColor: '#434343'
                         }}>
                           {
-                            props.avatar.get('CurrentBulletin').IsMark == "TRUE" &&
+                            current.IsMark == "TRUE" &&
                             <TouchableOpacity onPress={cancelCollection}>
                               <View style={styles.icon_view}>
                                 <Icon
@@ -164,7 +164,7 @@ const BulletinScreen = (props) => {
                             </TouchableOpacity>
                           }
                           {
-                            props.avatar.get('CurrentBulletin').IsMark == "FALSE" &&
+                            current.IsMark == "FALSE" &&
                             <TouchableOpacity onPress={handleCollection}>
                               <View style={styles.icon_view}>
                                 <Icon
@@ -178,12 +178,12 @@ const BulletinScreen = (props) => {
 
                           }
                           {
-                            props.avatar.get('CurrentBulletin').PreHash != GenesisHash &&
+                            current.PreHash != GenesisHash &&
                             <TouchableOpacity onPress={() => props.navigation.push('Bulletin', {
-                              address: props.avatar.get('CurrentBulletin').Address,
-                              sequence: props.avatar.get('CurrentBulletin').Sequence - 1,
-                              hash: props.avatar.get('CurrentBulletin').PreHash,
-                              to: props.avatar.get('CurrentBulletin').Address
+                              address: current.Address,
+                              sequence: current.Sequence - 1,
+                              hash: current.PreHash,
+                              to: current.Address
                             })}>
                               <View style={styles.icon_view}>
                                 <Icon
@@ -201,13 +201,13 @@ const BulletinScreen = (props) => {
                           }
 
                           <TouchableOpacity onPress={() => {
-                            quoteBulletin(props.avatar.get('CurrentBulletin').Address,
-                            props.avatar.get('CurrentBulletin').Sequence,
-                            props.avatar.get('CurrentBulletin').Hash)
+                            quoteBulletin(current.Address,
+                              current.Sequence,
+                              current.Hash)
                             quote()
                           }
-                            }
-                              >
+                          }
+                          >
                             <View style={styles.icon_view}>
                               <Icon
                                 name='link'
@@ -221,9 +221,9 @@ const BulletinScreen = (props) => {
                             props.navigation.push('AddressSelect', {
                               content: {
                                 ObjectType: "Bulletin",
-                                Address: props.avatar.get('CurrentBulletin').Address,
-                                Sequence: props.avatar.get('CurrentBulletin').Sequence,
-                                Hash: props.avatar.get('CurrentBulletin').Hash
+                                Address: current.Address,
+                                Sequence: current.Sequence,
+                                Hash: current.Hash
                               }
                             })}>
                             <View style={styles.icon_view}>
@@ -237,7 +237,7 @@ const BulletinScreen = (props) => {
                             </View>
                           </TouchableOpacity>
                           <TouchableOpacity onPress={() => {
-                            copyToClipboard();
+                            copyToClipboard()
                           }}>
                             <View style={styles.icon_view}>
                               <Icon
@@ -269,30 +269,45 @@ const BulletinScreen = (props) => {
               </Flex>
             </View>
 
-
             {
-              props.avatar.get('CurrentBulletin').QuoteList.length > 0 && <View style={{
-                ...styles.link_list,
-                backgroundColor: theme.tab_view
-              }}>
+              current.QuoteList != undefined &&
+              <>
                 {
-                  props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
-                    <Text key={index} style={{
-                      ...styles.link_list_text,
-                      color: theme.link_color,
-                      borderColor: theme.line,
-                    }} onPress={() => props.navigation.push('Bulletin', {
-                      address: item.Address,
-                      sequence: item.Sequence,
-                      hash: item.Hash,
-                      to: props.avatar.get('CurrentBulletin').Address
-                    })}>
-                      {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                      {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
-                    </Text>
-                  ))
+                  current.QuoteList.length > 0 &&
+                  <View style={{
+                    ...styles.link_list,
+                    backgroundColor: theme.tab_view
+                  }}>
+                    {
+                      current.QuoteList.map((item, index) => (
+                        <View
+                          key={index}
+                          style={{
+                            borderWidth: 1,
+                            borderColor: theme.split_line,
+                            borderRadius: 6,
+                            paddingLeft: 6,
+                            paddingRight: 6,
+                          }}>
+                          <Text
+                            style={{
+                              color: theme.text1,
+                              fontSize: 18
+                            }}
+                            onPress={() => props.navigation.push('Bulletin', {
+                              address: item.Address,
+                              sequence: item.Sequence,
+                              hash: item.Hash,
+                              to: current.Address
+                            })}>
+                            {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                          </Text>
+                        </View>
+                      ))
+                    }
+                  </View>
                 }
-              </View>
+              </>
             }
 
           </ScrollView>

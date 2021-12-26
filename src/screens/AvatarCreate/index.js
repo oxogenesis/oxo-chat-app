@@ -1,14 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TextInput } from 'react-native'
-import { Button, WhiteSpace } from '@ant-design/react-native';
+import { Button, WhiteSpace } from '@ant-design/react-native'
 import { AvatarCreateNew } from '../../lib/OXO'
 import { connect } from 'react-redux'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 //口令创建账户
 const AvatarCreateScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [name, setName] = useState('')
   const [error_msg, setMsg] = useState('')
 

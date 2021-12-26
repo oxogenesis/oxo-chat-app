@@ -1,5 +1,5 @@
 //in file theme-context.js
-import React from 'react';
+import React from 'react'
 
 export const themes = {
   light: {
@@ -52,7 +52,7 @@ const initialState = {
 const ThemeContext = React.createContext(initialState)
 
 function ThemeProvider({ children, defaultTheme = 'light' }) {
-  console.log('查看主题传入', defaultTheme)
+  // console.log('查看主题传入', defaultTheme)
   const [status, setStatus] = React.useState(defaultTheme) // Default theme is light
 
   React.useEffect(() => {
@@ -63,8 +63,8 @@ function ThemeProvider({ children, defaultTheme = 'light' }) {
     setStatus(value)
   }
 
-  const theme = status === 'light' ? themes.light : themes.dark;
-  console.log('最终展示主题:', status)
+  const theme = status === 'light' ? themes.light : themes.dark
+  // console.log('最终展示主题:', status)
   return (
     <ThemeContext.Provider value={{ theme, status, toggle }}>
       {children}

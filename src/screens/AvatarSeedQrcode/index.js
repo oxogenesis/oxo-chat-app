@@ -1,16 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, Alert } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import QRCode from 'react-native-qrcode-svg'
-import { WhiteSpace, Button } from '@ant-design/react-native';
+import { WhiteSpace, Button } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 import AlertView from '../AlertView'
 
 //地址标记
 const AvatarSeedQrcodeScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [qrcode, seQrcode] = useState('xxx')
   const [visible, showModal] = useState(false)
 
@@ -33,7 +33,7 @@ const AvatarSeedQrcodeScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       let json = { "Name": props.avatar.get('Name'), "Seed": props.avatar.get('Seed') }
       seQrcode(JSON.stringify(json))
     })

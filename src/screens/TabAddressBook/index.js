@@ -1,15 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, Image, ScrollView } from 'react-native'
 import { connect } from 'react-redux'
-import { List, WhiteSpace } from '@ant-design/react-native';
-import EmptyView from '../EmptyView';
-import { ThemeContext } from '../../theme/theme-context';
-import BaseAvatarList from '../BaseAvatarList';
-const Item = List.Item;
+import { List, WhiteSpace } from '@ant-design/react-native'
+import EmptyView from '../EmptyView'
+import { ThemeContext } from '../../theme/theme-context'
+import BaseAvatarList from '../BaseAvatarList'
+const Item = List.Item
 
 //地址薄
 const TabAddressBookScreen = props => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
 
   const lists = props.avatar.get('AddressArray').map(item => ({

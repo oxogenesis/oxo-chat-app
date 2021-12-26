@@ -3,7 +3,7 @@ import { View, Text, TextInput } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MasterKeySet } from '../../lib/OXO'
 import { connect } from 'react-redux'
-import { Button, WhiteSpace } from '@ant-design/react-native';
+import { Button, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 
 //主口令设置界面

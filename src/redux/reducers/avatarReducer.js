@@ -224,11 +224,11 @@ reducer.prototype[actionType.avatar.addQuote] = (state, action) => {
   let quote_list = state.get('QuoteList')
 
   if (quote_list.length >= 8) {
-    return
+    return state.set('QuoteList', quote_list)
   }
   for (const quote of quote_list) {
     if (quote.Hash == action.hash) {
-      return
+      return state.set('QuoteList', quote_list)
     }
   }
 

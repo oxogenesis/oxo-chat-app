@@ -1,17 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, Image } from 'react-native'
 import { connect } from 'react-redux'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { List, WhiteSpace } from '@ant-design/react-native';
+import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
-import { ThemeContext } from '../../theme/theme-context';
-import BaseAvatarList from '../BaseAvatarList';
+import { ThemeContext } from '../../theme/theme-context'
+import BaseAvatarList from '../BaseAvatarList'
 
 const Item = List.Item
 
 //好友申请
 const SettingFriendRequestScreen = props => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const data = props.avatar.get('FriendRequests')
   const lists = data.map(item => ({
     title: `${AddressToName(props.avatar.get('AddressMap'), item.Address)}`,

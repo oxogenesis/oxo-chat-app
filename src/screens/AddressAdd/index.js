@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { Button, WhiteSpace } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { Button, WhiteSpace } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import { styles } from '../../theme/style'
 
 //登录界面
@@ -11,7 +11,7 @@ const AddressAddScreen = (props) => {
   const [name, setName] = useState(undefined)
   const [address, setAddress] = useState(undefined)
   const [error_msg, setMsg] = useState('')
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const addAddressMark = () => {
     console.log('地址：',address)
@@ -33,7 +33,7 @@ const AddressAddScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       if (props.route.params && props.route.params.address) {
         setAddress(props.route.params.address)
       }

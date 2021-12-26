@@ -1,5 +1,5 @@
 
-import React, { Component, useContext, useEffect, useState } from 'react';
+import React, { Component, useContext, useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import IconAnt from 'react-native-vector-icons/AntDesign'
@@ -7,7 +7,7 @@ import IconFeather from 'react-native-vector-icons/Feather'
 //import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
-import { Provider } from '@ant-design/react-native';
+import { Provider } from '@ant-design/react-native'
 
 import { connect } from 'react-redux'
 
@@ -43,7 +43,7 @@ import { ThemeContext } from '../../theme/theme-context'
 const Stack = createStackNavigator()
 
 const StackView = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const headerStyleOption = {
     headerStyle: {

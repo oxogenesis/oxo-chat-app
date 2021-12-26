@@ -1,15 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, Image } from 'react-native'
 import { connect } from 'react-redux'
 import { AddressToName } from '../../lib/Util'
 import EmptyView from '../EmptyView'
-import { List, WhiteSpace } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
-import BaseAvatarList from '../BaseAvatarList';
+import { List, WhiteSpace } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
+import BaseAvatarList from '../BaseAvatarList'
 const Item = List.Item
 //关注设置
 const SettingFollowScreen = props => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const lists = props.avatar.get('Follows').map(item => ({
     title: `${AddressToName(props.avatar.get('AddressMap'), item)}`,

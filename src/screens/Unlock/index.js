@@ -1,15 +1,15 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TextInput, Appearance } from 'react-native'
-import { Button, WhiteSpace, Popover, Icon } from '@ant-design/react-native';
+import { Button, WhiteSpace, Popover, Icon } from '@ant-design/react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { MasterKeyDerive } from '../../lib/OXO'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 import { styles } from '../../theme/style'
 
 //Unlock界面
 const UnlockScreen = (props) => {
-  const { theme, toggle } = useContext(ThemeContext);
+  const { theme, toggle } = useContext(ThemeContext)
   const [master_key, setKey] = useState('')
   const [error_msg, setMsg] = useState('')
 
@@ -32,7 +32,7 @@ const UnlockScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       if (props.master.get('MasterKey') != null) {
         // 强制安全退出：加载此页面，置空MasterKey
         props.dispatch({

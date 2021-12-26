@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Button, Flex, Toast } from '@ant-design/react-native';
+import React, { useContext, useState, useEffect } from 'react'
+import { Button, Flex, Toast } from '@ant-design/react-native'
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { timestamp_format, AddressToName } from '../../lib/Util'
@@ -9,11 +9,11 @@ import { actionType } from '../../redux/actions/actionType'
 import { connect } from 'react-redux'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 //聊天会话界面
 const SessionScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [address, setAddress] = useState(props.route.params.address)
   const [name, setName] = useState('')
   const [message_input, setMsgInput] = useState('')
@@ -22,12 +22,12 @@ const SessionScreen = (props) => {
     let timestamp = Date.now()
     let newMessage_input = message_input.trim()
     if (message_input == "") {
-      Toast.success('消息不能为空...', 1);
+      Toast.success('消息不能为空...', 1)
     } else {
       let ecdh_sequence = DHSequence(DefaultDivision, timestamp, props.avatar.get("Address"), address)
       let current_session = props.avatar.get("CurrentSession")
       if (ecdh_sequence != current_session.EcdhSequence) {
-        Toast.success('握手未完成...', 1);
+        Toast.success('握手未完成...', 1)
       } else {
         props.dispatch({
           type: actionType.avatar.SendFriendMessage,
@@ -50,11 +50,11 @@ const SessionScreen = (props) => {
 
   const copyToClipboard = (content) => {
     Clipboard.setString(content)
-    Toast.success('拷贝成功！', 1);
+    Toast.success('拷贝成功！', 1)
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       let name = AddressToName(props.avatar.get('AddressMap'), props.route.params.address)
       setAddress(props.route.params.address)
       setName(name)

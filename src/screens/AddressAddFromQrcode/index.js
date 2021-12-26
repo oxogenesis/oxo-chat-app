@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Text } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { WhiteSpace, Button } from '@ant-design/react-native';
+import { WhiteSpace, Button } from '@ant-design/react-native'
 
 //登录界面
 class AddressAddFromQrcodeScreen extends React.Component {

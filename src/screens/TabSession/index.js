@@ -1,16 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { ScrollView, View, Text, Image, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import { List, Badge } from '@ant-design/react-native';
+import { List, Badge } from '@ant-design/react-native'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import EmptyView from '../EmptyView'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
-const Item = List.Item;
+import { ThemeContext } from '../../theme/theme-context'
+const Item = List.Item
 
 //聊天对象列表
 const TabSessionScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.base_view }}

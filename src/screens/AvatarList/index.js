@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Button, List, WhiteSpace, Flex, WingBlank } from '@ant-design/react-native';
+import React, { useContext, useState, useEffect } from 'react'
+import { Button, List, WhiteSpace, Flex, WingBlank } from '@ant-design/react-native'
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AvatarDerive } from '../../lib/OXO'
@@ -7,11 +7,11 @@ import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { styles } from '../../theme/style'
 import EmptyView from '../EmptyView'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 //登录界面
 const AvatarListScreen = props => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [avatarList, setList] = useState([])
 
   const loadAvatarList = () => {
@@ -27,7 +27,7 @@ const AvatarListScreen = props => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       loadAvatarList()
     })
   })

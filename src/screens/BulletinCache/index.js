@@ -1,16 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { Button, WhiteSpace } from '@ant-design/react-native';
+import { Button, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 //缓存设置界面
 const BulletinCacheScreen = (props) => {
   const [cache_size, setSize] = useState('')
   const [error_msg, setMsg] = useState('')
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const setBulletinCacheSize = () => {
     let cache_size = parseInt(cache_size)
@@ -28,7 +28,7 @@ const BulletinCacheScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       setSize(props.avatar.get('Setting').BulletinCacheSize)
     })
   })

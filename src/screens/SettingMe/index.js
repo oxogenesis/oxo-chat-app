@@ -1,25 +1,25 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Alert, Appearance } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Icon, Toast } from '@ant-design/react-native';
-import { List, WhiteSpace } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { Icon, Toast } from '@ant-design/react-native'
+import { List, WhiteSpace } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import BaseList from '../BaseList'
 import AlertView from '../AlertView'
 
 //设置
-const Item = List.Item;
-const Brief = Item.Brief;
+const Item = List.Item
+const Brief = Item.Brief
 
 const SettingMeScreen = (props) => {
 
   const [address, setAddress] = useState(props.avatar.get('Address'))
   const [name, setName] = useState(props.avatar.get('Name'))
   const [visible, showModal] = useState(false)
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const json = {
     "Relay": props.avatar.get('CurrentHost'),
@@ -28,11 +28,9 @@ const SettingMeScreen = (props) => {
   const [qrcode, setQrcode] = useState(JSON.stringify(json))
 
   const copyToClipboard = () => {
-    Toast.success('拷贝成功！', 1);
+    Toast.success('拷贝成功！', 1)
     Clipboard.setString(address)
   }
-
-  
 
   const viewSeedQrcodeAlert = () => {
     showModal(true)

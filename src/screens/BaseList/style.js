@@ -26,6 +26,6 @@ const styles = StyleSheet.create({
         lineHeight: 55,
         textAlign: 'right',
     },
-});
+})
 
 export default styles

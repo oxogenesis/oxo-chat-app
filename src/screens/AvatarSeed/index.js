@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
-import { Toast } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { Toast } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import Clipboard from '@react-native-clipboard/clipboard'
 import AlertView from '../AlertView'
 
@@ -12,10 +12,10 @@ const AvatarSeedScreen = (props) => {
 
   const [seed, setSeed] = useState(props.avatar.get('Seed'))
   const [visible, showModal] = useState(false)
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const copyToClipboard = () => {
-    Toast.success('拷贝成功！', 1);
+    Toast.success('拷贝成功！', 1)
     Clipboard.setString(seed)
   }
 

@@ -1,16 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { AddressToName } from '../../lib/Util'
-import { Button, List, WhiteSpace } from '@ant-design/react-native';
+import { Button, List, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 //发布公告页面
-const Item = List.Item;
+const Item = List.Item
 const BulletinPublishScreen = props => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [content, setContent] = useState('')
   const [error_msg, setMsg] = useState('')
 
@@ -70,7 +70,7 @@ const BulletinPublishScreen = props => {
               color: theme.link_color,
               borderColor: theme.line,
             }} onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
-              {AddressToName(props.avatar.get('AddressMap'), item.Address)}#{item.Sequence};
+              {AddressToName(props.avatar.get('AddressMap'), item.Address)}#{item.Sequence}
               {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
             </Text>
             <WhiteSpace size='lg' />

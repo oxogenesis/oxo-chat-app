@@ -1,15 +1,15 @@
-import React, { useContext } from 'react';
+import React, { useContext } from 'react'
 import { View, Text } from 'react-native'
-import { ThemeContext } from '../../theme/theme-context';
-import { Modal } from '@ant-design/react-native';
+import { ThemeContext } from '../../theme/theme-context'
+import { Modal } from '@ant-design/react-native'
 
 const AlertView = ({ visible, title, msg, onClose, onPress }) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const footerButtons = [
     { text: '取消', onPress: onClose },
     { text: '确认', onPress: onPress },
-  ];
+  ]
 
   return (
     <Modal

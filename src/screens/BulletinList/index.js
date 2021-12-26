@@ -1,21 +1,21 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, ScrollView, Image } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { Flex, WhiteSpace } from '@ant-design/react-native';
+import { Flex, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext, themes } from '../../theme/theme-context';
+import { ThemeContext, themes } from '../../theme/theme-context'
 import BaseList from '../BaseList'
-import EmptyView from '../EmptyView';
+import EmptyView from '../EmptyView'
 
 
 //公告列表
 
 const BulletinListScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const loadBulletinList = (flag) => {
     if (props.route.params.session == BulletinMarkSession) {
@@ -39,7 +39,7 @@ const BulletinListScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       loadBulletinList(true)
     })
   })

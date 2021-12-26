@@ -1,15 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { connect } from 'react-redux'
-import { List, WhiteSpace } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { List, WhiteSpace } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import BaseList from '../BaseList'
 
 const Item = List.Item
 //设置
 const SettingAddressScreen = props => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   return (
     <View style={{
       backgroundColor: theme.base_view,

@@ -1,19 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { AvatarNameEdit } from '../../lib/OXO'
 import { actionType } from '../../redux/actions/actionType'
-import { WhiteSpace, Button } from '@ant-design/react-native';
+import { WhiteSpace, Button } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 //地址标记
 const AvatarNameEditScreen = (props) => {
   const [address, setAddress] = useState(props.avatar.get('Address'))
   const [name, setName] = useState(props.avatar.get('Name'))
   const [error_msg, setMsg] = useState('')
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const saveName = () => {
     let newName = name.trim()

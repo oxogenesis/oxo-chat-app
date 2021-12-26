@@ -1,19 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
-import { AvatarNameEdit } from '../../lib/OXO'
 import { actionType } from '../../redux/actions/actionType'
-import { WhiteSpace, Button } from '@ant-design/react-native';
+import { WhiteSpace, Button } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
+import { AddressToName } from '../../lib/Util'
 
 //地址标记
 const AddressEditScreen = (props) => {
-  const [address, setAddress] = useState(props.avatar.get('Address'))
-  const [name, setName] = useState(props.avatar.get('Name'))
+  const [address, setAddress] = useState(props.route.params.address)
+  const [name, setName] = useState(AddressToName(props.avatar.get('AddressMap'), props.route.params.address))
   const [error_msg, setMsg] = useState('')
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const saveAddressName = () => {
     let address = address
@@ -40,11 +40,11 @@ const AddressEditScreen = (props) => {
       }}>地址：{address}</Text>
       <WhiteSpace size='lg' />
       <TextInput
-         placeholderTextColor={theme.text2}
-         style={{
-           ...styles.input_view,
-           color: theme.text1
-         }}
+        placeholderTextColor={theme.text2}
+        style={{
+          ...styles.input_view,
+          color: theme.text1
+        }}
         placeholder="昵称"
         value={name}
         multiline={false}

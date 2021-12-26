@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import TabSessionScreen from '../TabSession'
@@ -7,14 +7,14 @@ import TabAddressBookScreen from '../TabAddressBook'
 import TabSettingScreen from '../TabSetting'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import { connect } from 'react-redux'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 
 
 const Tab = createBottomTabNavigator()
 
 //登录后界面
 const TabHomeScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   return (
     <Tab.Navigator
       screenOptions={{

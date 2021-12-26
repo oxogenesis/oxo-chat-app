@@ -26,6 +26,6 @@ const styles = StyleSheet.create({
         height: 45,
         borderRadius: 5,
     }
-});
+})
 
 export default styles

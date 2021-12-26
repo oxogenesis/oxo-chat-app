@@ -1,14 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Text, TextInput, FlatList, Alert } from 'react-native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { my_styles, styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 import AlertView from '../AlertView'
 import BaseList from '../BaseList'
 
-import { Button, WhiteSpace } from '@ant-design/react-native';
+import { Button, WhiteSpace } from '@ant-design/react-native'
 
 //网络设置
 const SettingNetworkScreen = (props) => {
@@ -16,7 +16,7 @@ const SettingNetworkScreen = (props) => {
   const [error_msg, setMsg] = useState('')
   const [visible, showModal] = useState(false)
   const [host1, setHostData] = useState()
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const addHost = () => {
     let host_input1 = host_input.trim()

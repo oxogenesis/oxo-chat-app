@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity, Image } from 'react-native'
-import { Icon } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { Icon } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import styles from './style'
 
 const BaseList = ({ data = [] }) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const imgMap = (type, backgroundColor) => {
     if (type === 'sys') {

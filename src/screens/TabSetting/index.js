@@ -1,17 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { Button, WhiteSpace, Radio } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { Button, WhiteSpace, Radio } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import BaseList from '../BaseList'
 import { styles } from '../../theme/style'
 
-const RadioItem = Radio.RadioItem;
+const RadioItem = Radio.RadioItem
 //设置
 
 const TabSettingScreen = (props) => {
-  const { theme, toggle } = useContext(ThemeContext);
+  const { theme, toggle } = useContext(ThemeContext)
 
   const setThemeLight = (type) => {
     toggle(type)

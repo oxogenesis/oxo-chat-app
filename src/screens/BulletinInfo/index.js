@@ -1,20 +1,20 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react'
 import { View, ScrollView, Text, FlatList } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { my_styles, styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
-import EmptyView from '../EmptyView';
-import { WhiteSpace } from '@ant-design/react-native';
+import { ThemeContext } from '../../theme/theme-context'
+import EmptyView from '../EmptyView'
+import { WhiteSpace } from '@ant-design/react-native'
 
 //公告列表
 const BulletinInfoScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       props.dispatch({
         type: actionType.avatar.LoadCurrentBulletin,
         address: props.route.params.address,

@@ -1,17 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import { View, Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
 import { actionType } from '../../redux/actions/actionType'
-import { List, WhiteSpace } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { List, WhiteSpace } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import BaseList from '../BaseList'
 import AlertView from '../AlertView'
 
 const Item = List.Item
 //设置
 const SettingBulletinScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [visible, showModal] = useState(false)
 
   const clearBulletinCacheAlert = () => {

@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
-import { Icon, Switch  } from '@ant-design/react-native';
-import { ThemeContext } from '../../theme/theme-context';
+import { Icon, Switch  } from '@ant-design/react-native'
+import { ThemeContext } from '../../theme/theme-context'
 import styles from './style'
 
 const BaseList = ({ data }) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const renderContent = (item) => {
     if (item.type === 'radio') {

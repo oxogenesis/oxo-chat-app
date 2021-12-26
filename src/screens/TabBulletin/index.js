@@ -1,17 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { timestamp_format, AddressToName } from '../../lib/Util'
-import { Button, Flex, WhiteSpace } from '@ant-design/react-native';
+import { Button, Flex, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 import { styles } from '../../theme/style'
 
 //公告列表
 const TabBulletinScreen = (props) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
 
   const loadTabBulletinList = (flag) => {
     props.dispatch({
@@ -21,7 +21,8 @@ const TabBulletinScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
+      console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<TabBulletin focus`)
       if (props.avatar.get('TabBulletinList').length == 0) {
         loadTabBulletinList(true)
       }
@@ -110,7 +111,7 @@ const TabBulletinScreen = (props) => {
                         <Text style={{
                           color: theme.text1,
                           fontSize: 16
-                        }}>{item.Sequence}</Text>
+                        }}>{`#${item.Sequence}`}</Text>
                       </View>
                     </Text>
                   </Text>

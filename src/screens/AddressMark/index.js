@@ -1,14 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, Alert } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Button, List, Switch, WhiteSpace, Toast, Modal } from '@ant-design/react-native';
-import { Icon } from '@ant-design/react-native';
+import { Button, List, Switch, WhiteSpace, Toast, Modal } from '@ant-design/react-native'
+import { Icon } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext } from '../../theme/theme-context';
+import { ThemeContext } from '../../theme/theme-context'
 import AlertView from '../AlertView'
 import BaseList from '../BaseList'
 
@@ -18,7 +18,7 @@ const Brief = Item.Brief
 const AddressMarkScreen = (props) => {
   const [isFriend, setFriend] = useState(undefined)
   const [isFollow, setFollow] = useState(undefined)
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext)
   const [visible1, showModal1] = useState(false)
   const [visible2, showModal2] = useState(false)
   const [visible3, showModal3] = useState(false)
@@ -116,13 +116,13 @@ const AddressMarkScreen = (props) => {
     })
   }
 
-  const copyToClipboard = (content) => {
-    Clipboard.setString(content)
-    Toast.success('拷贝成功！', 1);
+  const copyToClipboard = () => {
+    Clipboard.setString(props.avatar.get('CurrentAddressMark').Address)
+    Toast.success('拷贝成功！', 1)
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       loadAddressMark()
     })
   })
@@ -149,8 +149,8 @@ const AddressMarkScreen = (props) => {
       //   { cancelable: false }
       // )
     }
-   
-  };
+
+  }
 
   const onSwitchChangeFollow = async value => {
     if (value) {
@@ -173,7 +173,7 @@ const AddressMarkScreen = (props) => {
       //   { cancelable: false }
       // )
     }
-    
+
   }
 
   const current = props.avatar.get('CurrentAddressMark')
@@ -196,7 +196,7 @@ const AddressMarkScreen = (props) => {
           ]} />
 
           <WhiteSpace size='lg' />
-         
+
           {
             IsMark && <BaseList data={[
               {
@@ -256,16 +256,17 @@ const AddressMarkScreen = (props) => {
               color: '#389e0d'
             }}>开始聊天</Text></Button>
           }
+          
           {
-            !IsMark && <Button
-              style={{
-                height: 55
-              }}
+            !IsMark &&
+            <Button
+              style={styles.btn_high}
+              type='primary'
               onPress={() => props.navigation.navigate('AddressAdd',
                 { address: Address })}
-            ><Text style={{
-              color: 'red'
-            }}>标记地址</Text></Button>
+            >
+              标记地址
+            </Button>
           }
         </>
       }

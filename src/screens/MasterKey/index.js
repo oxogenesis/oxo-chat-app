@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { View, Text, TextInput } from 'react-native'
+import { actionType } from '../../redux/actions/actionType'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MasterKeySet } from '../../lib/OXO'
 import { connect } from 'react-redux'
 import { Button, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
+import { DefaultHost, DefaultTheme, DefaultBulletinCacheSize } from '../../lib/Const'
 
 //主口令设置界面
 class MasterKeyScreen extends React.Component {
@@ -15,7 +17,56 @@ class MasterKeyScreen extends React.Component {
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      let timestamp = Date.now()
       try {
+        // @网友
+        // 所有账号使用全局设置：主题、服务器地址
+        // 设置服务器地址
+        AsyncStorage.getItem('HostList').then(json => {
+          let host_list = []
+          if (json != null) {
+            let HostList = JSON.parse(json)
+            HostList.forEach(item => {
+              host_list.push({ Address: item.Address, UpdatedAt: item.UpdatedAt })
+            })
+          }
+          if (host_list.length == 0) {
+            host_list.push({ Address: DefaultHost, UpdatedAt: timestamp })
+          }
+          this.props.dispatch({
+            type: actionType.avatar.changeHostList,
+            host_list: host_list
+          })
+          let current_host = host_list[0].Address
+          this.props.dispatch({
+            type: actionType.avatar.setCurrentHost,
+            current_host: current_host,
+            current_host_timestamp: timestamp
+          })
+        })
+
+        // 设置主题
+        AsyncStorage.getItem('Theme').then(theme => {
+          if (theme == null || theme != 'dark') {
+            theme = DefaultTheme
+          }
+          this.props.dispatch({
+            type: actionType.avatar.changeTheme,
+            theme: theme
+          })
+        })
+
+        // 设置公告缓存大小
+        AsyncStorage.getItem('BulletinCacheSize').then(bulletin_cache_size => {
+          if (bulletin_cache_size == null || isNaN(bulletin_cache_size) || bulletin_cache_size < 0) {
+            bulletin_cache_size = DefaultBulletinCacheSize
+          }
+          this.props.dispatch({
+            type: actionType.avatar.changeBulletinCacheSize,
+            bulletin_cache_size: bulletin_cache_size
+          })
+        })
+
         AsyncStorage.getItem('<#MasterKey#>').then(result => {
           if (result != null) {
             this.props.navigation.navigate('Unlock')

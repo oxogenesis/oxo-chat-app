@@ -6,7 +6,7 @@ import * as avatarActions from './avatarActions'
 
 export default function* rootSaga() {
   //avatar
-  yield takeEvery(actionType.avatar.setThemeFlag, avatarActions.setThemeFlag)
+  yield takeEvery(actionType.avatar.changeTheme, avatarActions.changeTheme)
   yield takeEvery(actionType.avatar.enableAvatar, avatarActions.enableAvatar)
   yield takeEvery(actionType.avatar.disableAvatar, avatarActions.disableAvatar)
   yield takeEvery(actionType.avatar.loadFromDB, avatarActions.loadFromDB)
@@ -20,7 +20,8 @@ export default function* rootSaga() {
 
   yield takeEvery(actionType.avatar.addFollow, avatarActions.addFollow)
   yield takeEvery(actionType.avatar.delFollow, avatarActions.delFollow)
-
+  
+  yield takeEvery(actionType.avatar.changeHostList, avatarActions.changeHostList)
   yield takeEvery(actionType.avatar.addHost, avatarActions.addHost)
   yield takeEvery(actionType.avatar.delHost, avatarActions.delHost)
   yield takeEvery(actionType.avatar.changeCurrentHost, avatarActions.changeCurrentHost)
@@ -29,7 +30,7 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.SendMessage, avatarActions.SendMessage)
   
   //Bulletin
-  yield takeEvery(actionType.avatar.setBulletinCacheSize, avatarActions.setBulletinCacheSize)
+  yield takeEvery(actionType.avatar.changeBulletinCacheSize, avatarActions.changeBulletinCacheSize)
   yield takeEvery(actionType.avatar.clearBulletinCache, avatarActions.clearBulletinCache)
 
   yield takeEvery(actionType.avatar.LoadTabBulletinList, avatarActions.LoadTabBulletinList)

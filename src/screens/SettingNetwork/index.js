@@ -94,99 +94,107 @@ const SettingNetworkScreen = (props) => {
         paddingLeft: 6,
         paddingRight: 6
       }}>
-      <TextInput
-        placeholder="ws://或者wss://"
-        value={host_input}
-        onChangeText={setHost}
-        placeholderTextColor={theme.text2}
-        style={{
-          ...styles.input_view,
-          color: theme.text1,
-          backgroundColor: theme.base_body
-        }}
-      />
-      <WhiteSpace size='md' />
-      {
-        error_msg.length > 0 &&
-        <View>
-          <Text style={{ color: 'red' }}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
-      }
-      <Button type='primary' style={{
-        height: 55
-      }} onPress={addHost}>设置</Button>
-      <WhiteSpace size='md' />
-      <FlatList
-        data={props.avatar.get('Hosts')}
-        keyExtractor={item => item.Address}
-        ListEmptyComponent={
-          <Text>暂未设置服务器地址...</Text>
+        <TextInput
+          placeholder="ws://或者wss://"
+          value={host_input}
+          onChangeText={setHost}
+          placeholderTextColor={theme.text2}
+          style={{
+            ...styles.input_view,
+            color: theme.text1,
+            backgroundColor: theme.base_body
+          }}
+        />
+        <WhiteSpace size='md' />
+        {
+          error_msg.length > 0 &&
+          <View>
+            <Text style={{ color: 'red' }}>{error_msg}</Text>
+            <WhiteSpace size='lg' />
+          </View>
         }
-        renderItem={
-          ({ item }) => {
-            return (
-              <View style={{
-                flexDirection: "row",
-                paddingTop: 5,
-                height: 55,
-                borderBottomWidth: 1,
-                borderColor: theme.line,
-                backgroundColor: theme.base_body,
-                paddingLeft: 6,
-                paddingRight: 6
-              }} >
-                <View style={{
-                  flex: 0.7,
-                }} >
-                  <Text style={{
-                    lineHeight: 55,
-                    color: theme.text1,
-                  }}>{item.Address}</Text>
-                </View>
-                {
-                  item.Address == props.avatar.get('CurrentHost') ?
-                    <View style={{ flex: 0.25 }} >
-                      <Text style={{
-                        lineHeight: 45,
-                        color: 'green',
-                        textAlign: 'right'
-                      }}>
-                        当前正在使用
-                      </Text>
-                    </View>
-                    :
-                    <>
-                      <View style={{ flex: 0.25 }} >
-                        <Text style={{
-                          textAlign: 'right'
-                        }}>
-                          <Button type='primary' onPress={() => changeCurrentHost(item.Address)} style={{
-                            height: 40,
-                            marginTop: 4,
-                            width: 70,
-                          }}>使用</Button>
-                        </Text>
-                      </View>
-                      <View style={{ flex: 0.25 }} >
-                        <Text style={{
-                          textAlign: 'right'
-                        }}>
-                          <Button onPress={() => delHostAlert(item.Address)} type='warning' style={{
-                            height: 40,
-                            marginTop: 4,
-                            width: 70,
-                          }}>删除</Button>
-                        </Text>
-                      </View>
-                    </>
-                }
-              </View>
-            )
+        <Button type='primary' style={{
+          height: 55
+        }} onPress={addHost}>设置</Button>
+        <WhiteSpace size='md' />
+        <FlatList
+          data={props.avatar.get('HostList')}
+          keyExtractor={item => item.Address}
+          ListEmptyComponent={
+            <Text style={{
+              paddingLeft: 12,
+              color: theme.text2,
+              borderBottomWidth: 1,
+              borderColor: theme.line,
+              paddingBottom: 12,
+            }}>
+              暂未设置服务器地址...
+            </Text>
           }
-        }
-      >
-      </FlatList >
+          renderItem={
+            ({ item }) => {
+              return (
+                <View style={{
+                  flexDirection: "row",
+                  paddingTop: 5,
+                  height: 55,
+                  borderBottomWidth: 1,
+                  borderColor: theme.line,
+                  backgroundColor: theme.base_body,
+                  paddingLeft: 6,
+                  paddingRight: 6
+                }} >
+                  <View style={{
+                    flex: 0.7,
+                  }} >
+                    <Text style={{
+                      lineHeight: 55,
+                      color: theme.text1,
+                    }}>{item.Address}</Text>
+                  </View>
+                  {
+                    item.Address == props.avatar.get('CurrentHost') ?
+                      <View style={{ flex: 0.25 }} >
+                        <Text style={{
+                          lineHeight: 45,
+                          color: 'green',
+                          textAlign: 'right'
+                        }}>
+                          当前正在使用
+                        </Text>
+                      </View>
+                      :
+                      <>
+                        <View style={{ flex: 0.25 }} >
+                          <Text style={{
+                            textAlign: 'right'
+                          }}>
+                            <Button type='primary' onPress={() => changeCurrentHost(item.Address)} style={{
+                              height: 40,
+                              marginTop: 4,
+                              width: 70,
+                            }}>使用</Button>
+                          </Text>
+                        </View>
+                        <View style={{ flex: 0.25 }} >
+                          <Text style={{
+                            textAlign: 'right'
+                          }}>
+                            <Button onPress={() => delHostAlert(item.Address)} type='warning' style={{
+                              height: 40,
+                              marginTop: 4,
+                              width: 70,
+                            }}>删除</Button>
+                          </Text>
+                        </View>
+                      </>
+                  }
+                </View>
+              )
+            }
+          }
+        >
+        </FlatList >
       </View>
       <AlertView
         visible={visible}

@@ -46,7 +46,7 @@ const TabBulletinScreen = (props) => {
         }}
         automaticallyAdjustContentInsets={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={true}>
         {
           !props.avatar.get('ConnStatus') && <View style={{
             alignItems: 'center',

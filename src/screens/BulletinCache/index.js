@@ -8,18 +8,18 @@ import { ThemeContext } from '../../theme/theme-context'
 
 //缓存设置界面
 const BulletinCacheScreen = (props) => {
-  const [cache_size, setSize] = useState('')
+  const [size, setSize] = useState('')
   const [error_msg, setMsg] = useState('')
   const { theme } = useContext(ThemeContext)
 
   const setBulletinCacheSize = () => {
-    let cache_size = parseInt(cache_size)
-    if (cache_size == NaN || cache_size < 0) {
+    let bulletin_cache_size = parseInt(size)
+    if (isNaN(bulletin_cache_size) || bulletin_cache_size < 0) {
       setMsg('公告缓存数量不能小于0...')
     } else {
       props.dispatch({
-        type: actionType.avatar.setBulletinCacheSize,
-        cache_size: cache_size
+        type: actionType.avatar.changeBulletinCacheSize,
+        bulletin_cache_size: bulletin_cache_size
       })
       setSize('')
       setMsg('')
@@ -29,7 +29,7 @@ const BulletinCacheScreen = (props) => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      setSize(props.avatar.get('Setting').BulletinCacheSize)
+      setSize(`${props.avatar.get('BulletinCacheSize')}`)
     })
   })
 
@@ -44,11 +44,18 @@ const BulletinCacheScreen = (props) => {
           ...styles.input_view,
           color: theme.text1
         }}
-        placeholder={`公告缓存数量:${props.avatar.get('Setting').BulletinCacheSize}`}
-        value={cache_size}
-        onChangeText={setSize}
+        placeholder={`公告缓存数量:${props.avatar.get('BulletinCacheSize')}`}
+        value={size}
+        onChangeText={text => setSize(text)}
       />
       <WhiteSpace size='lg' />
+      {
+        error_msg.length > 0 &&
+        <View>
+          <Text style={styles.required_text}>{error_msg}</Text>
+          <WhiteSpace size='lg' />
+        </View>
+      }
       <Button style={{
         height: 55
       }} type='primary' onPress={setBulletinCacheSize}>设置</Button>

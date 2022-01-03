@@ -3,7 +3,8 @@ export const actionType = {
     setMasterKey: 'SET_MASTER_KEY'
   },
   avatar: {
-    setThemeFlag:'SET_THEME_FLAG',
+    setTheme: 'SET_THEME',
+    changeTheme: 'CHANGE_THEME',
     setAvatar: 'SET_AVATAR',
     setAvatarName: 'SET_AVATAR_NAME',
     setDatabase: 'SET_DATABASE',
@@ -11,7 +12,6 @@ export const actionType = {
     enableAvatar: 'ENABLE_AVATAR',
     disableAvatar: 'DISABLE_AVATAR',
     resetAvatar: 'RESET_AVATAR',
-    setSetting: 'SET_SETTING',
     loadFromDB: 'LOAD_FROM_DB',
 
     setAddressBook: 'SET_ADDRESS_BOOK',
@@ -29,7 +29,8 @@ export const actionType = {
 
     Conn: 'CONN',
     setConnStatus: 'SET_CONN_STATUS',
-    setHosts: 'SET_HOSTS',
+    changeHostList: 'CHANGE_HOST_LIST',
+    setHostList: 'SET_HOSTS_LIST',
     addHost: 'ADD_HOST',
     delHost: 'DEL_HOST',
     setCurrentHost: 'SET_CURRENT_HOST',
@@ -48,6 +49,7 @@ export const actionType = {
     setTabBulletinList: 'SET_TAB_BULLETIN_LIST',
     setBulletinList: 'SET_BULLETIN_LIST',
     setBulletinCacheSize: 'SET_BULLETIN_CACHE_SIZE',
+    changeBulletinCacheSize: 'CHANGE_BULLETIN_CACHE_SIZE',
     clearBulletinCache: 'CLEAR_BULLETIN_CACHE',
     LoadTabBulletinList: 'LOAD_TAB_BULLETIN_LIST',
     LoadBulletinList: 'LOAD_BULLETIN_LIST',

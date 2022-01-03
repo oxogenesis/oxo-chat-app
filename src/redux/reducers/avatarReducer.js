@@ -1,6 +1,7 @@
 import { actionType } from '../actions/actionType'
 import { fromJS, set } from 'immutable'
 import { AddressToName } from '../../lib/Util'
+import { DefaultTheme, DefaultBulletinCacheSize } from '../../lib/Const'
 
 function initialState() {
   return fromJS(
@@ -9,11 +10,11 @@ function initialState() {
       Address: null,
       PublicKey: null,
       PrivateKey: null,
-      Setting: {},
+      Theme: DefaultTheme,
 
       Database: null,
 
-      Hosts: [],
+      HostList: [],
       CurrentHost: null,
       WebSocket: null,
       WebSocketChannel: null,
@@ -34,6 +35,7 @@ function initialState() {
       CurrentBulletin: null,
       QuoteList: [],
       QuoteWhiteList: [],
+      BulletinCacheSize: DefaultBulletinCacheSize,
 
       SessionMap: {},
       SessionList: [],
@@ -61,9 +63,8 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('Address', action.address)
     .set('PublicKey', action.public_key)
     .set('PrivateKey', action.private_key)
-    .set('Setting', action.setting)
     .set('Database', null)
-    .set('Hosts', [])
+    .set('HostList', [])
     .set('CurrentHost', null)
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
@@ -85,7 +86,11 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('CurrentMessageList', [])
     .set('CountUnreadMessage', null)
     .set('MessageWhiteList', [])
-    .set('Setting', {})
+}
+
+
+reducer.prototype[actionType.avatar.setTheme] = (state, action) => {
+  return state.set('Theme', action.theme)
 }
 
 reducer.prototype[actionType.avatar.setAvatarName] = (state, action) => {
@@ -102,7 +107,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('PublicKey', null)
     .set('PrivateKey', null)
     .set('Database', null)
-    .set('Hosts', [])
+    .set('HostList', [])
     .set('CurrentHost', null)
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
@@ -124,11 +129,6 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('CurrentMessageList', [])
     .set('CountUnreadMessage', null)
     .set('MessageWhiteList', [])
-    .set('Setting', {})
-}
-
-reducer.prototype[actionType.avatar.setSetting] = (state, action) => {
-  return state.set('Setting', action.setting)
 }
 
 reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {
@@ -170,8 +170,8 @@ reducer.prototype[actionType.avatar.setFollows] = (state, action) => {
   return state.set('Follows', action.follow_list)
 }
 
-reducer.prototype[actionType.avatar.setHosts] = (state, action) => {
-  return state.set('Hosts', action.hosts)
+reducer.prototype[actionType.avatar.setHostList] = (state, action) => {
+  return state.set('HostList', action.host_list)
 }
 
 reducer.prototype[actionType.avatar.setCurrentHost] = (state, action) => {
@@ -196,6 +196,10 @@ reducer.prototype[actionType.avatar.setMessageGenerator] = (state, action) => {
 }
 
 //Bulletin
+reducer.prototype[actionType.avatar.setBulletinCacheSize] = (state, action) => {
+  return state.set('BulletinCacheSize', action.bulletin_cache_size)
+}
+
 reducer.prototype[actionType.avatar.setTabBulletinList] = (state, action) => {
   return state.set('TabBulletinList', action.tab_bulletin_list)
 }

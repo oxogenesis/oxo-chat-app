@@ -20,14 +20,14 @@ const Stack = createStackNavigator()
 
 const App = (props) => {
   const { toggle } = useContext(ThemeContext)
-  // console.log('默认获取的主题',props.avatar.get('Setting').ThemeFlag)
+  // console.log('默认获取的主题',props.avatar.get('Theme'))
   useEffect(() => {
-    toggle(props.avatar.get('Setting').ThemeFlag)
-  }, [props.avatar.get('Setting').ThemeFlag])
+    toggle(props.avatar.get('Theme'))
+  }, [props.avatar.get('Theme')])
   
   return (
     <Provider>
-      <ThemeProvider defaultTheme={props.avatar.get('Setting').ThemeFlag}>
+      <ThemeProvider defaultTheme={props.avatar.get('Theme')}>
         <NavigationContainer>
           <AppStack />
         </NavigationContainer>

@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema } from '../../lib/MessageSchemaVerifier'
@@ -10,8 +11,6 @@ import { DHSequence, AesEncrypt, AesDecrypt } from '../../lib/OXO'
 import { DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
-
-const SettingJson = { "BulletinCacheSize": 0, "ThemeFlag": 'light' }
 
 function DelayExec(ms) {
   return new Promise(resolve => {
@@ -25,6 +24,19 @@ function Array2Str(array) {
     tmpArray.push(`'${array[i]}'`)
   }
   return tmpArray.join(',')
+}
+
+function setStorageItem(key, json) {
+  try {
+    AsyncStorage.setItem(key, JSON.stringify(json)).then(() => {
+      // console.log(`setStorageItem:#key#:${key}`)
+      // console.log(`setStorageItem:value:${JSON.stringify(json)}`)
+      // return true
+    })
+  } catch (e) {
+    console.log(e)
+    // return false
+  }
 }
 
 // WebSocket
@@ -275,21 +287,21 @@ export function* loadFromDB(action) {
   })
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
 
-  // Host
-  sql = `SELECT * FROM HOSTS ORDER BY updated_at DESC`
-  items = yield call([db, db.getAll], sql)
-  let hosts = []
-  items.forEach(item => {
-    hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
-  })
-  if (hosts.length == 0) {
-    hosts.push({ Address: DefaultHost, UpdatedAt: timestamp })
-  }
-  yield put({ type: actionType.avatar.setHosts, hosts: hosts })
+  // // Host
+  // sql = `SELECT * FROM HOSTS ORDER BY updated_at DESC`
+  // items = yield call([db, db.getAll], sql)
+  // let hosts = []
+  // items.forEach(item => {
+  //   hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
+  // })
+  // if (hosts.length == 0) {
+  //   hosts.push({ Address: DefaultHost, UpdatedAt: timestamp })
+  // }
+  // yield put({ type: actionType.avatar.setHostList, hosts: hosts })
 
-  let current_host = hosts[0].Address
-  yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host, current_host_timestamp: timestamp })
-  yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
+  // let current_host = hosts[0].Address
+  // yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host, current_host_timestamp: timestamp })
+  // yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
 
   // SessionList
   sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
@@ -357,24 +369,14 @@ export function* enableAvatar(action) {
     yield put({ type: actionType.avatar.setFriends, friend_list: cache.friend_list })
     yield put({ type: actionType.avatar.setFriendRequests, friend_request_list: cache.friend_request_list })
     yield put({ type: actionType.avatar.setFollows, follow_list: cache.follow_list })
-    yield put({ type: actionType.avatar.setHosts, hosts: cache.hosts })
-    yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host, current_host_timestamp: timestamp })
+    // yield put({ type: actionType.avatar.setHostList, hosts: cache.hosts })
+    // yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host, current_host_timestamp: timestamp })
     yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
-    yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
+    // yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
   } else {
     // Load from db, very slow
     yield put({ type: actionType.avatar.loadFromDB })
   }
-
-
-  sql = `SELECT * FROM SETTINGS LIMIT 1`
-  let setting = yield call([db, db.getOne], sql)
-  if (setting != null) {
-    setting = JSON.parse(setting.content)
-  } else {
-    setting = SettingJson
-  }
-  yield put({ type: actionType.avatar.setSetting, setting: setting })
 
   // update
   yield put({ type: actionType.avatar.UpdateFollowBulletin })
@@ -390,7 +392,7 @@ export function* disableAvatar() {
   cache.friend_list = yield select(state => state.avatar.get('Friends'))
   cache.friend_request_list = yield select(state => state.avatar.get('FriendRequests'))
   cache.follow_list = yield select(state => state.avatar.get('Follows'))
-  cache.hosts = yield select(state => state.avatar.get('Hosts'))
+  // cache.hosts = yield select(state => state.avatar.get('HostList'))
   cache.current_host = yield select(state => state.avatar.get('CurrentHost'))
   cache.session_map = yield select(state => state.avatar.get('SessionMap'))
   let sql = `DELETE FROM CACHES`
@@ -400,9 +402,9 @@ VALUES ('${JSON.stringify(cache)}', ${timestamp})`
   yield call([db, db.runSQL], sql)
 
   // 清理多余缓存公告
-  let setting = yield select(state => state.avatar.get('Setting'))
-  if (setting.BulletinCacheSize != 0) {
-    let sql = `SELECT hash FROM BULLETINS WHERE is_cache = 'TRUE' AND is_mark = 'FALSE' ORDER BY created_at DESC LIMIT ${setting.BulletinCacheSize}`
+  let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
+  if (bulletin_cache_size != 0) {
+    let sql = `SELECT hash FROM BULLETINS WHERE is_cache = 'TRUE' AND is_mark = 'FALSE' ORDER BY created_at DESC LIMIT ${bulletin_cache_size}`
     let items = yield call([db, db.getAll], sql)
     let hashes = []
     items.forEach(item => {
@@ -430,33 +432,17 @@ VALUES ('${JSON.stringify(cache)}', ${timestamp})`
   }
 }
 
-export function* setBulletinCacheSize(action) {
-  let db = yield select(state => state.avatar.get('Database'))
-  let timestamp = Date.now()
-  let setting = yield select(state => state.avatar.get('Setting'))
-  setting.BulletinCacheSize = action.cache_size
-  console.log(setting)
-  let sql = `DELETE FROM SETTINGS`
-  yield call([db, db.runSQL], sql)
-  sql = `INSERT INTO SETTINGS (content, updated_at)
-VALUES ('${JSON.stringify(setting)}', ${timestamp})`
-  yield call([db, db.runSQL], sql)
-  yield put({ type: actionType.avatar.setSetting, setting: setting })
+export function* changeBulletinCacheSize(action) {
+  console.log(action.bulletin_cache_size)
+  let bulletin_cache_size = action.bulletin_cache_size
+  yield put({ type: actionType.avatar.setBulletinCacheSize, bulletin_cache_size: bulletin_cache_size })
+  yield call(setStorageItem, `BulletinCacheSize`, bulletin_cache_size)
 }
 
-
-export function* setThemeFlag(action) {
-  let db = yield select(state => state.avatar.get('Database'))
-  let timestamp = Date.now()
-  let setting = yield select(state => state.avatar.get('Setting'))
-  setting.ThemeFlag = action.theme_flag
-  console.log(setting)
-  let sql = `DELETE FROM SETTINGS`
-  yield call([db, db.runSQL], sql)
-  sql = `INSERT INTO SETTINGS (content, updated_at)
-VALUES ('${JSON.stringify(setting)}', ${timestamp})`
-  yield call([db, db.runSQL], sql)
-  yield put({ type: actionType.avatar.setSetting, setting: setting })
+export function* changeTheme(action) {
+  let theme = action.theme
+  yield put({ type: actionType.avatar.setTheme, theme: theme })
+  yield call(setStorageItem, `Theme`, theme)
 }
 
 // AddressBook
@@ -580,40 +566,31 @@ export function* delFollow(action) {
 }
 
 // Host
-export function* addHost(action) {
-  let db = yield select(state => state.avatar.get('Database'))
-  let timestamp = Date.now()
-  let sql = `INSERT INTO HOSTS (address, updated_at)
-VALUES ('${action.host}', ${timestamp})`
-  yield call([db, db.runSQL], sql)
+export function* changeHostList(action) {
+  yield put({ type: actionType.avatar.setHostList, host_list: action.host_list })
+  yield call(setStorageItem, `HostList`, action.host_list)
+}
 
-  sql = `SELECT * FROM HOSTS ORDER BY updated_at DESC`
-  let items = yield call([db, db.getAll], sql)
-  let hosts = []
-  items.forEach(item => {
-    hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
-  })
-  if (hosts.length == 0) {
-    hosts.push({ Address: DefaultHost, UpdatedAt: Date.now() })
-  }
-  yield put({ type: actionType.avatar.setHosts, hosts: hosts })
+export function* addHost(action) {
+  let timestamp = Date.now()
+  let host_list = yield select(state => state.avatar.get('HostList'))
+  console.log(host_list)
+  host_list = host_list.filter((host) => host.Address != action.host)
+  host_list.unshift({ Address: action.host, UpdatedAt: timestamp })
+  console.log(host_list)
+  yield put({ type: actionType.avatar.setHostList, host_list: host_list })
+  yield call(setStorageItem, `HostList`, host_list)
 }
 
 export function* delHost(action) {
-  let db = yield select(state => state.avatar.get('Database'))
-  let sql = `DELETE FROM HOSTS WHERE address = "${action.host}"`
-  yield call([db, db.runSQL], sql)
-  let hosts = yield select(state => state.avatar.get('Hosts'))
-  hosts = hosts.filter((item) => item.Address != action.host)
-  yield put({ type: actionType.avatar.setHosts, hosts: hosts })
+  let host_list = yield select(state => state.avatar.get('HostList'))
+  host_list = host_list.filter((host) => host.Address != action.host)
+  yield put({ type: actionType.avatar.setHostList, host_list: host_list })
+  yield call(setStorageItem, `HostList`, host_list)
 }
 
 export function* changeCurrentHost(action) {
-  console.log(`=====================================================================changeCurrentHost`)
   let timestamp = Date.now()
-  let db = yield select(state => state.avatar.get('Database'))
-  let sql = `UPDATE HOSTS SET updated_at = ${timestamp} WHERE address = "${action.host}"`
-  yield call([db, db.runSQL], sql)
 
   let channel = yield select(state => state.avatar.get('WebSocketChannel'))
   console.log(channel)
@@ -625,9 +602,14 @@ export function* changeCurrentHost(action) {
   if (ws != null) {
     yield call([ws, ws.close])
   }
-
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host, current_host_timestamp: timestamp })
   yield put({ type: actionType.avatar.Conn, host: action.host, timestamp: timestamp })
+
+  let host_list = yield select(state => state.avatar.get('HostList'))
+  host_list = host_list.filter((host) => host.Address != action.host)
+  host_list.unshift({ Address: action.host, UpdatedAt: timestamp })
+  yield put({ type: actionType.avatar.setHostList, host_list: host_list })
+  yield call(setStorageItem, `HostList`, host_list)
 }
 
 // Bulletin

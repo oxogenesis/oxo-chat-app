@@ -1,4 +1,6 @@
-const DefaultHost = 'ws://127.0.0.1:3000'
+const DefaultHost = 'wss://ru.oxo-chat-server.com'
+const DefaultTheme = 'light'
+const DefaultBulletinCacheSize = 0
 
 //1000*60*60*24=86400000
 //const Epoch = Date.parse('2011-11-11 11:11:11')
@@ -78,6 +80,8 @@ const MessagePageSize = 10
 
 export {
   DefaultHost,
+  DefaultTheme,
+  DefaultBulletinCacheSize,
   Epoch,
   GenesisHash,
   MessageInterval,

@@ -17,8 +17,8 @@ const TabSettingScreen = (props) => {
     toggle(type)
 
     props.dispatch({
-      type: actionType.avatar.setThemeFlag,
-      theme_flag: type
+      type: actionType.avatar.setTheme,
+      theme: type
     })
   }
 
@@ -49,7 +49,7 @@ const TabSettingScreen = (props) => {
         {
           title: '切换主题',
           type: 'switch',
-          checked: props.avatar.get('Setting').ThemeFlag === 'dark',
+          checked: props.avatar.get('Theme') === 'dark',
           onChange: onSwitchChange,
         },
       ]} />

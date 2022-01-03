@@ -9,7 +9,7 @@ import { styles } from '../../theme/style'
 
 //Unlock界面
 const UnlockScreen = (props) => {
-  const { theme, toggle } = useContext(ThemeContext)
+  const { theme } = useContext(ThemeContext)
   const [master_key, setKey] = useState('')
   const [error_msg, setMsg] = useState('')
 
@@ -52,12 +52,12 @@ const UnlockScreen = (props) => {
       backgroundColor: theme.base_view
     }}>
       <TextInput
-         placeholderTextColor={theme.text1}
-         style={{
-           ...styles.input_view,
-           color: theme.text1,
-           borderColor: theme.border_color
-         }}
+        placeholderTextColor={theme.text1}
+        style={{
+          ...styles.input_view,
+          color: theme.text1,
+          borderColor: theme.border_color
+        }}
         secureTextEntry={true}
         placeholder="口令"
         value={master_key}

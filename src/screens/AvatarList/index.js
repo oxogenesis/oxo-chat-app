@@ -8,6 +8,7 @@ import { actionType } from '../../redux/actions/actionType'
 import { styles } from '../../theme/style'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
 //登录界面
 const AvatarListScreen = props => {
@@ -109,4 +110,8 @@ const ReduxAvatarListScreen = connect((state) => {
   }
 })(AvatarListScreen)
 
-export default ReduxAvatarListScreen
+export default function (props) {
+  const navigation = useNavigation()
+  const route = useRoute()
+  return <ReduxAvatarListScreen{...props} navigation={navigation} route={route} />
+}

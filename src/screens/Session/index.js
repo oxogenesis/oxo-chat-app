@@ -48,10 +48,26 @@ const SessionScreen = (props) => {
     })
   }
 
+  // @网友 向下拉，从本地加载更多聊天记录
+  // loadMessageList(false)
+
+  // @网友
+  // 同TabBulletin页面，是不是用FlatList更好？
+
+  // @网友
+  // 消息发送后，输入法和输入框自动恢复原位
+
   const copyToClipboard = (content) => {
     Clipboard.setString(content)
     Toast.success('拷贝成功！', 1)
   }
+
+  // @网友
+  // 监听：addListener('beforeRemove'
+  // 执行：
+  // props.dispatch({
+  //   type: actionType.avatar.setCurrentSession
+  // })
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
@@ -91,7 +107,7 @@ const SessionScreen = (props) => {
         }}
         automaticallyAdjustContentInsets={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
       >
         {
           data.length > 0 && data.map(item => {
@@ -113,6 +129,7 @@ const SessionScreen = (props) => {
                           }}
                           >{name}&nbsp;</Text>
                         </View>
+
                         <View style={{
                           borderWidth: 1,
                           borderColor: theme.border_color,
@@ -124,6 +141,13 @@ const SessionScreen = (props) => {
                             color: theme.text1,
                             fontSize: 16
                           }}>{item.Sequence}</Text>
+                        </View>
+
+                        <View>
+                          <Text style={{
+                            ...styles.date_text,
+                            color: item.Confirmed ? '#434343' : theme.text2
+                          }}>&nbsp;@{timestamp_format(item.Timestamp)}</Text>
                         </View>
                       </Text>
                       <View style={{
@@ -147,10 +171,6 @@ const SessionScreen = (props) => {
 
                               </Text>
                               : <TouchableOpacity onPress={() => { copyToClipboard(item.Content) }}>
-                                <Text style={{
-                                  ...styles.date_text,
-                                  color: item.Confirmed ? '#434343' : theme.text2
-                                }}>{timestamp_format(item.Timestamp)}</Text>
                                 <Text style={{
                                   color: item.Confirmed ? '#141414' : theme.text1
                                 }}>{item.Content}</Text>
@@ -192,6 +212,14 @@ const SessionScreen = (props) => {
                           fontSize: 16
                         }}>{item.Sequence}</Text>
                       </View>
+
+                      <View>
+                        <Text style={{
+                          ...styles.date_text,
+                          textAlign: 'right',
+                          color: item.Confirmed ? '#434343' : theme.text2
+                        }}>&nbsp;@{timestamp_format(item.Timestamp)}</Text>
+                      </View>
                     </Text>
                     <View style={{
                       ...styles.mess_content,
@@ -212,11 +240,6 @@ const SessionScreen = (props) => {
                               {`${AddressToName(props.avatar.get('AddressMap'), item.ObjectJson.Address)}#${item.ObjectJson.Sequence}`}
                             </Text>
                             : <TouchableOpacity onPress={() => { copyToClipboard(item.Content) }}>
-                              <Text style={{
-                                ...styles.date_text,
-                                textAlign: 'right',
-                                color: item.Confirmed ? '#434343' : theme.text2
-                              }}>{timestamp_format(item.Timestamp)}</Text>
                               <Text style={{
                                 color: item.Confirmed ? '#141414' : theme.text1
                               }}>{item.Content}</Text>

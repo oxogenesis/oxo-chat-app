@@ -19,7 +19,6 @@ class MasterKeyScreen extends React.Component {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       let timestamp = Date.now()
       try {
-        // @网友
         // 所有账号使用全局设置：主题、服务器地址
         // 设置服务器地址
         AsyncStorage.getItem('HostList').then(json => {
@@ -47,6 +46,8 @@ class MasterKeyScreen extends React.Component {
 
         // 设置主题
         AsyncStorage.getItem('Theme').then(theme => {
+          console.log(theme)
+          // @网友 开发环境按r，当读取的是dark，但是显示效果还是light
           if (theme == null || theme != 'dark') {
             theme = DefaultTheme
           }

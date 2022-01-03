@@ -789,10 +789,12 @@ export function* LoadTabBulletinList(action) {
   let sql = ''
   let bulletin_list = []
 
-  // session_flag?新的列表：延长列表
-  if (action.session_flag == true) {
+  // bulletin_list_flag?新的列表：列表增加本地数据
+  if (action.bulletin_list_flag == true) {
+    // 先置空列表
     yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: [] })
   } else {
+    // 当前列表
     bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
   }
   let bulletin_list_size = bulletin_list.length
@@ -824,7 +826,7 @@ export function* LoadTabBulletinList(action) {
   }
 
   // 获取更新
-  yield put({ type: actionType.avatar.UpdateFollowBulletin })
+  // yield put({ type: actionType.avatar.UpdateFollowBulletin })
 }
 
 export function* LoadBulletinList(action) {
@@ -833,8 +835,8 @@ export function* LoadBulletinList(action) {
   let sql = ''
   let bulletin_list = []
 
-  // session_flag?新的列表：延长列表
-  if (action.session_flag == true) {
+  // bulletin_list_flag?新的列表：列表增加本地数据
+  if (action.bulletin_list_flag == true) {
     yield put({ type: actionType.avatar.setBulletinList, bulletin_list: [] })
   } else {
     bulletin_list = yield select(state => state.avatar.get('BulletinList'))
@@ -1002,7 +1004,6 @@ export function* LoadCurrentMessageList(action) {
   let message_list_size = message_list.length
   let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
 
-
   let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size}`
   let items = yield call([db, db.getAll], sql)
   let tmp = []
@@ -1017,7 +1018,7 @@ export function* LoadCurrentMessageList(action) {
         message_white_list.push(object_json.Hash)
       }
     }
-    tmp.push({
+    tmp.unshift({
       "SourAddress": item.sour_address,
       "Timestamp": item.timestamp,
       "Sequence": item.sequence,
@@ -1220,7 +1221,7 @@ VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '$
       if (current_session && sour_address == current_session.Address) {
         //CurrentSession: show message
         let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
-        message_list.unshift({
+        message_list.push({
           "SourAddress": sour_address,
           "Timestamp": json.Timestamp,
           "Sequence": json.Sequence,
@@ -1357,7 +1358,7 @@ VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.mes
     if (dest_address == current_session.Address) {
       //CurrentSession: show message
       let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
-      message_list.unshift({
+      message_list.push({
         "SourAddress": "",
         "Timestamp": timestamp,
         "Sequence": sequence,

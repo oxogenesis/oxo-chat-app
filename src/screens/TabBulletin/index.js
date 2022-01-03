@@ -16,9 +16,24 @@ const TabBulletinScreen = (props) => {
   const loadTabBulletinList = (flag) => {
     props.dispatch({
       type: actionType.avatar.LoadTabBulletinList,
-      session_flag: flag
+      bulletin_list_flag: flag
     })
   }
+
+  // @网友 向上拉到底部，加载更到本地公告
+  // loadTabBulletinList(false)
+
+  // @网友 向下拉，从服务器请求更多公告
+  // props.dispatch({ type: actionType.avatar.UpdateFollowBulletin })
+
+  // @网友
+  // https://reactnative.dev/docs/scrollview
+  //   <ScrollView> vs <FlatList> - which one to use?
+  // ScrollView renders all its react child components at once, but this has a performance downside.
+  // Imagine you have a very long list of items you want to display, maybe several screens worth of content. Creating JS components and native views for everything all at once, much of which may not even be shown, will contribute to slow rendering and increased memory usage.
+  // This is where FlatList comes into play. FlatList renders items lazily, when they are about to appear, and removes items that scroll way off screen to save memory and processing time.
+  // FlatList is also handy if you want to render separators between your items, multiple columns, infinite scroll loading, or any number of other features it supports out of the box.
+  // 这个页面是不是用FlatList更好？
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
@@ -72,8 +87,8 @@ const TabBulletinScreen = (props) => {
                 borderColor: theme.split_line
               }}>
               <Flex justify="start" align="start">
-                <TouchableOpacity 
-                onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
+                <TouchableOpacity
+                  onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
                 >
                   <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
                 </TouchableOpacity>

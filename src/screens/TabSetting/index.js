@@ -13,20 +13,20 @@ const RadioItem = Radio.RadioItem
 const TabSettingScreen = (props) => {
   const { theme, toggle } = useContext(ThemeContext)
 
-  const setThemeLight = (type) => {
+  const setTheme = (type) => {
     toggle(type)
 
     props.dispatch({
-      type: actionType.avatar.setTheme,
+      type: actionType.avatar.changeTheme,
       theme: type
     })
   }
 
   const onSwitchChange = (value) => {
     if (value) {
-      setThemeLight('dark')
+      setTheme('dark')
     } else {
-      setThemeLight('light')
+      setTheme('light')
     }
   }
 

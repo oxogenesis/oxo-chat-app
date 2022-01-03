@@ -10,13 +10,15 @@ const Item = List.Item
 
 //聊天对象列表
 const TabSessionScreen = (props) => {
+
   const { theme } = useContext(ThemeContext)
+  
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.base_view }}
       automaticallyAdjustContentInsets={false}
       showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
+      showsVerticalScrollIndicator={true}
     >
       {
         !props.avatar.get('ConnStatus') && <View style={{
@@ -34,7 +36,6 @@ const TabSessionScreen = (props) => {
           </Text>
         </View>
       }
-
 
       {
         props.avatar.get('SessionList').length > 0 ? props.avatar.get('SessionList').map((item, index) => {
@@ -55,17 +56,19 @@ const TabSessionScreen = (props) => {
                 }}>
                   {
                     item.CountUnread != null && item.CountUnread != 0 ?
-                      <Badge text={item.CountUnread} overflowCount={99} size='small'><View style={{
-                        width: 55,
-                        height: 55,
-                      }}>
-                        <Image style={{
-                          ...styles.msg_img,
-                        }} source={require('../../assets/app.png')}>
-
-                        </Image>
-                      </View>
-                      </Badge> : <Image style={{
+                      <Badge text={item.CountUnread} overflowCount={99} size='small'>
+                        <View style={{
+                          width: 55,
+                          height: 55,
+                        }}>
+                          <Image style={{
+                            ...styles.msg_img,
+                          }} source={require('../../assets/app.png')}>
+                          </Image>
+                        </View>
+                      </Badge>
+                      :
+                      <Image style={{
                         ...styles.msg_img,
                       }} source={require('../../assets/app.png')}></Image>
                   }

@@ -32,7 +32,7 @@ const BulletinListScreen = (props) => {
 
     props.dispatch({
       type: actionType.avatar.LoadBulletinList,
-      session_flag: flag,
+      bulletin_list_flag: flag,
       session: props.route.params.session,
       address: props.route.params.address
     })

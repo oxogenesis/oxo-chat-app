@@ -34,16 +34,6 @@ const SettingMeScreen = (props) => {
 
   const viewSeedQrcodeAlert = () => {
     showModal(true)
-//     Alert.alert(
-//       '提示',
-//       `确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
-// 确定要查看种子二维码吗？`,
-//       [
-//         { text: '确认', onPress: () => props.navigation.navigate('AvatarSeedQrcode') },
-//         { text: '取消', style: 'cancel' },
-//       ],
-//       { cancelable: false }
-//     )
   }
 
   const loadFromDB = () => {
@@ -76,7 +66,6 @@ const SettingMeScreen = (props) => {
       <BaseList data={[
         { title: address, icon: 'block', onpress: copyToClipboard },
         { title: name, onpress: () => { props.navigation.navigate('AvatarNameEdit') } },
-        { title: '应用异常退出，导致数据显示：重载', onpress: loadFromDB },
         { title: '查看种子二维码', onpress: viewSeedQrcodeAlert },
       ]} />
       <AlertView

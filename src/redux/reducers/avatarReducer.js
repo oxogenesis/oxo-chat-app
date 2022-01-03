@@ -43,6 +43,7 @@ function initialState() {
       UnreadSessionMap: {},
       CurrentSession: {},
       CurrentMessageList: [],
+      // bulletin from message
       MessageWhiteList: [],
       CountUnreadMessage: 0
     }

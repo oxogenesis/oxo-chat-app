@@ -159,11 +159,6 @@ export default class Database {
           created_at INTEGER
           )`)
 
-      await this.createTable('CACHES', `CREATE TABLE IF NOT EXISTS CACHES(
-          content TEXT PRIMARY KEY,
-          updated_at INTEGER
-          )`)
-
       console.log(`************done********************`)
     } catch (e) {
       console.log(e)

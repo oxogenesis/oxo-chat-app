@@ -359,25 +359,13 @@ export function* enableAvatar(action) {
   yield call([db, db.initDB], address, '0.0.1', address, 0)
   yield put({ type: actionType.avatar.setDatabase, db: db })
 
-  let sql = `SELECT * FROM CACHES LIMIT 1`
-  let cache = yield call([db, db.getOne], sql)
-  if (cache != null) {
-    // Load from snapshot, fast
-    cache = JSON.parse(cache.content)
-    console.log(cache)
-    yield put({ type: actionType.avatar.setAddressBook, address_map: cache.address_map })
-    yield put({ type: actionType.avatar.setFriends, friend_list: cache.friend_list })
-    yield put({ type: actionType.avatar.setFriendRequests, friend_request_list: cache.friend_request_list })
-    yield put({ type: actionType.avatar.setFollows, follow_list: cache.follow_list })
-    // yield put({ type: actionType.avatar.setHostList, hosts: cache.hosts })
-    // yield put({ type: actionType.avatar.setCurrentHost, current_host: cache.current_host, current_host_timestamp: timestamp })
-    yield put({ type: actionType.avatar.setSessionMap, session_map: cache.session_map })
-    // yield put({ type: actionType.avatar.Conn, host: cache.current_host, timestamp: timestamp })
-  } else {
-    // Load from db, very slow
-    yield put({ type: actionType.avatar.loadFromDB })
-  }
+  // Load from db, very slow
+  yield put({ type: actionType.avatar.loadFromDB })
 
+  let host_list = yield select(state => state.avatar.get('HostList'))
+  let current_host = host_list[0].Address
+  yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host, current_host_timestamp: timestamp })
+  yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
   // update
   yield put({ type: actionType.avatar.UpdateFollowBulletin })
 }
@@ -385,21 +373,6 @@ export function* enableAvatar(action) {
 export function* disableAvatar() {
   let db = yield select(state => state.avatar.get('Database'))
   let timestamp = Date.now()
-
-  // 缓存设置
-  let cache = {}
-  cache.address_map = yield select(state => state.avatar.get('AddressMap'))
-  cache.friend_list = yield select(state => state.avatar.get('Friends'))
-  cache.friend_request_list = yield select(state => state.avatar.get('FriendRequests'))
-  cache.follow_list = yield select(state => state.avatar.get('Follows'))
-  // cache.hosts = yield select(state => state.avatar.get('HostList'))
-  cache.current_host = yield select(state => state.avatar.get('CurrentHost'))
-  cache.session_map = yield select(state => state.avatar.get('SessionMap'))
-  let sql = `DELETE FROM CACHES`
-  yield call([db, db.runSQL], sql)
-  sql = `INSERT INTO CACHES (content, updated_at)
-VALUES ('${JSON.stringify(cache)}', ${timestamp})`
-  yield call([db, db.runSQL], sql)
 
   // 清理多余缓存公告
   let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
@@ -433,7 +406,6 @@ VALUES ('${JSON.stringify(cache)}', ${timestamp})`
 }
 
 export function* changeBulletinCacheSize(action) {
-  console.log(action.bulletin_cache_size)
   let bulletin_cache_size = action.bulletin_cache_size
   yield put({ type: actionType.avatar.setBulletinCacheSize, bulletin_cache_size: bulletin_cache_size })
   yield call(setStorageItem, `BulletinCacheSize`, bulletin_cache_size)
@@ -568,7 +540,7 @@ export function* delFollow(action) {
 // Host
 export function* changeHostList(action) {
   yield put({ type: actionType.avatar.setHostList, host_list: action.host_list })
-  yield call(setStorageItem, `HostList`, action.host_list)
+  yield call(setStorageItem, 'HostList', action.host_list)
 }
 
 export function* addHost(action) {
@@ -579,14 +551,14 @@ export function* addHost(action) {
   host_list.unshift({ Address: action.host, UpdatedAt: timestamp })
   console.log(host_list)
   yield put({ type: actionType.avatar.setHostList, host_list: host_list })
-  yield call(setStorageItem, `HostList`, host_list)
+  yield call(setStorageItem, 'HostList', host_list)
 }
 
 export function* delHost(action) {
   let host_list = yield select(state => state.avatar.get('HostList'))
   host_list = host_list.filter((host) => host.Address != action.host)
   yield put({ type: actionType.avatar.setHostList, host_list: host_list })
-  yield call(setStorageItem, `HostList`, host_list)
+  yield call(setStorageItem, 'HostList', host_list)
 }
 
 export function* changeCurrentHost(action) {
@@ -609,7 +581,7 @@ export function* changeCurrentHost(action) {
   host_list = host_list.filter((host) => host.Address != action.host)
   host_list.unshift({ Address: action.host, UpdatedAt: timestamp })
   yield put({ type: actionType.avatar.setHostList, host_list: host_list })
-  yield call(setStorageItem, `HostList`, host_list)
+  yield call(setStorageItem, 'HostList', host_list)
 }
 
 // Bulletin

@@ -1,12 +1,11 @@
 import React, { useContext, useState } from 'react'
-import { View, Text, TextInput, FlatList, Alert } from 'react-native'
+import { View, Text, TextInput, FlatList } from 'react-native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { my_styles, styles } from '../../theme/style'
+import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
 import AlertView from '../AlertView'
-import BaseList from '../BaseList'
 
 import { Button, WhiteSpace } from '@ant-design/react-native'
 
@@ -44,15 +43,6 @@ const SettingNetworkScreen = (props) => {
   const delHostAlert = (host) => {
     showModal(true)
     setHostData(host)
-    // Alert.alert(
-    //   '提示',
-    //   `确定要删除${host}吗？`,
-    //   [
-    //     { text: '确认', onPress: () => delHost(host) },
-    //     { text: '取消', style: 'cancel' },
-    //   ],
-    //   { cancelable: false }
-    // )
   }
 
   const delHost = (host) => {

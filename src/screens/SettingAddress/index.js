@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { View } from 'react-native'
-import QRCode from 'react-native-qrcode-svg'
 import { connect } from 'react-redux'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
@@ -24,7 +23,6 @@ const SettingAddressScreen = props => {
     </View>
   )
 }
-
 
 const ReduxSettingAddressScreen = connect((state) => {
   return {

@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { Component, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { Provider } from '@ant-design/react-native'
@@ -24,7 +24,7 @@ const App = (props) => {
   useEffect(() => {
     toggle(props.avatar.get('Theme'))
   }, [props.avatar.get('Theme')])
-  
+
   return (
     <Provider>
       <ThemeProvider defaultTheme={props.avatar.get('Theme')}>
@@ -33,7 +33,6 @@ const App = (props) => {
         </NavigationContainer>
       </ThemeProvider>
     </Provider>
-
   )
 }
 

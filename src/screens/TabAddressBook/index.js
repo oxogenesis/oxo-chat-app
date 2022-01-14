@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react'
-import { View, Text, Image, ScrollView } from 'react-native'
+import React, { useContext } from 'react'
+import { View, Text, ScrollView } from 'react-native'
 import { connect } from 'react-redux'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
@@ -24,7 +24,7 @@ const TabAddressBookScreen = props => {
       automaticallyAdjustContentInsets={false}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
-        <WhiteSpace />
+      <WhiteSpace />
       <View>
         <Text style={{
           paddingLeft: 12,
@@ -46,7 +46,7 @@ const TabAddressBookScreen = props => {
         }]} />
       </View>
       <WhiteSpace />
-     
+
 
       {
         props.avatar.get('AddressArray').length > 0 ? <View>

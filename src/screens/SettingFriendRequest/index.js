@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react'
-import { View, Text, Image } from 'react-native'
+import React, { useContext } from 'react'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { List, WhiteSpace } from '@ant-design/react-native'

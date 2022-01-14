@@ -4,7 +4,7 @@ import QRCode from 'react-native-qrcode-svg'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Icon, Toast } from '@ant-design/react-native'
+import { Toast } from '@ant-design/react-native'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
 import BaseList from '../BaseList'
@@ -34,12 +34,6 @@ const SettingMeScreen = (props) => {
 
   const viewSeedQrcodeAlert = () => {
     showModal(true)
-  }
-
-  const loadFromDB = () => {
-    props.dispatch({
-      type: actionType.avatar.loadFromDB
-    })
   }
 
   const onClose = () => {

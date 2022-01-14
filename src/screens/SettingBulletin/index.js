@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { View, Alert } from 'react-native'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
 import { actionType } from '../../redux/actions/actionType'
@@ -16,15 +16,6 @@ const SettingBulletinScreen = (props) => {
 
   const clearBulletinCacheAlert = () => {
     showModal(true)
-    // Alert.alert(
-    //   '提示',
-    //   '确定要清除所有缓存公告吗？',
-    //   [
-    //     { text: '确认', onPress: clearBulletinCache },
-    //     { text: '取消', style: 'cancel' },
-    //   ],
-    //   { cancelable: false }
-    // )
   }
 
   const clearBulletinCache = () => {
@@ -36,7 +27,6 @@ const SettingBulletinScreen = (props) => {
   const onClose = () => {
     showModal(false)
   }
-
 
   return (
     <View style={{
@@ -68,7 +58,6 @@ const SettingBulletinScreen = (props) => {
       />
     </View >
   )
-
 }
 
 

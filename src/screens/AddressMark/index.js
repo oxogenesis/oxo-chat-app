@@ -1,12 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, Alert } from 'react-native'
+import { View, Text } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Button, List, Switch, WhiteSpace, Toast, Modal } from '@ant-design/react-native'
-import { Icon } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
 import AlertView from '../AlertView'
@@ -28,14 +27,6 @@ const AddressMarkScreen = (props) => {
   const delAddressMark = () => {
     if (props.avatar.get('CurrentAddressMark').IsFollow || props.avatar.get('CurrentAddressMark').IsFriend) {
       showModal1(true)
-      // Alert.alert(
-      //   '错误',
-      //   '删除账户标记前，请先解除好友并取消关注，谢谢。',
-      //   [
-      //     { text: '确认', style: 'cancel' }
-      //   ],
-      //   { cancelable: false }
-      // )
     } else {
       props.dispatch({
         type: actionType.avatar.delAddressMark,
@@ -62,15 +53,6 @@ const AddressMarkScreen = (props) => {
 
   const delFriendAlert = () => {
     showModal2(true)
-    // Alert.alert(
-    //   '提示',
-    //   '解除好友关系后，历史聊天记录将会被删除，并拒绝接收该账户的消息。',
-    //   [
-    //     { text: '确认', onPress: delFriend },
-    //     { text: '取消', style: 'cancel' },
-    //   ],
-    //   { cancelable: false }
-    // )
   }
 
   const delFriend = () => {
@@ -91,15 +73,6 @@ const AddressMarkScreen = (props) => {
   const delFollowAlert = () => {
     showModal3(true)
     setFollow(false)
-    // Alert.alert(
-    //   '提示',
-    //   '取消关注账户后，该账户的公告都将会被设置为缓存。',
-    //   [
-    //     { text: '确认', onPress: delFollow },
-    //     { text: '取消', style: 'cancel' },
-    //   ],
-    //   { cancelable: false }
-    // )
   }
 
   const delFollow = () => {
@@ -133,21 +106,6 @@ const AddressMarkScreen = (props) => {
       setFriend(value)
     } else {
       showModal4(true)
-      // Alert.alert(
-      //   '提示',
-      //   `确定要删除好友吗？`,
-      //   [
-      //     {
-      //       text: '确认', onPress: () => {
-      //         delFriend()
-      //         setFriend(value)
-
-      //       }
-      //     },
-      //     { text: '取消', style: 'cancel' },
-      //   ],
-      //   { cancelable: false }
-      // )
     }
 
   }
@@ -158,20 +116,6 @@ const AddressMarkScreen = (props) => {
       setFollow(value)
     } else {
       showModal5(true)
-      // Alert.alert(
-      //   '提示',
-      //   `确定要取消关注吗？`,
-      //   [
-      //     {
-      //       text: '确认', onPress: () => {
-      //         delFollowAlert()
-      //         setFollow(value)
-      //       }
-      //     },
-      //     { text: '取消', style: 'cancel' },
-      //   ],
-      //   { cancelable: false }
-      // )
     }
 
   }
@@ -256,7 +200,7 @@ const AddressMarkScreen = (props) => {
               color: '#389e0d'
             }}>开始聊天</Text></Button>
           }
-          
+
           {
             !IsMark &&
             <Button
@@ -293,7 +237,7 @@ const AddressMarkScreen = (props) => {
         visible={visible4}
         onClose={onClose}
         msg='确定要删除好友吗？'
-        onPress={delFriend}
+        onPress={delFriendAlert}
       />
       <AlertView
         visible={visible5}

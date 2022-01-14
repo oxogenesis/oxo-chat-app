@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
-import { useNavigation, useRoute } from '@react-navigation/native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { Toast } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
@@ -21,15 +20,6 @@ const AvatarSeedScreen = (props) => {
 
   const copySeedAlert = () => {
     showModal(true)
-    // Alert.alert(
-    //   '提示',
-    //   `确定要复制种子吗？`,
-    //   [
-    //     { text: '确认', onPress: () => this.copyToClipboard() },
-    //     { text: '取消', style: 'cancel' },
-    //   ],
-    //   { cancelable: false }
-    // )
   }
 
   const onClose = () => {
@@ -66,16 +56,3 @@ const ReduxAvatarSeedScreen = connect((state) => {
 })(AvatarSeedScreen)
 
 export default ReduxAvatarSeedScreen
-
-// const ReduxAvatarSeedScreen = connect((state) => {
-//   return {
-//     avatar: state.avatar
-//   }
-// })(AvatarSeedScreen)
-
-// //export default AvatarSeedScreen
-// export default function (props) {
-//   const navigation = useNavigation()
-//   const route = useRoute()
-//   return <ReduxAvatarSeedScreen{...props} navigation={navigation} route={route} />
-// }

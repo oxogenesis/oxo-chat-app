@@ -1,15 +1,11 @@
 
-import React, { Component, useContext, useEffect, useState } from 'react'
-import { NavigationContainer } from '@react-navigation/native'
+import React, { useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconFeather from 'react-native-vector-icons/Feather'
 //import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
-import { Provider } from '@ant-design/react-native'
-
-import { connect } from 'react-redux'
 
 import MasterKeyScreen from '../MasterKey'
 import UnlockScreen from '../Unlock'
@@ -247,7 +243,7 @@ const StackView = (props) => {
       <Stack.Screen
         name="SettingMe"
         component={SettingMeScreen}
-        headerBackTitle= '返回'
+        headerBackTitle='返回'
         options={
           ({ route, navigation }) => ({
             title: '账户设置',

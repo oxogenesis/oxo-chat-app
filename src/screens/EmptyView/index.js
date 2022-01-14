@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { View, Text, Image } from 'react-native'
 import { ThemeContext } from '../../theme/theme-context'
 

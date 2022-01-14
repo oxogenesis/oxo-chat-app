@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { ScrollView, View, Text, Image, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { List, Badge } from '@ant-design/react-native'
@@ -12,7 +12,7 @@ const Item = List.Item
 const TabSessionScreen = (props) => {
 
   const { theme } = useContext(ThemeContext)
-  
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.base_view }}

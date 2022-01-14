@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { View, Text, ScrollView, Image } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
@@ -7,8 +7,7 @@ import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } f
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { Flex, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
-import { ThemeContext, themes } from '../../theme/theme-context'
-import BaseList from '../BaseList'
+import { ThemeContext } from '../../theme/theme-context'
 import EmptyView from '../EmptyView'
 
 
@@ -121,7 +120,7 @@ const BulletinListScreen = (props) => {
                     ...styles.content_text,
                     color: theme.text1
                   }}
-                  onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
                   >{item.Content}</Text>
                 </View>
               </View>
@@ -139,7 +138,6 @@ const ReduxBulletinListScreen = connect((state) => {
   }
 })(BulletinListScreen)
 
-//export default BulletinListScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()

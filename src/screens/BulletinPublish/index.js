@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'

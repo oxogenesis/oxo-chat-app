@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity, Image } from 'react-native'
-import { Icon } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
 import styles from './style'
 
@@ -58,8 +57,8 @@ const BaseList = ({ data = [] }) => {
                 }}>{item.desc}</Text>
               }
             </View>
-           
-            
+
+
           </TouchableOpacity>
         ))
       }

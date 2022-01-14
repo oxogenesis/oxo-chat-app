@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import TabSessionScreen from '../TabSession'
@@ -40,12 +40,12 @@ const TabHomeScreen = (props) => {
           color: theme.tab_text,
         },
         tabBarBadge: props.avatar.get("CountUnreadMessage"),
-        tabBarIcon: ({color}) => {
+        tabBarIcon: ({ color }) => {
           return <IconAnt
-          name={'message1'}
-          size={32}
-          color={color}
-        />
+            name={'message1'}
+            size={32}
+            color={color}
+          />
         }
       }} />
       <Tab.Screen name="公告" component={TabBulletinScreen} options={{
@@ -102,7 +102,6 @@ const ReduxTabHomeScreen = connect((state) => {
   }
 })(TabHomeScreen)
 
-//export default TabHomeScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()

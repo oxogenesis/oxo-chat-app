@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
-import { Icon, Switch  } from '@ant-design/react-native'
+import { Icon, Switch } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
 import styles from './style'
 
@@ -18,7 +18,7 @@ const BaseList = ({ data }) => {
       )
     }
 
-    if(item.type === 'switch') {
+    if (item.type === 'switch') {
       return (<View style={styles.item_switch}>
         <Switch style={{
           marginTop: 18

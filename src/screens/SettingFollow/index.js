@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react'
-import { View, Text, Image } from 'react-native'
+import React, { useContext } from 'react'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { AddressToName } from '../../lib/Util'
 import EmptyView from '../EmptyView'
@@ -7,6 +7,7 @@ import { List, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
 import BaseAvatarList from '../BaseAvatarList'
 const Item = List.Item
+
 //关注设置
 const SettingFollowScreen = props => {
   const { theme } = useContext(ThemeContext)
@@ -21,13 +22,12 @@ const SettingFollowScreen = props => {
       height: '100%',
       backgroundColor: theme.base_view
     }}>
-       <WhiteSpace size='lg' />
+      <WhiteSpace size='lg' />
       {
         props.avatar.get('Follows').length > 0 ? <View>
           <BaseAvatarList data={lists} />
         </View> : <EmptyView />
       }
-
     </View >
   )
 }

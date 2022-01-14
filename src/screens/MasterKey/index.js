@@ -45,11 +45,13 @@ class MasterKeyScreen extends React.Component {
         })
 
         // 设置主题
-        AsyncStorage.getItem('Theme').then(theme => {
-          console.log(theme)
-          // @网友 开发环境按r，当读取的是dark，但是显示效果还是light
-          if (theme == null || theme != 'dark') {
-            theme = DefaultTheme
+        AsyncStorage.getItem('Theme').then(json => {
+          let theme = DefaultTheme
+          if (json != null) {
+            json = JSON.parse(json)
+            if (json.Theme != null && json.Theme == 'dark') {
+              theme = 'dark'
+            }
           }
           this.props.dispatch({
             type: actionType.avatar.changeTheme,
@@ -137,6 +139,7 @@ class MasterKeyScreen extends React.Component {
 
 const ReduxMasterKeyScreen = connect((state) => {
   return {
+    avatar: state.avatar,
     master: state.master
   }
 })(MasterKeyScreen)

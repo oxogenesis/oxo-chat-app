@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, TextInput, Appearance } from 'react-native'
-import { Button, WhiteSpace, Popover, Icon } from '@ant-design/react-native'
+import { View, Text, TextInput } from 'react-native'
+import { Button, WhiteSpace } from '@ant-design/react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { MasterKeyDerive } from '../../lib/OXO'

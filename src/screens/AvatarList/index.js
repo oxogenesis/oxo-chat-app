@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Button, List, WhiteSpace, Flex, WingBlank } from '@ant-design/react-native'
+import { Button, WhiteSpace, Flex } from '@ant-design/react-native'
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AvatarDerive } from '../../lib/OXO'
@@ -67,7 +67,7 @@ const AvatarListScreen = props => {
         automaticallyAdjustContentInsets={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
-          <WhiteSpace />
+        <WhiteSpace />
         {
           avatarList.length > 0 ? avatarList.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>

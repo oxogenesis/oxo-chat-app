@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react'
-import { View, ScrollView, Text, FlatList } from 'react-native'
+import { View, ScrollView, Text } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
@@ -63,24 +63,24 @@ const BulletinInfoScreen = (props) => {
               }}>{props.avatar.get('CurrentBulletin').Content}</Text>
               <WhiteSpace size='lg' />
               {
-                  props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
-                    <Text key={index} style={{
-                      ...styles.link_list_text,
-                      color: theme.link_color,
-                      borderColor: theme.line,
-                    }} onPress={() => props.navigation.push('Bulletin', {
-                      address: item.Address,
-                      sequence: item.Sequence,
-                      hash: item.Hash,
-                      to: props.avatar.get('CurrentBulletin').Address
-                    })}>
-                      {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                      {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
-                    </Text>
-                  ))
-                }
+                props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
+                  <Text key={index} style={{
+                    ...styles.link_list_text,
+                    color: theme.link_color,
+                    borderColor: theme.line,
+                  }} onPress={() => props.navigation.push('Bulletin', {
+                    address: item.Address,
+                    sequence: item.Sequence,
+                    hash: item.Hash,
+                    to: props.avatar.get('CurrentBulletin').Address
+                  })}>
+                    {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                    {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
+                  </Text>
+                ))
+              }
             </ScrollView>
-            
+
 
           </>
       }
@@ -95,7 +95,6 @@ const ReduxBulletinInfoScreen = connect((state) => {
   }
 })(BulletinInfoScreen)
 
-//export default BulletinInfoScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()

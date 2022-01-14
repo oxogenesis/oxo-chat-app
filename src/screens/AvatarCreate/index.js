@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { Button, WhiteSpace } from '@ant-design/react-native'
 import { AvatarCreateNew } from '../../lib/OXO'

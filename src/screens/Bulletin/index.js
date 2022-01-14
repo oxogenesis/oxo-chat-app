@@ -1,21 +1,21 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { View, ScrollView, Text, Image, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { Icon, WhiteSpace, Tag, Toast, Popover } from '@ant-design/react-native'
+import { Icon, WhiteSpace, Toast, Popover } from '@ant-design/react-native'
 import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Flex } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseList from '../BaseList'
 
 //公告列表
 const BulletinScreen = (props) => {
   const { theme } = useContext(ThemeContext)
   const current = props.avatar.get('CurrentBulletin')
+  const [show, setShow] = useState('0')
 
   const markBulletin = (hash) => {
     props.dispatch({
@@ -43,17 +43,17 @@ const BulletinScreen = (props) => {
   const copyToClipboard = () => {
     Clipboard.setString(current.Content)
     Toast.success('拷贝成功！', 1)
+    setShow(Math.random())
   }
 
   const quote = () => {
     Toast.success('引用成功！', 1)
+    setShow(Math.random())
   }
 
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<BulletinScreen focus`)
-      console.log(props.route.params.hash)
       props.dispatch({
         type: actionType.avatar.LoadCurrentBulletin,
         address: props.route.params.address,
@@ -68,11 +68,13 @@ const BulletinScreen = (props) => {
   const handleCollection = () => {
     markBulletin(current.Hash)
     Toast.success('收藏成功！', 1)
+    setShow(Math.random())
   }
 
   const cancelCollection = () => {
     unmarkBulletin(current.Hash)
     Toast.success('取消收藏！', 1)
+    setShow(Math.random())
   }
 
   return (
@@ -143,14 +145,17 @@ const BulletinScreen = (props) => {
                     <Text style={styles.desc_view}>
                     </Text>
                     <Popover
+                      key={show}
                       overlay={
-                        <Popover.Item style={{
-                          backgroundColor: '#434343',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                          borderRadius: 5,
-                          borderColor: '#434343'
-                        }}>
+                        <Popover.Item
+                          style={{
+                            backgroundColor: '#434343',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-end',
+                            borderRadius: 5,
+                            borderColor: '#434343',
+                          }}
+                        >
                           {
                             current.IsMark == "TRUE" &&
                             <TouchableOpacity onPress={cancelCollection}>
@@ -179,12 +184,16 @@ const BulletinScreen = (props) => {
                           }
                           {
                             current.PreHash != GenesisHash &&
-                            <TouchableOpacity onPress={() => props.navigation.push('Bulletin', {
-                              address: current.Address,
-                              sequence: current.Sequence - 1,
-                              hash: current.PreHash,
-                              to: current.Address
-                            })}>
+                            <TouchableOpacity onPress={() => {
+                              props.navigation.push('Bulletin', {
+                                address: current.Address,
+                                sequence: current.Sequence - 1,
+                                hash: current.PreHash,
+                                to: current.Address
+                              })
+                              setShow(Math.random())
+                            }
+                            }>
                               <View style={styles.icon_view}>
                                 <Icon
                                   name='backward'
@@ -217,7 +226,7 @@ const BulletinScreen = (props) => {
                             </View>
                           </TouchableOpacity>
 
-                          <TouchableOpacity onPress={() =>
+                          <TouchableOpacity onPress={() => {
                             props.navigation.push('AddressSelect', {
                               content: {
                                 ObjectType: "Bulletin",
@@ -225,7 +234,12 @@ const BulletinScreen = (props) => {
                                 Sequence: current.Sequence,
                                 Hash: current.Hash
                               }
-                            })}>
+
+                            })
+                            setShow(Math.random())
+                          }
+
+                          }>
                             <View style={styles.icon_view}>
                               <Icon
                                 name='branches'
@@ -309,7 +323,6 @@ const BulletinScreen = (props) => {
                 }
               </>
             }
-
           </ScrollView>
       }
     </View>
@@ -323,7 +336,6 @@ const ReduxBulletinScreen = connect((state) => {
   }
 })(BulletinScreen)
 
-//export default BulletinScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()

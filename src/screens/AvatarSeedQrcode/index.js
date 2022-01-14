@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, Alert } from 'react-native'
+import { View, Text } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import QRCode from 'react-native-qrcode-svg'
@@ -16,16 +16,6 @@ const AvatarSeedQrcodeScreen = (props) => {
 
   const viewSeedAlert = () => {
     showModal(true)
-    //     Alert.alert(
-    //       '提示',
-    //       `查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
-    // 确定要查看种子吗？`,
-    //       [
-    //         { text: '确认', onPress: () => this.props.navigation.navigate('AvatarSeed') },
-    //         { text: '取消', style: 'cancel' },
-    //       ],
-    //       { cancelable: false }
-    //     )
   }
 
   const onClose = () => {
@@ -78,7 +68,6 @@ const ReduxAvatarSeedQrcodeScreen = connect((state) => {
   }
 })(AvatarSeedQrcodeScreen)
 
-//export default AvatarSeedQrcodeScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()

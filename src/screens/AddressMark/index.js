@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Button, List, Switch, WhiteSpace, Toast, Modal } from '@ant-design/react-native'
+import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
 import AlertView from '../AlertView'
@@ -95,9 +95,11 @@ const AddressMarkScreen = (props) => {
   }
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
+    props.navigation.addListener('focus', () => {
       loadAddressMark()
     })
+    return () => {
+    }
   })
 
   const onSwitchChange = async value => {
@@ -107,7 +109,6 @@ const AddressMarkScreen = (props) => {
     } else {
       showModal4(true)
     }
-
   }
 
   const onSwitchChangeFollow = async value => {
@@ -117,7 +118,6 @@ const AddressMarkScreen = (props) => {
     } else {
       showModal5(true)
     }
-
   }
 
   const current = props.avatar.get('CurrentAddressMark')
@@ -256,7 +256,6 @@ const ReduxAddressMarkScreen = connect((state) => {
   }
 })(AddressMarkScreen)
 
-//export default AddressMarkScreen
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()

@@ -69,14 +69,14 @@ const SessionType = {
 }
 
 //Bulletin
-const BulletinPageSize = 20
+const BulletinPageSize = 50
 const BulletinTabSession = '<BT>'
 const BulletinMarkSession = '<BM>'
 const BulletinHistorySession = '<BH>'
 const BulletinAddressSession = '<BA>'
 
 //Message
-const MessagePageSize = 10
+const MessagePageSize = 50
 
 export {
   DefaultHost,

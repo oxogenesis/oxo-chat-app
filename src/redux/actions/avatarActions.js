@@ -1034,7 +1034,7 @@ export function* LoadCurrentMessageList(action) {
     }
   })
   if (tmp.length != 0) {
-    message_list = message_list.concat(tmp)
+    message_list = tmp.concat(message_list)
     yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
     yield put({ type: actionType.avatar.setMessageWhiteList, message_white_list: message_white_list })
   }

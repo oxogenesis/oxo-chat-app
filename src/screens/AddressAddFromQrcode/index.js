@@ -1,16 +1,20 @@
-import React, { useContext, useState } from 'react'
-import { Text } from 'react-native'
+import React, { useContext, useState, useEffect } from 'react'
+import { View, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { Button, WhiteSpace } from '@ant-design/react-native'
+import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
 
 //登录界面
 const AddressAddFromQrcodeScreen = (props) => {
-  const { theme } = useContext(ThemeContext)
   const [address, setAddress] = useState('')
   const [relay, setRelay] = useState('')
+  const { theme } = useContext(ThemeContext)
 
+  const markAddress = () => {
+    props.navigation.navigate('AddressAdd', { address: address })
+  }
 
   const addHost = () => {
     let host = relay
@@ -65,6 +69,7 @@ const AddressAddFromQrcodeScreen = (props) => {
           </Text>
         </View>
       </View>
+
       <View style={{
         flexDirection: "row",
         paddingTop: 5,
@@ -89,10 +94,10 @@ const AddressAddFromQrcodeScreen = (props) => {
 
       <WhiteSpace size='md' />
       <Button type='primary' style={{ height: 55 }}
-        onPress={props.navigation.navigate('AddressAdd', { address: address })}>标记地址</Button>
+        onPress={markAddress}>标记地址</Button>
       <WhiteSpace size='md' />
       <Button type='primary' style={{ height: 55 }}
-        onPress={addHost}>保存服务器网址+标记地址</Button>
+        onPress={addHost}>标记地址 + 保存服务器网址</Button>
     </View>
   )
 }

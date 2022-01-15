@@ -82,7 +82,6 @@ async function MasterKeyDerive(masterKey) {
     let json = JSON.parse(result)
     let key = halfSHA512(json.salt + masterKey).toString('hex').slice(0, 32)
     let mk = decrypt(key, json.iv, json.ct)
-    console.log(mk)
     return true
   } catch (e) {
     console.log(e)
@@ -103,13 +102,11 @@ async function AvatarCreateNew(name, password) {
 
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
-    console.log(result)
     let avatarList = []
     if (result != null) {
       avatarList = JSON.parse(result)
     }
     avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
-    console.log(avatarList)
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {
@@ -130,13 +127,11 @@ async function AvatarCreateWithSeed(name, seed, password) {
 
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
-    console.log(result)
     let avatarList = []
     if (result != null) {
       avatarList = JSON.parse(result)
     }
     avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
-    console.log(avatarList)
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {
@@ -155,13 +150,8 @@ async function AvatarNameEdit(name, seed, password) {
   let crypted = encrypt(key, iv, JSON.stringify(msg))
   let save = { "salt": salt, "iv": iv, "ct": crypted }
 
-  console.log(name)
-  console.log(seed)
-  console.log(password)
-
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
-    console.log(result)
     let avatarList = []
     if (result != null) {
       avatarList = JSON.parse(result)
@@ -174,7 +164,6 @@ async function AvatarNameEdit(name, seed, password) {
       avatarList = tmp
     }
     avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
-    console.log(avatarList)
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {

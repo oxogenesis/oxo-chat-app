@@ -28,9 +28,11 @@ const AvatarListScreen = props => {
   }
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
+    props.navigation.addListener('focus', () => {
       loadAvatarList()
     })
+    return () => {
+    }
   })
 
 

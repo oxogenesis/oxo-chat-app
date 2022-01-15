@@ -201,7 +201,6 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
           .then(([tx, results]) => {
-            console.log(results)
             resolve(results)
           })
       }).catch((err) => {
@@ -241,7 +240,6 @@ export default class Database {
               items.push(item)
             }
             console.log(`#####################getAll#${items.length}`)
-            console.log(items)
             resolve(items)
           })
       }).catch((err) => {

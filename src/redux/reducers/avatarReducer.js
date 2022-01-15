@@ -256,7 +256,7 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
 
 //Chat
 reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
-  console.log(action.session_map)
+  // console.log(action.session_map)
   let session_list = Object.values(action.session_map)
 
   session_list.sort(function (m, n) {
@@ -297,11 +297,11 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => {
-  console.log(action.message_list)
+  // console.log(action.message_list)
   return state.set('CurrentMessageList', action.message_list)
 }
 
 reducer.prototype[actionType.avatar.setMessageWhiteList] = (state, action) => {
-  console.log(action.message_white_list)
+  // console.log(action.message_white_list)
   return state.set('MessageWhiteList', action.message_white_list)
 }

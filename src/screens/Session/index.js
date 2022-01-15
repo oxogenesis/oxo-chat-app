@@ -51,15 +51,6 @@ const SessionScreen = (props) => {
     })
   }
 
-  // @网友 向下拉，从本地加载更多聊天记录
-  // loadMessageList(false)
-
-  // @网友
-  // 同TabBulletin页面，是不是用FlatList更好？
-
-  // @网友
-  // 消息发送后，输入法和输入框自动恢复原位
-
   const copyToClipboard = (content) => {
     Clipboard.setString(content)
     Toast.success('拷贝成功！', 1)
@@ -79,7 +70,7 @@ const SessionScreen = (props) => {
       let message_input = ''
       if (props.route.params.content != null) {
         message_input = JSON.stringify(props.route.params.content)
-        console.log(message_input)
+        // console.log(message_input)
       }
       setAddress(props.route.params.address)
       setName(name)
@@ -107,7 +98,7 @@ const SessionScreen = (props) => {
     } else {
       console.log("下拉加载")
       setRefreshFlag(true)
-      props.dispatch({ type: actionType.avatar.UpdateFollowBulletin })
+      loadMessageList(false)
       setRefreshFlag(false)
     }
   }

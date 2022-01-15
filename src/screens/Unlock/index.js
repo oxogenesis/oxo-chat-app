@@ -32,7 +32,7 @@ const UnlockScreen = (props) => {
   }
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
+    props.navigation.addListener('focus', () => {
       if (props.master.get('MasterKey') != null) {
         // 强制安全退出：加载此页面，置空MasterKey
         props.dispatch({
@@ -43,6 +43,8 @@ const UnlockScreen = (props) => {
       setKey('')
       setMsg('')
     })
+    return () => {
+    }
   })
 
 

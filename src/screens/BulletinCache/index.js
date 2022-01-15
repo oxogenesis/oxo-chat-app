@@ -28,9 +28,12 @@ const BulletinCacheScreen = (props) => {
   }
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
+    props.navigation.addListener('focus', () => {
       setSize(`${props.avatar.get('BulletinCacheSize')}`)
     })
+
+    return () => {
+    }
   })
 
   return (

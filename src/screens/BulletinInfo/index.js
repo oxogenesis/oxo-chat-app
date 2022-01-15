@@ -14,7 +14,7 @@ const BulletinInfoScreen = (props) => {
   const { theme } = useContext(ThemeContext)
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
+    props.navigation.addListener('focus', () => {
       props.dispatch({
         type: actionType.avatar.LoadCurrentBulletin,
         address: props.route.params.address,
@@ -23,6 +23,9 @@ const BulletinInfoScreen = (props) => {
         to: props.route.params.to
       })
     })
+
+    return () => {
+    }
   })
 
   const data = [{

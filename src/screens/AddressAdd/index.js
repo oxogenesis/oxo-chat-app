@@ -14,7 +14,6 @@ const AddressAddScreen = (props) => {
   const { theme } = useContext(ThemeContext)
 
   const addAddressMark = () => {
-    console.log('地址：',address)
     let newAddress = address.trim()
     let newName = name.trim()
     if (newAddress == '' || newName == '' || newAddress == newName) {
@@ -33,11 +32,13 @@ const AddressAddScreen = (props) => {
   }
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
+    props.navigation.addListener('focus', () => {
       if (props.route.params && props.route.params.address) {
         setAddress(props.route.params.address)
       }
     })
+    return () => {
+    }
   })
 
 
@@ -47,22 +48,22 @@ const AddressAddScreen = (props) => {
       backgroundColor: theme.base_view
     }}>
       <TextInput
-         placeholderTextColor={theme.text2}
-         style={{
-           ...styles.input_view,
-           color: theme.text1
-         }}
+        placeholderTextColor={theme.text2}
+        style={{
+          ...styles.input_view,
+          color: theme.text1
+        }}
         placeholder="地址"
         value={address}
         onChangeText={text => setAddress(text)}
       />
       <WhiteSpace size='lg' />
       <TextInput
-         placeholderTextColor={theme.text2}
-         style={{
-           ...styles.input_view,
-           color: theme.text1
-         }}
+        placeholderTextColor={theme.text2}
+        style={{
+          ...styles.input_view,
+          color: theme.text1
+        }}
         placeholder="昵称"
         value={name}
         onChangeText={text => setName(text)}

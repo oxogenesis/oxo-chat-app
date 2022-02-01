@@ -12,7 +12,7 @@ const AddressScanScreen = (props) => {
   const onSuccess = (e) => {
     let result = ParseQrcodeAddress(e.data)
     if (result != false) {
-      props.navigation.replace('AddressAddFromQrcode', { address: result })
+      props.navigation.replace('AddressAddFromQrcode', { qrcode: result })
     }
   }
 

@@ -23,13 +23,10 @@ const AvatarSeedQrcodeScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       let json = { "Name": props.avatar.get('Name'), "Seed": props.avatar.get('Seed') }
       seQrcode(JSON.stringify(json))
     })
-
-    return () => {
-    }
   })
 
   return (

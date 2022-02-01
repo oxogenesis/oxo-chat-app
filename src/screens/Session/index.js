@@ -57,7 +57,7 @@ const SessionScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       let name = AddressToName(props.avatar.get('AddressMap'), props.route.params.address)
       setAddress(props.route.params.address)
       setName(name)
@@ -77,18 +77,17 @@ const SessionScreen = (props) => {
       setMsgInput(message_input)
 
       loadMessageList(true)
-    })
 
-    props.navigation.addListener('beforeRemove', () => {
+      flatRef.current.scrollToEnd()
+    })
+  })
+
+  useEffect(() => {
+    return props.navigation.addListener('blur', () => {
       props.dispatch({
         type: actionType.avatar.setCurrentSession
       })
     })
-
-    flatRef.current.scrollToEnd()
-
-    return () => {
-    }
   })
 
   //向下拉，加载更到本地消息

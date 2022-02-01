@@ -95,11 +95,9 @@ const AddressMarkScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       loadAddressMark()
     })
-    return () => {
-    }
   })
 
   const onSwitchChange = async value => {

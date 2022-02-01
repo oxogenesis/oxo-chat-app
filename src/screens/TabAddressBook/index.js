@@ -11,7 +11,6 @@ const Item = List.Item
 const TabAddressBookScreen = props => {
   const { theme } = useContext(ThemeContext)
 
-
   const lists = props.avatar.get('AddressArray').map(item => ({
     title: item.Name,
     onpress: () => props.navigation.push('AddressMark', { address: item.Address })

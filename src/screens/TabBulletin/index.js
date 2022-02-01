@@ -23,14 +23,11 @@ const TabBulletinScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       if (props.avatar.get('TabBulletinList').length == 0) {
         loadTabBulletinList(true)
       }
     })
-
-    return () => {
-    }
   })
 
   // 向上拉到底部，加载更到本地公告

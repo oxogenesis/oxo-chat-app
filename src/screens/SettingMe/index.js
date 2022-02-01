@@ -16,8 +16,6 @@ const Brief = Item.Brief
 
 const SettingMeScreen = (props) => {
 
-  const [address, setAddress] = useState(props.avatar.get('Address'))
-  const [name, setName] = useState(props.avatar.get('Name'))
   const [visible, showModal] = useState(false)
   const { theme } = useContext(ThemeContext)
 
@@ -29,7 +27,7 @@ const SettingMeScreen = (props) => {
 
   const copyToClipboard = () => {
     Toast.success('拷贝成功！', 1)
-    Clipboard.setString(address)
+    Clipboard.setString(props.avatar.get('Address'))
   }
 
   const viewSeedQrcodeAlert = () => {
@@ -58,8 +56,8 @@ const SettingMeScreen = (props) => {
       </View>
       <WhiteSpace size='lg' />
       <BaseList data={[
-        { title: address, icon: 'block', onpress: copyToClipboard },
-        { title: name, onpress: () => { props.navigation.navigate('AvatarNameEdit') } },
+        { title: props.avatar.get('Address'), icon: 'block', onpress: copyToClipboard },
+        { title: props.avatar.get('Name'), onpress: () => { props.navigation.navigate('AvatarNameEdit') } },
         { title: '查看种子二维码', onpress: viewSeedQrcodeAlert },
       ]} />
       <AlertView

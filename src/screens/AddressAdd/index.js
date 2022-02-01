@@ -32,13 +32,11 @@ const AddressAddScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       if (props.route.params && props.route.params.address) {
         setAddress(props.route.params.address)
       }
     })
-    return () => {
-    }
   })
 
 

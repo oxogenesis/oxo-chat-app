@@ -28,11 +28,9 @@ const AvatarListScreen = props => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       loadAvatarList()
     })
-    return () => {
-    }
   })
 
 
@@ -46,7 +44,7 @@ const AvatarListScreen = props => {
             seed: result,
             name: name
           })
-          props.navigation.navigate('TabHome')
+          props.navigation.replace('TabHome')
         }
       })
   }

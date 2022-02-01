@@ -30,7 +30,7 @@ const AddressAddFromQrcodeScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       if (props.route.params && props.route.params.qrcode) {
         setAddress(props.route.params.qrcode.Address)
         setRelay(props.route.params.qrcode.Relay)
@@ -38,8 +38,6 @@ const AddressAddFromQrcodeScreen = (props) => {
         props.navigation.goBack()
       }
     })
-    return () => {
-    }
   })
 
   return (

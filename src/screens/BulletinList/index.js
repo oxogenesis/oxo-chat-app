@@ -38,12 +38,9 @@ const BulletinListScreen = (props) => {
   }
 
   useEffect(() => {
-    props.navigation.addListener('focus', () => {
+    return props.navigation.addListener('focus', () => {
       loadBulletinList(true)
     })
-
-    return () => {
-    }
   })
 
   return (

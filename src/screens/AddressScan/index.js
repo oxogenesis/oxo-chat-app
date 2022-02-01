@@ -1,58 +1,52 @@
-import * as React from 'react'
-
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import React, { useContext } from 'react'
+import { Text } from 'react-native'
 import QRCodeScanner from 'react-native-qrcode-scanner'
 import { RNCamera } from 'react-native-camera'
 import { ParseQrcodeAddress } from '../../lib/OXO'
+import { ThemeContext } from '../../theme/theme-context'
 
-class AddressScanScreen extends React.Component {
-  onSuccess(e) {
+const AddressScanScreen = (props) => {
+
+  const { theme } = useContext(ThemeContext)
+
+  const onSuccess = (e) => {
     let result = ParseQrcodeAddress(e.data)
     if (result != false) {
-      this.props.navigation.replace('AddressAddFromQrcode', { qrcode: result })
+      props.navigation.replace('AddressAddFromQrcode', { address: result })
     }
   }
 
-  render() {
-    return (
-      <QRCodeScanner
-        onRead={(e) => (this.onSuccess(e))}
-        reactivate={true}
-        reactivateTimeout={1500}
-        flashMode={RNCamera.Constants.FlashMode.auto}
-        showMarker={true}
-        topContent={
-          <Text style={styles.centerText}>
-          </Text>
-        }
-        bottomContent={
-          <TouchableOpacity style={styles.buttonTouchable}>
-            <Text style={styles.buttonText}></Text>
-          </TouchableOpacity>
-        }
-      />
-    )
-  }
+  return (
+    <QRCodeScanner
+      onRead={(e) => (onSuccess(e))}
+      reactivate={true}
+      reactivateTimeout={1500}
+      flashMode={RNCamera.Constants.FlashMode.auto}
+      showMarker={true}
+      topContent={
+        <Text style={{
+          flex: 1,
+          fontSize: 18,
+          padding: 32,
+          color: theme.base_body,
+          backgroundColor: theme.base_body
+        }}>
+          .................................................................................................................................
+        </Text>
+      }
+      bottomContent={
+        <Text style={{
+          flex: 1,
+          fontSize: 18,
+          padding: 32,
+          color: theme.base_body,
+          backgroundColor: theme.base_body
+        }}>
+          .................................................................................................................................
+        </Text>
+      }
+    />
+  )
 }
-
-const styles = StyleSheet.create({
-  centerText: {
-    flex: 1,
-    fontSize: 18,
-    padding: 32,
-    color: '#777'
-  },
-  textBold: {
-    fontWeight: '500',
-    color: '#000'
-  },
-  buttonText: {
-    fontSize: 21,
-    color: 'rgb(0,122,255)'
-  },
-  buttonTouchable: {
-    padding: 16
-  }
-})
 
 export default AddressScanScreen

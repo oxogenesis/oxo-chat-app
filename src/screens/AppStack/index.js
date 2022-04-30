@@ -14,6 +14,7 @@ import AvatarCreateScreen from '../AvatarCreate'
 import AvatarNameEditScreen from '../AvatarNameEdit'
 import AvatarSeedScreen from '../AvatarSeed'
 import AvatarSeedQrcodeScreen from '../AvatarSeedQrcode'
+import AboutScreen from '../About'
 import AvatarCreateFromScanSeedQrcodeScreen from '../AvatarCreateFromScanSeedQrcode'
 import TabHomeScreen from '../TabHome'
 import BulletinScreen from '../Bulletin'
@@ -67,7 +68,7 @@ const StackView = (props) => {
             headerRight: () => (
               <IconAnt
                 name={'adduser'}
-                size={24}
+                size={32}
                 color={theme.text1}
                 onPress={() => navigation.navigate('AvatarCreate')
                 }
@@ -84,7 +85,7 @@ const StackView = (props) => {
             headerRight: () => (
               <IconAnt
                 name={'qrcode'}
-                size={24}
+                size={32}
                 color={theme.text1}
                 onPress={() => navigation.navigate('AvatarCreateFromScanSeedQrcode')
                 }
@@ -110,7 +111,7 @@ const StackView = (props) => {
             headerRight: () => (
               <IconFontisto
                 name={'info'}
-                size={24}
+                size={32}
                 color={theme.text1}
                 onPress={() => navigation.push('BulletinInfo', { hash: route.params.hash })}
               />)
@@ -126,7 +127,7 @@ const StackView = (props) => {
             headerRight: () => (
               <IconFeather
                 name={'more-horizontal'}
-                size={24}
+                size={32}
                 color={theme.text1}
                 onPress={() => navigation.push('AddressMark', {
                   address: route.params.address
@@ -144,7 +145,7 @@ const StackView = (props) => {
             headerRight: () => (
               <IconMaterial
                 name={'post-add'}
-                size={24}
+                size={32}
                 color={theme.text1}
                 onPress={() => navigation.navigate('BulletinPublish')}
               />)
@@ -283,6 +284,15 @@ const StackView = (props) => {
         options={
           ({ route, navigation }) => ({
             title: '地址设置',
+            ...headerStyleOption,
+          })
+        } />
+      <Stack.Screen
+        name="About"
+        component={AboutScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '关于',
             ...headerStyleOption,
           })
         } />

@@ -63,9 +63,20 @@ const TabSettingScreen = (props) => {
           type: actionType.avatar.disableAvatar
         })
         props.navigation.navigate('AvatarList')
-      }}><Text style={{
-        color: 'red'
-      }}>切换账户</Text></Button>
+      }}>
+        <Text style={{ color: 'red' }}>切换账户</Text>
+      </Button>
+
+      <WhiteSpace size='lg' />
+      <Button style={{
+        ...styles.btn_high,
+        backgroundColor: theme.base_body,
+        borderColor: theme.line,
+      }} onPress={() => {
+        props.navigation.navigate('About')
+      }}>
+        <Text style={{ color: theme.text1 }}>关于</Text>
+      </Button>
     </View >
   )
 }

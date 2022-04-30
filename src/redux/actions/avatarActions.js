@@ -713,6 +713,7 @@ export function* SaveBulletin(action) {
   if (VerifyJsonSignature(bulletin_json) == true) {
     let timestamp = Date.now()
     let db = yield select(state => state.avatar.get('Database'))
+    let self_address = yield select(state => state.avatar.get('Address'))
     let follow_list = yield select(state => state.avatar.get('Follows'))
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
     let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
@@ -779,6 +780,14 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
       if (current_bulletin == null) {
         yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
       }
+    } else if (self_address == object_address) {
+      //bulletin from myself
+      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+  VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+      //save bulletin
+      yield call([db, db.runSQL], sql)
+      yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
     }
   }
 }
@@ -830,7 +839,7 @@ export function* LoadTabBulletinList(action) {
 }
 
 export function* LoadBulletinList(action) {
-  let self_address = yield select(state => state.avatar.get('Address'))
+  // let self_address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
   let sql = ''
   let bulletin_list = []
@@ -872,7 +881,8 @@ export function* LoadBulletinList(action) {
   }
 
   // 获取更新
-  if (action.session == BulletinAddressSession && action.address != self_address) {
+  // 甚至是自己的公告，为切回设备后从服务器取回历史公告 && action.address != self_address
+  if (action.session == BulletinAddressSession) {
     let next_sequence = 1
     if (bulletin_list.length != 0) {
       next_sequence = bulletin_list[0].Sequence + 1

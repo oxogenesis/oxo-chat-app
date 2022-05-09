@@ -33,6 +33,8 @@ function initialState() {
       BulletinList: [],
       CurrentBBSession: null,
       CurrentBulletin: null,
+      RandomBulletin: null,
+      RandomBulletinFlag: false,
       QuoteList: [],
       QuoteWhiteList: [],
       BulletinCacheSize: DefaultBulletinCacheSize,
@@ -68,6 +70,8 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('CurrentHost', null)
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
+    .set('RandomBulletin', null)
+    .set('RandomBulletinFlag', false)
     .set('AddressMap', {})
     .set('AddressArray', [])
     .set('CurrentAddressMark', null)
@@ -110,6 +114,8 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('CurrentHost', null)
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
+    .set('RandomBulletin', null)
+    .set('RandomBulletinFlag', false)
     .set('AddressMap', {})
     .set('AddressArray', [])
     .set('CurrentAddressMark', null)
@@ -209,6 +215,14 @@ reducer.prototype[actionType.avatar.setBulletinList] = (state, action) => {
 
 reducer.prototype[actionType.avatar.setCurrentBulletin] = (state, action) => {
   return state.set('CurrentBulletin', action.bulletin)
+}
+
+reducer.prototype[actionType.avatar.setRandomBulletin] = (state, action) => {
+  return state.set('RandomBulletin', action.bulletin)
+}
+
+reducer.prototype[actionType.avatar.setRandomBulletinFlag] = (state, action) => {
+  return state.set('RandomBulletinFlag', action.flag)
 }
 
 reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {

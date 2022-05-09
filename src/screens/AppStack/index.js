@@ -18,6 +18,7 @@ import AboutScreen from '../About'
 import AvatarCreateFromScanSeedQrcodeScreen from '../AvatarCreateFromScanSeedQrcode'
 import TabHomeScreen from '../TabHome'
 import BulletinScreen from '../Bulletin'
+import BulletinRandomScreen from '../BulletinRandom'
 import BulletinInfoScreen from '../BulletinInfo'
 import SessionScreen from '../Session'
 import BulletinListScreen from '../BulletinList'
@@ -115,6 +116,15 @@ const StackView = (props) => {
                 color={theme.text1}
                 onPress={() => navigation.push('BulletinInfo', { hash: route.params.hash })}
               />)
+          })
+        } />
+      <Stack.Screen
+        name="BulletinRandom"
+        component={BulletinRandomScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: "公告：随便看看",
+            ...headerStyleOption
           })
         } />
       <Stack.Screen

@@ -40,8 +40,8 @@ const TabSettingScreen = (props) => {
       <WhiteSpace size='lg' />
       <BaseList data={[
         { title: '网络设置', onpress: () => { props.navigation.navigate('SettingNetwork') } },
-        { title: '公告设置', onpress: () => { props.navigation.navigate('SettingBulletin') } },
         { title: '地址管理', onpress: () => { props.navigation.navigate('SettingAddress') } },
+        { title: '公告设置', onpress: () => { props.navigation.navigate('SettingBulletin') } },
       ]} />
       <WhiteSpace size='lg' />
 

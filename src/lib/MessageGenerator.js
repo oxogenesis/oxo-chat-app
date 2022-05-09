@@ -43,6 +43,15 @@ export default class MessageGenerator {
     return JSON.stringify(this.signJson(json))
   }
 
+  genBulletinRandom() {
+    let json = {
+      "Action": ActionCode.BulletinRandom,
+      "Timestamp": Date.now(),
+      "PublicKey": this.PublicKey
+    }
+    return JSON.stringify(this.signJson(json))
+  }
+
   genBulletinRequest(address, sequence, to) {
     let json = {
       "Action": ActionCode.BulletinRequest,

@@ -16,6 +16,7 @@ const ActionCode = {
   "Declare": 100,
   "ObjectResponse": 101,
 
+  "BulletinRandom": 200,
   "BulletinRequest": 201,
   "BulletinFileRequest": 202,
 

@@ -190,8 +190,10 @@ const ReduxTabBulletinScreen = connect((state) => {
   }
 })(TabBulletinScreen)
 
-export default function (props) {
-  const navigation = useNavigation()
-  const route = useRoute()
-  return <ReduxTabBulletinScreen{...props} navigation={navigation} route={route} />
-}
+export default ReduxTabBulletinScreen
+
+// export default function (props) {
+//   const navigation = useNavigation()
+//   const route = useRoute()
+//   return <ReduxTabBulletinScreen{...props} navigation={navigation} route={route} />
+// }

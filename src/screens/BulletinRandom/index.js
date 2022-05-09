@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, ScrollView, Text, Image, TouchableOpacity } from 'react-native'
+import { View, ScrollView, RefreshControl, Text, Image, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { Icon, WhiteSpace, Toast, Popover } from '@ant-design/react-native'
-import { GenesisHash } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Flex } from '@ant-design/react-native'
@@ -12,9 +11,10 @@ import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
 
 //公告列表
-const BulletinScreen = (props) => {
+const BulletinRandomScreen = (props) => {
   const { theme } = useContext(ThemeContext)
-  const current = props.avatar.get('CurrentBulletin')
+  const random = props.avatar.get('RandomBulletin')
+  const [refreshFlag, setRefreshFlag] = useState(false)
   const [show, setShow] = useState('0')
 
   const markBulletin = (hash) => {
@@ -41,7 +41,7 @@ const BulletinScreen = (props) => {
   }
 
   const copyToClipboard = () => {
-    Clipboard.setString(current.Content)
+    Clipboard.setString(random.Content)
     Toast.success('拷贝成功！', 1)
     setShow(Math.random())
   }
@@ -51,28 +51,51 @@ const BulletinScreen = (props) => {
     setShow(Math.random())
   }
 
+  const loadRandomBulletin = () => {
+    props.dispatch({
+      type: actionType.avatar.setRandomBulletinFlag,
+      flag: true
+    })
+    props.dispatch({
+      type: actionType.avatar.FetchRandomBulletin
+    })
+  }
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
+      loadRandomBulletin()
+    })
+  })
+
+  useEffect(() => {
+    return props.navigation.addListener('blur', () => {
       props.dispatch({
-        type: actionType.avatar.LoadCurrentBulletin,
-        address: props.route.params.address,
-        sequence: props.route.params.sequence,
-        hash: props.route.params.hash,
-        to: props.route.params.to
+        type: actionType.avatar.setRandomBulletinFlag,
+        flag: false
       })
     })
   })
 
+  //向下拉，从服务器请求更多公告
+  const refreshing = () => {
+    if (refreshFlag) {
+      console.log("现在正在刷新")
+    } else {
+      console.log("下拉刷新")
+      setRefreshFlag(true)
+      loadRandomBulletin()
+      setRefreshFlag(false)
+    }
+  }
 
   const handleCollection = () => {
-    markBulletin(current.Hash)
+    markBulletin(random.Hash)
     Toast.success('收藏成功！', 1)
     setShow(Math.random())
   }
 
   const cancelCollection = () => {
-    unmarkBulletin(current.Hash)
+    unmarkBulletin(random.Hash)
     Toast.success('取消收藏！', 1)
     setShow(Math.random())
   }
@@ -83,17 +106,26 @@ const BulletinScreen = (props) => {
       backgroundColor: theme.base_body
     }}>
       {
-        current == null ?
+        random == null ?
           <Text style={{ color: theme.text2 }}>公告不存在，正在获取中，请稍后查看...</Text>
           :
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshFlag}
+                onRefresh={() => refreshing()}
+                colors={['red', 'green', 'blue']}
+                title="正在加载中..."
+              />
+            }
+          >
             <View style={{
               backgroundColor: theme.base_body
             }}>
               <Flex justify="start" align="start">
                 <TouchableOpacity
                   onPress={() => props.navigation.push('AddressMark',
-                    { address: current.Address })}
+                    { address: random.Address })}
                 >
                   <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
                 </TouchableOpacity>
@@ -108,12 +140,10 @@ const BulletinScreen = (props) => {
                         color: theme.link_color,
                       }}
                         onPress={() => props.navigation.push('AddressMark',
-                          { address: current.Address })}
-                      >{AddressToName(props.avatar.get('AddressMap'), current.Address)}&nbsp;&nbsp;</Text>
+                          { address: random.Address })}
+                      >{AddressToName(props.avatar.get('AddressMap'), random.Address)}&nbsp;&nbsp;</Text>
                     </View>
-                    <Text
-                    // onPress={() => props.navigation.push('Bulletin', { hash: current.Hash })}
-                    >
+                    <Text>
                       <View style={{
                         borderWidth: 1,
                         borderColor: theme.split_line,
@@ -124,12 +154,12 @@ const BulletinScreen = (props) => {
                         <Text style={{
                           color: theme.text1,
                           fontSize: 18
-                        }}>{`#${current.Sequence}`}</Text>
+                        }}>{`#${random.Sequence}`}</Text>
                       </View>
                     </Text>
                   </Text>
                   <Text style={styles.desc_view}>
-                    {timestamp_format(current.Timestamp)}
+                    {timestamp_format(random.Timestamp)}
                   </Text>
 
                   <View style={styles.content_view}>
@@ -137,7 +167,7 @@ const BulletinScreen = (props) => {
                       ...styles.content_text,
                       color: theme.text1
                     }}>
-                      {current.Content}
+                      {random.Content}
                     </Text>
                   </View>
                   <WhiteSpace size='lg' />
@@ -157,7 +187,7 @@ const BulletinScreen = (props) => {
                           }}
                         >
                           {
-                            current.IsMark == "TRUE" &&
+                            random.IsMark == "TRUE" &&
                             <TouchableOpacity onPress={cancelCollection}>
                               <View style={styles.icon_view}>
                                 <Icon
@@ -169,7 +199,7 @@ const BulletinScreen = (props) => {
                             </TouchableOpacity>
                           }
                           {
-                            current.IsMark == "FALSE" &&
+                            random.IsMark == "FALSE" &&
                             <TouchableOpacity onPress={handleCollection}>
                               <View style={styles.icon_view}>
                                 <Icon
@@ -182,37 +212,11 @@ const BulletinScreen = (props) => {
                             </TouchableOpacity>
 
                           }
-                          {
-                            current.PreHash != GenesisHash &&
-                            <TouchableOpacity onPress={() => {
-                              props.navigation.push('Bulletin', {
-                                address: current.Address,
-                                sequence: current.Sequence - 1,
-                                hash: current.PreHash,
-                                to: current.Address
-                              })
-                              setShow(Math.random())
-                            }
-                            }>
-                              <View style={styles.icon_view}>
-                                <Icon
-                                  name='backward'
-                                  size="md"
-                                  color='#fff'
-                                  style={{
-                                    textAlign: 'center'
-                                  }}
-                                />
-                                <Text style={styles.icon_text}>上一个</Text>
-                              </View>
-                            </TouchableOpacity>
-
-                          }
 
                           <TouchableOpacity onPress={() => {
-                            quoteBulletin(current.Address,
-                              current.Sequence,
-                              current.Hash)
+                            quoteBulletin(random.Address,
+                              random.Sequence,
+                              random.Hash)
                             quote()
                           }
                           }
@@ -230,9 +234,9 @@ const BulletinScreen = (props) => {
                             props.navigation.push('AddressSelect', {
                               content: {
                                 ObjectType: "Bulletin",
-                                Address: current.Address,
-                                Sequence: current.Sequence,
-                                Hash: current.Hash
+                                Address: random.Address,
+                                Sequence: random.Sequence,
+                                Hash: random.Hash
                               }
 
                             })
@@ -284,16 +288,16 @@ const BulletinScreen = (props) => {
             </View>
 
             {
-              current.QuoteList != undefined &&
+              random.QuoteList != undefined &&
               <>
                 {
-                  current.QuoteList.length > 0 &&
+                  random.QuoteList.length > 0 &&
                   <View style={{
                     ...styles.link_list,
                     backgroundColor: theme.tab_view
                   }}>
                     {
-                      current.QuoteList.map((item, index) => (
+                      random.QuoteList.map((item, index) => (
                         <View
                           key={index}
                           style={{
@@ -307,13 +311,7 @@ const BulletinScreen = (props) => {
                             style={{
                               color: theme.text1,
                               fontSize: 18
-                            }}
-                            onPress={() => props.navigation.push('Bulletin', {
-                              address: item.Address,
-                              sequence: item.Sequence,
-                              hash: item.Hash,
-                              to: current.Address
-                            })}>
+                            }}>
                             {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
                           </Text>
                         </View>
@@ -330,14 +328,14 @@ const BulletinScreen = (props) => {
 }
 
 
-const ReduxBulletinScreen = connect((state) => {
+const ReduxBulletinRandomScreen = connect((state) => {
   return {
     avatar: state.avatar
   }
-})(BulletinScreen)
+})(BulletinRandomScreen)
 
 export default function (props) {
   const navigation = useNavigation()
   const route = useRoute()
-  return <ReduxBulletinScreen{...props} navigation={navigation} route={route} />
+  return <ReduxBulletinRandomScreen{...props} navigation={navigation} route={route} />
 }

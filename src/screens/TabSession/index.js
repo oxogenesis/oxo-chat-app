@@ -121,4 +121,3 @@ const ReduxTabSessionScreen = connect((state) => {
 })(TabSessionScreen)
 
 export default ReduxTabSessionScreen
-

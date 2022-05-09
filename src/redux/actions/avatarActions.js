@@ -346,6 +346,7 @@ export function* loadFromDB(action) {
 }
 
 export function* enableAvatar(action) {
+  // action.seed = ''
   let timestamp = Date.now()
   let keypair = DeriveKeypair(action.seed)
   let address = DeriveAddress(keypair.publicKey)
@@ -718,6 +719,8 @@ export function* SaveBulletin(action) {
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
     let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
 
+    let randonm_bulletin_flag = yield select(state => state.avatar.get('RandomBulletinFlag'))
+
     console.log(quote_white_list)
 
     //check is_file?
@@ -783,11 +786,21 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
     } else if (self_address == object_address) {
       //bulletin from myself
       let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-  VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+      VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
 
       //save bulletin
       yield call([db, db.runSQL], sql)
       yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+    } else if (randonm_bulletin_flag) {
+      //bulletin from myself
+      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+      VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+      //save bulletin
+      yield call([db, db.runSQL], sql)
+      bulletin_json.Address = object_address
+      yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
+      yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
     }
   }
 }
@@ -926,6 +939,13 @@ export function* UpdateFollowBulletin() {
 export function* FetchBulletin(action) {
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genBulletinRequest(action.address, action.sequence, action.to)
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* FetchRandomBulletin() {
+  // let address = yield select(state => state.avatar.get('Address'))
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genBulletinRandom()
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 

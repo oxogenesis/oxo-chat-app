@@ -58,12 +58,15 @@ export const actionType = {
     UnmarkBulletin: "UNMARK_BULLETIN",
     UpdateFollowBulletin: "UPDATE_FOLLOW_BULLETIN",
     setCurrentBulletin: 'SET_CURRENT_BULLETIN',
+    setRandomBulletin: 'SET_RANDOM_BULLETIN',
+    setRandomBulletinFlag: 'SET_RANDOM_BULLETIN_FLAG',
     setCurrentBBSession: 'SET_CURRENT_BB_SESSION',
 
     HandleBulletinRequest: 'HANDLE_BULLETIN_REQUEST',
     SaveBulletin: 'SAVE_BULLETIN',
     // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
+    FetchRandomBulletin: 'FETCH_RANDOM_BULLETIN',
     PublishBulletin: 'PUBLISH_BULLETIN',
 
 

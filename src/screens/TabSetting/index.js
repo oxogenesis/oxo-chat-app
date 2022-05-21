@@ -42,6 +42,7 @@ const TabSettingScreen = (props) => {
         { title: '网络设置', onpress: () => { props.navigation.navigate('SettingNetwork') } },
         { title: '地址管理', onpress: () => { props.navigation.navigate('SettingAddress') } },
         { title: '公告设置', onpress: () => { props.navigation.navigate('SettingBulletin') } },
+        { title: '随便看看', onpress: () => { props.navigation.push('BulletinRandom') } },
       ]} />
       <WhiteSpace size='lg' />
 

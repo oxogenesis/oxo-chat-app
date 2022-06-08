@@ -185,6 +185,29 @@ async function AvatarDerive(strSave, masterKey) {
   }
 }
 
+async function AvatarRemove(address) {
+  try {
+    const result = await AsyncStorage.getItem('<#Avatars#>')
+    // console.log(result)
+    let avatar_list = []
+    if (result != null) {
+      avatar_list = JSON.parse(result)
+      for (let i = 0; i < avatar_list.length; i++) {
+        const avatar = avatar_list[i]
+        if (avatar.Address == address) {
+          avatar_list.splice(i, 1)
+          break
+        }
+      }
+    }
+    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatar_list))
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 function ParseQrcodeAddress(qrcode) {
   try {
     let json = JSON.parse(qrcode)
@@ -274,6 +297,7 @@ export {
   AvatarCreateWithSeed,
   AvatarDerive,
   AvatarNameEdit,
+  AvatarRemove,
   ParseQrcodeAddress,
   ParseQrcodeSeed,
   DHSequence

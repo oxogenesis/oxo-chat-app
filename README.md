@@ -30,6 +30,9 @@
 **[服务端](https://github.com/oxogenesis/oxo-chat-server)**  
 
 # apk
+//to run the code  
+nvm use 14.17.6  
+
 **[apk](https://github.com/oxogenesis/oxo-chat-app/releases)**  
 
 # wiki

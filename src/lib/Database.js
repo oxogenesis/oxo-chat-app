@@ -196,7 +196,11 @@ export default class Database {
   }
 
   runSQL(sql) {
-    console.log(sql)
+    if (sql.indexOf('INSERT') != -1) {
+      console.log('#####################INSERT SQL')
+    } else {
+      console.log(sql)
+    }
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)

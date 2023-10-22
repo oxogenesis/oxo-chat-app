@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
+import BaseImageList from '../BaseImageList'
 import BaseAvatarList from '../BaseAvatarList'
 const Item = List.Item
 
@@ -13,6 +14,7 @@ const TabAddressBookScreen = props => {
 
   const lists = props.avatar.get('AddressArray').map(item => ({
     title: item.Name,
+    address: item.Address,
     onpress: () => props.navigation.push('AddressMark', { address: item.Address })
   }))
 
@@ -32,7 +34,7 @@ const TabAddressBookScreen = props => {
           borderColor: theme.line,
           paddingBottom: 12,
         }}>添加好友</Text>
-        <BaseAvatarList data={[{
+        <BaseImageList data={[{
           title: '扫一扫',
           img: 'sys',
           backgroundColor: '#1296db',

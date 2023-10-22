@@ -4,7 +4,7 @@ import { List, WhiteSpace } from '@ant-design/react-native'
 import { connect } from 'react-redux'
 import { AddressToName } from '../../lib/Util'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseAvatarList from '../BaseAvatarList'
+import BaseImageList from '../BaseImageList'
 const Item = List.Item
 
 //设置
@@ -34,7 +34,7 @@ const AddressSelectScreen = props => {
               borderColor: theme.line,
             }}>全部好友</Text>
             <WhiteSpace />
-            <BaseAvatarList data={lists} />
+            <BaseImageList data={lists} />
           </View>
           :
           <View>

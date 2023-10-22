@@ -185,10 +185,21 @@ async function AvatarDerive(strSave, masterKey) {
   }
 }
 
+function ParseQrcodeAddress(qrcode) {
+  try {
+    let json = JSON.parse(qrcode)
+    let address = oxoKeyPairs.deriveAddress(json.PublicKey)
+    return { Relay: json.Relay, Address: address }
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 async function AvatarRemove(address) {
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
-    // console.log(result)
+    // console.log(result)                                                                                                                             
     let avatar_list = []
     if (result != null) {
       avatar_list = JSON.parse(result)
@@ -202,17 +213,6 @@ async function AvatarRemove(address) {
     }
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatar_list))
     return true
-  } catch (e) {
-    console.log(e)
-    return false
-  }
-}
-
-function ParseQrcodeAddress(qrcode) {
-  try {
-    let json = JSON.parse(qrcode)
-    let address = oxoKeyPairs.deriveAddress(json.PublicKey)
-    return { Relay: json.Relay, Address: address }
   } catch (e) {
     console.log(e)
     return false

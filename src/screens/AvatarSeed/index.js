@@ -37,7 +37,6 @@ const AvatarSeedScreen = (props) => {
     showCopySeed(false)
     showRemoveAvatar(false)
   }
-
   const removeAvatar = () => {
     AvatarRemove(props.avatar.get('Address'))
       .then((result) => {

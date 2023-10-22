@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
@@ -8,6 +8,8 @@ import { Button, Flex } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
 import { styles } from '../../theme/style'
+import { BulletinPreviewSize } from '../../lib/Const'
+import Avatar from '../../component/Avatar'
 
 //公告列表
 const TabBulletinScreen = (props) => {
@@ -97,11 +99,7 @@ const TabBulletinScreen = (props) => {
               borderColor: theme.split_line
             }}>
             <Flex justify="start" align="start">
-              <TouchableOpacity
-                onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
-              >
-                <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
-              </TouchableOpacity>
+              <Avatar address={item.Address} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} />
               <View style={{
                 marginLeft: 8,
               }}>
@@ -109,20 +107,23 @@ const TabBulletinScreen = (props) => {
                   marginBottom: 6
                 }}>
                   {
-                    props.avatar.get('Address') == item.Address ? <View>
-                      <Text style={{
-                        ...styles.name2,
-                        color: theme.link_color,
-                      }}
-                      >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
-                    </View> : <View>
-                      <Text style={{
-                        ...styles.name2,
-                        color: theme.link_color,
-                      }}
-                        onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
-                      >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
-                    </View>
+                    props.avatar.get('Address') == item.Address ?
+                      <View>
+                        <Text style={{
+                          ...styles.name2,
+                          color: theme.link_color,
+                        }}
+                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
+                      </View>
+                      :
+                      <View>
+                        <Text style={{
+                          ...styles.name2,
+                          color: theme.link_color,
+                        }}
+                          onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
+                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
+                      </View>
                   }
                   <Text onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
                     <View style={{
@@ -158,15 +159,24 @@ const TabBulletinScreen = (props) => {
                       来自：◀{item.QuoteSize}</Text>
                   }
                 </View>
-                <View style={styles.content_view}>
-                  <Text style={{
-                    fontSize: 16,
-                    width: '100%',
-                    color: theme.text1
-                  }}
-                    onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                  >{item.Content}</Text>
-                </View>
+                {item.Content.length <= BulletinPreviewSize ?
+                  <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    >{item.Content}</Text>
+                  </View>
+                  : <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    >{item.Content.slice(0, BulletinPreviewSize)}</Text>
+                  </View>
+                }
               </View>
             </Flex>
           </View>
@@ -190,10 +200,8 @@ const ReduxTabBulletinScreen = connect((state) => {
   }
 })(TabBulletinScreen)
 
-export default ReduxTabBulletinScreen
-
-// export default function (props) {
-//   const navigation = useNavigation()
-//   const route = useRoute()
-//   return <ReduxTabBulletinScreen{...props} navigation={navigation} route={route} />
-// }
+export default function (props) {
+  const navigation = useNavigation()
+  const route = useRoute()
+  return <ReduxTabBulletinScreen{...props} navigation={navigation} route={route} />
+}

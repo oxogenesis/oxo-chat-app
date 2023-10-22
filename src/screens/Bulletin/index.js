@@ -10,6 +10,7 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import { Flex } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
+import Avatar from '../../component/Avatar'
 
 //公告列表
 const BulletinScreen = (props) => {
@@ -47,7 +48,7 @@ const BulletinScreen = (props) => {
   }
 
   const quote = () => {
-    Toast.success('引用成功！', 1)
+    Toast.success('引用成功，请去发布公告！', 1)
     setShow(Math.random())
   }
 
@@ -91,12 +92,7 @@ const BulletinScreen = (props) => {
               backgroundColor: theme.base_body
             }}>
               <Flex justify="start" align="start">
-                <TouchableOpacity
-                  onPress={() => props.navigation.push('AddressMark',
-                    { address: current.Address })}
-                >
-                  <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
-                </TouchableOpacity>
+                <Avatar address={current.Address} />
 
                 <View style={{
                   marginLeft: 8
@@ -111,22 +107,173 @@ const BulletinScreen = (props) => {
                           { address: current.Address })}
                       >{AddressToName(props.avatar.get('AddressMap'), current.Address)}&nbsp;&nbsp;</Text>
                     </View>
-                    <Text
-                    // onPress={() => props.navigation.push('Bulletin', { hash: current.Hash })}
-                    >
-                      <View style={{
-                        borderWidth: 1,
-                        borderColor: theme.split_line,
-                        borderRadius: 6,
-                        paddingLeft: 6,
-                        paddingRight: 6,
-                      }}>
+                    {/* <Text onPress={() => props.navigation.push('Bulletin', { hash: current.Hash })}                    > */}
+                    <View style={{
+                      borderWidth: 1,
+                      borderColor: theme.split_line,
+                      borderRadius: 6,
+                      paddingLeft: 6,
+                      paddingRight: 6,
+                    }}>
+                      <Text style={{
+                        color: theme.text1,
+                        fontSize: 18
+                      }}>{`#${current.Sequence}`}</Text>
+                    </View>
+                    <View style={styles.content_view}>
+                      <Text style={styles.desc_view}>
+                      </Text>
+                      <Popover
+                        key={show}
+                        overlay={
+                          <Popover.Item
+                            style={{
+                              backgroundColor: '#434343',
+                              flexDirection: 'row',
+                              justifyContent: 'flex-end',
+                              borderRadius: 5,
+                              borderColor: '#434343',
+                            }}
+                          >
+                            {
+                              current.IsMark == "TRUE" &&
+                              <TouchableOpacity onPress={cancelCollection}>
+                                <View style={styles.icon_view}>
+                                  <Icon
+                                    color='red'
+                                    name="star" size="md"
+                                  />
+                                  <Text style={styles.icon_text}>取消收藏</Text>
+                                </View>
+                              </TouchableOpacity>
+                            }
+                            {
+                              current.IsMark == "FALSE" &&
+                              <TouchableOpacity onPress={handleCollection}>
+                                <View style={styles.icon_view}>
+                                  <Icon
+                                    name='star'
+                                    size="md"
+                                    color='#fff'
+                                  />
+                                  <Text style={styles.icon_text}>收藏</Text>
+                                </View>
+                              </TouchableOpacity>
+
+                            }
+                            {
+                              current.PreHash != GenesisHash &&
+                              <TouchableOpacity onPress={() => {
+                                props.navigation.push('Bulletin', {
+                                  address: current.Address,
+                                  sequence: current.Sequence - 1,
+                                  hash: current.PreHash,
+                                  to: current.Address
+                                })
+                                setShow(Math.random())
+                              }
+                              }>
+                                <View style={styles.icon_view}>
+                                  <Icon
+                                    name='backward'
+                                    size="md"
+                                    color='#fff'
+                                    style={{
+                                      textAlign: 'center'
+                                    }}
+                                  />
+                                  <Text style={styles.icon_text}>上一个</Text>
+                                </View>
+                              </TouchableOpacity>
+
+                            }
+
+                            <TouchableOpacity onPress={() => {
+                              quoteBulletin(current.Address,
+                                current.Sequence,
+                                current.Hash)
+                              quote()
+                            }
+                            }
+                            >
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  name='link'
+                                  size="md"
+                                  color='#fff' />
+                                <Text style={styles.icon_text}>引用</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={() => {
+                              props.navigation.push('AddressSelect', {
+                                content: {
+                                  ObjectType: "Bulletin",
+                                  Address: current.Address,
+                                  Sequence: current.Sequence,
+                                  Hash: current.Hash
+                                }
+
+                              })
+                              setShow(Math.random())
+                            }
+
+                            }>
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  name='branches'
+                                  size="md"
+                                  color='#fff'
+
+                                />
+                                <Text style={styles.icon_text}>分享</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                              copyToClipboard()
+                            }}>
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  name='block'
+                                  color='#fff'
+                                  size="md"
+                                />
+                                <Text style={styles.icon_text}>拷贝</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                              quoteBulletin(current.Address,
+                                current.Sequence,
+                                current.Hash)
+                              props.navigation.push('BulletinPublish')
+                              setShow(Math.random())
+                            }
+
+                            }>
+                              <View style={styles.icon_view}>
+                                <Icon
+                                  name='comment'
+                                  size="md"
+                                  color='#fff'
+                                />
+                                <Text style={styles.icon_text}>评论</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </Popover.Item>
+                        }
+                      >
                         <Text style={{
-                          color: theme.text1,
-                          fontSize: 18
-                        }}>{`#${current.Sequence}`}</Text>
-                      </View>
-                    </Text>
+                          fontSize: 24,
+                          backgroundColor: theme.icon_view,
+                          lineHeight: 20,
+                          width: 32,
+                          height: 25,
+                          textAlign: 'center',
+                          color: theme.text1
+                        }}>...</Text>
+                      </Popover>
+                    </View>
+                    {/* </Text> */}
                   </Text>
                   <Text style={styles.desc_view}>
                     {timestamp_format(current.Timestamp)}
@@ -164,7 +311,7 @@ const BulletinScreen = (props) => {
                                   color='red'
                                   name="star" size="md"
                                 />
-                                <Text style={styles.icon_text}>取消收藏</Text>
+                                <Text style={styles.icon_text}>收藏</Text>
                               </View>
                             </TouchableOpacity>
                           }

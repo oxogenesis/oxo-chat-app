@@ -217,6 +217,7 @@ reducer.prototype[actionType.avatar.setCurrentBulletin] = (state, action) => {
   return state.set('CurrentBulletin', action.bulletin)
 }
 
+
 reducer.prototype[actionType.avatar.setRandomBulletin] = (state, action) => {
   return state.set('RandomBulletin', action.bulletin)
 }

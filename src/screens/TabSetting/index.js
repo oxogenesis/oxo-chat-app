@@ -64,9 +64,9 @@ const TabSettingScreen = (props) => {
           type: actionType.avatar.disableAvatar
         })
         props.navigation.navigate('AvatarList')
-      }}>
-        <Text style={{ color: 'red' }}>切换账户</Text>
-      </Button>
+      }}><Text style={{
+        color: 'red'
+      }}>切换账户</Text></Button>
 
       <WhiteSpace size='lg' />
       <Button style={{

@@ -3,8 +3,31 @@ import { View, Text, TouchableOpacity, Image } from 'react-native'
 import { ThemeContext } from '../../theme/theme-context'
 import styles from './style'
 
-const BaseAvatarList = ({ data = [] }) => {
+const BaseImageList = ({ data = [] }) => {
   const { theme } = useContext(ThemeContext)
+
+  const imgMap = (type, backgroundColor) => {
+    if (type === 'sys') {
+      return <View style={{
+        ...styles.img,
+        backgroundColor: backgroundColor
+      }}><Image style={{
+        width: 32,
+        height: 32
+      }} source={require(`../../assets/sys.png`)}></Image></View>
+
+    } else if (type === 'add') {
+      return <View style={{
+        ...styles.img,
+        backgroundColor: backgroundColor
+      }}><Image style={{
+        width: 32,
+        height: 32
+      }} source={require(`../../assets/add.png`)}></Image></View>
+    } else {
+      return <Image style={styles.img1} source={require(`../../assets/app.png`)}></Image>
+    }
+  }
 
   return (
     <View>
@@ -17,7 +40,9 @@ const BaseAvatarList = ({ data = [] }) => {
               borderColor: theme.line,
               flexDirection: 'row'
             }}>
-              <Image style={styles.img1} source={{ uri: `https://www.gravatar.com/avatar/${item.address}?s=${50}&d=retro&r=g` }}></Image>
+              {
+                imgMap(item.img, item.backgroundColor)
+              }
               <Text style={{
                 color: theme.text1,
                 ...styles.text,
@@ -39,4 +64,4 @@ const BaseAvatarList = ({ data = [] }) => {
   )
 }
 
-export default BaseAvatarList
+export default BaseImageList

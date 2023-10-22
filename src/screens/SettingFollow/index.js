@@ -5,7 +5,7 @@ import { AddressToName } from '../../lib/Util'
 import EmptyView from '../EmptyView'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseAvatarList from '../BaseAvatarList'
+import BaseImageList from '../BaseImageList'
 const Item = List.Item
 
 //关注设置
@@ -25,7 +25,7 @@ const SettingFollowScreen = props => {
       <WhiteSpace size='lg' />
       {
         props.avatar.get('Follows').length > 0 ? <View>
-          <BaseAvatarList data={lists} />
+          <BaseImageList data={lists} />
         </View> : <EmptyView />
       }
     </View >

@@ -71,6 +71,7 @@ const SessionType = {
 
 //Bulletin
 const BulletinPageSize = 50
+const BulletinPreviewSize = 256
 const BulletinTabSession = '<BT>'
 const BulletinMarkSession = '<BM>'
 const BulletinHistorySession = '<BH>'
@@ -94,6 +95,7 @@ export {
   ObjectType,
   SessionType,
   BulletinPageSize,
+  BulletinPreviewSize,
   BulletinTabSession,
   BulletinMarkSession,
   BulletinHistorySession,

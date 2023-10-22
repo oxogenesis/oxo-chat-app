@@ -16,6 +16,11 @@ const AboutScreen = (props) => {
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-client')
   }
 
+  const copyChatApp = () => {
+    Toast.success('拷贝成功！', 1)
+    Clipboard.setString('https://github.com/oxogenesis/oxo-chat-app')
+  }
+
   const copyChatServer = () => {
     Toast.success('拷贝成功！', 1)
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-server')
@@ -36,14 +41,19 @@ const AboutScreen = (props) => {
       backgroundColor: theme.base_view,
       height: '100%'
     }}>
-      <TouchableOpacity onPress={() => { copyChatClient() }}>
-        <Text style={{ color: theme.text2, fontWeight: 'bold' }}>
-          {`客户端源码：https://github.com/oxogenesis/oxo-chat-client`}
-        </Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={() => { copyChatServer() }}>
         <Text style={{ color: theme.text2, fontWeight: 'bold' }}>
           {`服务端源码：https://github.com/oxogenesis/oxo-chat-server`}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => { copyChatApp() }}>
+        <Text style={{ color: theme.text2, fontWeight: 'bold' }}>
+          {`App源码：https://github.com/oxogenesis/oxo-chat-app`}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => { copyChatClient() }}>
+        <Text style={{ color: theme.text2, fontWeight: 'bold' }}>
+          {`客户端源码：https://github.com/oxogenesis/oxo-chat-client`}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { copyWiki() }}>

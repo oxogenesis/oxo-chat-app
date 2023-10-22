@@ -64,7 +64,6 @@ const BulletinPublishScreen = props => {
       {
         props.avatar.get('QuoteList').map((item, index) => (
           <View key={item.Hash}>
-
             <Text style={{
               ...styles.link_list_text,
               color: theme.link_color,

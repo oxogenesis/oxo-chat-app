@@ -5,7 +5,7 @@ import { AddressToName } from '../../lib/Util'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseAvatarList from '../BaseAvatarList'
+import BaseImageList from '../BaseImageList'
 
 const Item = List.Item
 //好友设置
@@ -25,7 +25,7 @@ const SettingFriendScreen = (props) => {
       <WhiteSpace size='lg' />
       {
         props.avatar.get('Friends').length > 0 ? <View>
-          <BaseAvatarList data={lists} />
+          <BaseImageList data={lists} />
         </View> : <EmptyView />
       }
     </View >

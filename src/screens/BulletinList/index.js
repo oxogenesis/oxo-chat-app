@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Image } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
-import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../lib/Const'
+import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession, BulletinPreviewSize } from '../../lib/Const'
 import { timestamp_format, AddressToName } from '../../lib/Util'
 import { Flex, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
@@ -12,7 +12,6 @@ import EmptyView from '../EmptyView'
 
 
 //公告列表
-
 const BulletinListScreen = (props) => {
   const { theme } = useContext(ThemeContext)
 
@@ -115,14 +114,24 @@ const BulletinListScreen = (props) => {
                       来自：◀{item.QuoteSize}</Text>
                   }
                 </View>
-                <View style={styles.content_view}>
-                  <Text style={{
-                    ...styles.content_text,
-                    color: theme.text1
-                  }}
-                    onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                  >{item.Content}</Text>
-                </View>
+                {item.Content.length <= BulletinPreviewSize ?
+                  <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    >{item.Content}</Text>
+                  </View>
+                  : <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    >{item.Content.slice(0, BulletinPreviewSize)}</Text>
+                  </View>
+                }
               </View>
             </Flex>
           </View>

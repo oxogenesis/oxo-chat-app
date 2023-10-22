@@ -5,7 +5,7 @@ import { timestamp_format, AddressToName } from '../../lib/Util'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseAvatarList from '../BaseAvatarList'
+import BaseImageList from '../BaseImageList'
 
 const Item = List.Item
 
@@ -28,7 +28,7 @@ const SettingFriendRequestScreen = props => {
       <WhiteSpace size='lg' />
       {
         data.length > 0 ? <View>
-          <BaseAvatarList data={lists} />
+          <BaseImageList data={lists} />
         </View> : <EmptyView />
       }
     </View >

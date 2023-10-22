@@ -101,7 +101,7 @@ export default class MessageGenerator {
       "Timestamp": timestamp,
       "PublicKey": this.PublicKey
     }
-    console.log(json)
+    // console.log(json)
     return JSON.stringify(this.signJson(json))
   }
 
@@ -113,7 +113,7 @@ export default class MessageGenerator {
       "Timestamp": Date.now(),
       "PublicKey": this.PublicKey,
     }
-    console.log(json)
+    // console.log(json)
     return JSON.stringify(this.signJson(json))
   }
 
@@ -128,7 +128,7 @@ export default class MessageGenerator {
       "Timestamp": timestamp,
       "PublicKey": this.PublicKey,
     }
-    console.log(json)
+    // console.log(json)
     return JSON.stringify(this.signJson(json))
   }
 

@@ -116,7 +116,7 @@ export function* Conn(action) {
       // console.log(`======================================================yield take(channel)`)
       let payload = yield take(channel)
       let json = JSON.parse(payload)
-      console.log(json)
+      // console.log(json)
       //save bulletin from server cache
       if (json.ObjectType == ObjectType.Bulletin && checkBulletinSchema(json)) {
         let address = DeriveAddress(json.PublicKey)
@@ -190,8 +190,8 @@ export function* Conn(action) {
         }
       } else {
         console.log("======================================================json schema invalid...")
-        console.log(payload)
-        console.log(json)
+        // console.log(payload)
+        // console.log(json)
       }
       //yield put(nowPlayingUpdate(stationName, artist, title, artUrl))
     }
@@ -346,7 +346,6 @@ export function* loadFromDB(action) {
 }
 
 export function* enableAvatar(action) {
-  // action.seed = ''
   let timestamp = Date.now()
   let keypair = DeriveKeypair(action.seed)
   let address = DeriveAddress(keypair.publicKey)
@@ -852,7 +851,7 @@ export function* LoadTabBulletinList(action) {
 }
 
 export function* LoadBulletinList(action) {
-  // let self_address = yield select(state => state.avatar.get('Address'))
+  let self_address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
   let sql = ''
   let bulletin_list = []

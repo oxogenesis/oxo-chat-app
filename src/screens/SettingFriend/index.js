@@ -5,15 +5,17 @@ import { AddressToName } from '../../lib/Util'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseImageList from '../BaseImageList'
+import BaseAvatarList from '../BaseAvatarList'
 
 const Item = List.Item
 //好友设置
 
 const SettingFriendScreen = (props) => {
   const { theme } = useContext(ThemeContext)
+
   const lists = props.avatar.get('Friends').map(item => ({
     title: `${AddressToName(props.avatar.get('AddressMap'), item)}`,
+    address: item,
     onpress: () => props.navigation.push('AddressMark', { address: item })
   }))
 
@@ -25,7 +27,7 @@ const SettingFriendScreen = (props) => {
       <WhiteSpace size='lg' />
       {
         props.avatar.get('Friends').length > 0 ? <View>
-          <BaseImageList data={lists} />
+          <BaseAvatarList data={lists} />
         </View> : <EmptyView />
       }
     </View >

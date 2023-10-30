@@ -4,7 +4,7 @@ import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { DefaultHost, Epoch, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
+import { DefaultHost, Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema } from '../../lib/MessageSchemaVerifier'
 import { DHSequence, AesEncrypt, AesDecrypt } from '../../lib/OXO'
 
@@ -64,6 +64,7 @@ function createWebSocketChannel(ws) {
     ws.onmessage = (event) => {
       console.log(`======================================================onmessage`)
       emit(event.data)
+      console.log(event.data)
     }
 
     // Close the channel as appropriate
@@ -113,10 +114,12 @@ export function* Conn(action) {
 
     // Handle messages as they come in
     while (true) {
-      // console.log(`======================================================yield take(channel)`)
+      console.log(`======================================================yield take(channel)`)
       let payload = yield take(channel)
+      console.log(payload)
       let json = JSON.parse(payload)
-      // console.log(json)
+      console.log(json)
+      console.log(`======================================================yield take(channel)`)
       //save bulletin from server cache
       if (json.ObjectType == ObjectType.Bulletin && checkBulletinSchema(json)) {
         let address = DeriveAddress(json.PublicKey)
@@ -372,7 +375,6 @@ export function* enableAvatar(action) {
 
 export function* disableAvatar() {
   let db = yield select(state => state.avatar.get('Database'))
-  let timestamp = Date.now()
 
   // 清理多余缓存公告
   let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
@@ -587,17 +589,29 @@ export function* changeCurrentHost(action) {
 // Bulletin
 export function* HandleBulletinRequest(action) {
   console.log(`===================================================================HandleBulletinRequest`)
-  console.log(action.json)
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let json = action.json
-  let address = DeriveAddress(json.PublicKey)
+  let self_address = yield select(state => state.avatar.get('Address'))
+  let request_address = DeriveAddress(json.PublicKey)
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `SELECT * FROM BULLETINS WHERE address = "${json.Address}" AND sequence = ${json.Sequence} LIMIT 1`
   let item = yield call([db, db.getOne], sql)
   if (item != null) {
     let bulletin = JSON.parse(item.json)
-    let msg = MessageGenerator.genObjectResponse(bulletin, address)
+    let msg = MessageGenerator.genObjectResponse(bulletin, request_address)
     yield put({ type: actionType.avatar.SendMessage, message: msg })
+  } else if (json.Address == self_address && json.Sequence > 1) {
+    // syn self bulletin from server
+    sql = `SELECT * FROM BULLETINS WHERE address = "${self_address}" ORDER BY sequence DESC LIMIT 1`
+    let last_bulletin = yield call([db, db.getOne], sql)
+    let current_sequence = 0
+    if (last_bulletin != null) {
+      current_sequence = last_bulletin.sequence
+    }
+    if (current_sequence < json.Sequence - 1) {
+      console.log(`syn self bulletin from server`)
+      yield put({ type: actionType.avatar.FetchBulletin, address: self_address, sequence: current_sequence + 1, to: request_address })
+    }
   }
 }
 
@@ -659,7 +673,7 @@ export function* clearBulletinCache() {
 }
 
 export function* PublishBulletin(action) {
-  //console.log(`=================================================PublishBulletin`)
+  console.log(`=================================================PublishBulletin`)
   let address = yield select(state => state.avatar.get('Address'))
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `SELECT * FROM BULLETINS WHERE address = "${address}" ORDER BY sequence DESC LIMIT 1`
@@ -720,7 +734,7 @@ export function* SaveBulletin(action) {
 
     let randonm_bulletin_flag = yield select(state => state.avatar.get('RandomBulletinFlag'))
 
-    console.log(quote_white_list)
+    // console.log(quote_white_list)
 
     //check is_file?
     let is_file = false
@@ -899,11 +913,16 @@ export function* LoadBulletinList(action) {
     if (bulletin_list.length != 0) {
       next_sequence = bulletin_list[0].Sequence + 1
     }
-    yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: action.address })
+    if (action.address != self_address) {
+      yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: action.address })
+    } else {
+      yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: GenesisAddress })
+    }
   }
 }
 
 export function* UpdateFollowBulletin() {
+  console.log(`=================================================UpdateFollowBulletin`)
   let db = yield select(state => state.avatar.get('Database'))
   let follow_list = yield select(state => state.avatar.get('Follows'))
   let sql = `SELECT * FROM BULLETINS GROUP BY address`
@@ -933,6 +952,16 @@ export function* UpdateFollowBulletin() {
   for (let i = follow_list.length - 1; i >= 0; i--) {
     yield put({ type: actionType.avatar.FetchBulletin, address: follow_list[i], sequence: address_next_sequence[follow_list[i]], to: follow_list[i] })
   }
+
+  //fetch self next bulletin
+  let self_address = yield select(state => state.avatar.get('Address'))
+  sql = `SELECT * FROM BULLETINS WHERE address = "${self_address}" ORDER BY sequence DESC LIMIT 1`
+  let last_bulletin = yield call([db, db.getOne], sql)
+  let current_sequence = 0
+  if (last_bulletin != null) {
+    current_sequence = last_bulletin.sequence
+  }
+  yield put({ type: actionType.avatar.FetchBulletin, address: self_address, sequence: current_sequence + 1, to: GenesisAddress })
 }
 
 export function* FetchBulletin(action) {

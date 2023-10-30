@@ -7,6 +7,7 @@ const DefaultBulletinCacheSize = 0
 const Epoch = 1320981071000
 
 //const GenesisHash = quarterSHA512('obeTvR9XDbUwquA6JPQhmbgaCCaiFa2rvf')
+const GenesisAddress = 'obeTvR9XDbUwquA6JPQhmbgaCCaiFa2rvf'
 const GenesisHash = 'F4C2EB8A3EBFC7B6D81676D79F928D0E'
 
 const MessageInterval = 1000
@@ -85,6 +86,7 @@ export {
   DefaultTheme,
   DefaultBulletinCacheSize,
   Epoch,
+  GenesisAddress,
   GenesisHash,
   MessageInterval,
   ActionCode,

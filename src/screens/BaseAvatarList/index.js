@@ -17,7 +17,7 @@ const BaseAvatarList = ({ data = [] }) => {
               borderColor: theme.line,
               flexDirection: 'row'
             }}>
-              <Image style={styles.img1} source={{ uri: `https://www.gravatar.com/avatar/${item.address}?s=${50}&d=retro&r=g` }}></Image>
+              <Image style={styles.img1} defaultSource={require('../../assets/app.png')} source={{ uri: `https://www.gravatar.com/avatar/${item.address}?s=${50}&d=retro&r=g` }}></Image>
               <Text style={{
                 color: theme.text1,
                 ...styles.text,

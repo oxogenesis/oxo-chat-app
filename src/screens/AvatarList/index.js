@@ -9,6 +9,7 @@ import { styles } from '../../theme/style'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
 import { useNavigation, useRoute } from '@react-navigation/native'
+import Avatar from '../../component/Avatar'
 
 //登录界面
 const AvatarListScreen = props => {
@@ -78,7 +79,7 @@ const AvatarListScreen = props => {
               >
                 <Flex>
                   <Flex.Item style={{ flex: 0.1 }}>
-                    <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                    <Avatar address={item.Address} />
                   </Flex.Item>
                   <Flex.Item >
                     <Text style={{

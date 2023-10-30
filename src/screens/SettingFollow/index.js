@@ -5,7 +5,7 @@ import { AddressToName } from '../../lib/Util'
 import EmptyView from '../EmptyView'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseImageList from '../BaseImageList'
+import BaseAvatarList from '../BaseAvatarList'
 const Item = List.Item
 
 //关注设置
@@ -14,6 +14,7 @@ const SettingFollowScreen = props => {
 
   const lists = props.avatar.get('Follows').map(item => ({
     title: `${AddressToName(props.avatar.get('AddressMap'), item)}`,
+    address: item,
     onpress: () => props.navigation.push('AddressMark', { address: item })
   }))
 
@@ -25,7 +26,7 @@ const SettingFollowScreen = props => {
       <WhiteSpace size='lg' />
       {
         props.avatar.get('Follows').length > 0 ? <View>
-          <BaseImageList data={lists} />
+          <BaseAvatarList data={lists} />
         </View> : <EmptyView />
       }
     </View >

@@ -5,7 +5,7 @@ import { timestamp_format, AddressToName } from '../../lib/Util'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
-import BaseImageList from '../BaseImageList'
+import BaseAvatarList from '../BaseAvatarList'
 
 const Item = List.Item
 
@@ -16,6 +16,7 @@ const SettingFriendRequestScreen = props => {
   const lists = data.map(item => ({
     title: `${AddressToName(props.avatar.get('AddressMap'), item.Address)}`,
     desc: timestamp_format(item.Timestamp),
+    address: item,
     onpress: () => props.navigation.push('AddressMark', { address: item.Address })
   }))
 
@@ -28,7 +29,7 @@ const SettingFriendRequestScreen = props => {
       <WhiteSpace size='lg' />
       {
         data.length > 0 ? <View>
-          <BaseImageList data={lists} />
+          <BaseAvatarList data={lists} />
         </View> : <EmptyView />
       }
     </View >

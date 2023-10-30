@@ -51,91 +51,94 @@ const BulletinListScreen = (props) => {
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
       {
-        props.avatar.get('BulletinList').length > 0 ? props.avatar.get('BulletinList').map((item, index) => (
-          <View
-            key={index}
-            style={{
-              ...styles.list_border,
-              borderBottomColor: theme.split_line
-            }}>
-            <Flex justify="start" align="start">
-              <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
-              <View style={{
-                marginLeft: 8,
+        props.avatar.get('BulletinList').length > 0 ?
+          props.avatar.get('BulletinList').map((item, index) => (
+            <View
+              key={index}
+              style={{
+                ...styles.list_border,
+                borderBottomColor: theme.split_line
               }}>
-                <Text style={{
-                  marginBottom: 6
+              <Flex justify="start" align="start">
+                <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                <View style={{
+                  marginLeft: 8,
                 }}>
-                  {
-                    props.avatar.get('Address') == item.Address ? <View>
-                      <Text style={{
-                        ...styles.name2,
-                        color: theme.link_color,
-                      }}
-                      >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
-                    </View> : <View>
-                      <Text style={{
-                        ...styles.name2,
-                        color: theme.link_color,
-                      }}
-                        onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
-                      >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
-                    </View>
-                  }
-                  <Text onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
-                    <View style={{
-                      borderWidth: 1,
-                      borderColor: theme.split_line,
-                      borderRadius: 6,
-                      paddingLeft: 6,
-                      paddingRight: 6,
-
-                    }}>
-                      <Text style={{
-                        color: theme.text1,
-                        fontSize: 16
-                      }}>{item.Sequence}</Text>
-                    </View>
-                  </Text>
-                </Text>
-
-
-                <View style={styles.content_view}>
-                  <WhiteSpace size='lg' />
                   <Text style={{
-                    ...styles.format_text1,
-                    color: theme.text2
-                  }}>{timestamp_format(item.Timestamp)}</Text>
-                  {
-                    item.QuoteSize != 0 && <Text style={{
-                      ...styles.format_text2,
+                    marginBottom: 6
+                  }}>
+                    {
+                      props.avatar.get('Address') == item.Address ? <View>
+                        <Text style={{
+                          ...styles.name2,
+                          color: theme.link_color,
+                        }}
+                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
+                      </View> : <View>
+                        <Text style={{
+                          ...styles.name2,
+                          color: theme.link_color,
+                        }}
+                          onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
+                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
+                      </View>
+                    }
+                    <Text onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
+                      <View style={{
+                        borderWidth: 1,
+                        borderColor: theme.split_line,
+                        borderRadius: 6,
+                        paddingLeft: 6,
+                        paddingRight: 6,
+
+                      }}>
+                        <Text style={{
+                          color: theme.text1,
+                          fontSize: 16
+                        }}>{item.Sequence}</Text>
+                      </View>
+                    </Text>
+                  </Text>
+
+
+                  <View style={styles.content_view}>
+                    <WhiteSpace size='lg' />
+                    <Text style={{
+                      ...styles.format_text1,
                       color: theme.text2
-                    }}>
-                      来自：◀{item.QuoteSize}</Text>
+                    }}>{timestamp_format(item.Timestamp)}</Text>
+                    {
+                      item.QuoteSize != 0 && <Text style={{
+                        ...styles.format_text2,
+                        color: theme.text2
+                      }}>
+                        来自：◀{item.QuoteSize}</Text>
+                    }
+                  </View>
+                  {item.Content.length <= BulletinPreviewSize ?
+                    <View style={styles.content_view}>
+                      <Text style={{
+                        ...styles.content_text,
+                        color: theme.text1
+                      }}
+                        onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                      >{item.Content}</Text>
+                    </View>
+                    : <View style={styles.content_view}>
+                      <Text style={{
+                        ...styles.content_text,
+                        color: theme.text1
+                      }}
+                        onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                      >{item.Content.slice(0, BulletinPreviewSize)}</Text>
+                    </View>
                   }
                 </View>
-                {item.Content.length <= BulletinPreviewSize ?
-                  <View style={styles.content_view}>
-                    <Text style={{
-                      ...styles.content_text,
-                      color: theme.text1
-                    }}
-                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                    >{item.Content}</Text>
-                  </View>
-                  : <View style={styles.content_view}>
-                    <Text style={{
-                      ...styles.content_text,
-                      color: theme.text1
-                    }}
-                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                    >{item.Content.slice(0, BulletinPreviewSize)}</Text>
-                  </View>
-                }
-              </View>
-            </Flex>
-          </View>
-        )) : <EmptyView />
+              </Flex>
+            </View>
+          ))
+          :
+          <EmptyView />
       }
     </ScrollView >
   )

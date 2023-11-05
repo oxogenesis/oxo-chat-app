@@ -23,7 +23,7 @@ const UnlockScreen = (props) => {
           })
           setKey('')
           setMsg('')
-          props.navigation.navigate('AvatarList')
+          props.navigation.replace('AvatarList')
         } else {
           setKey('')
           setMsg('invalid MasterKey...')

@@ -131,8 +131,16 @@ async function AvatarCreateWithSeed(name, seed, password) {
     if (result != null) {
       avatarList = JSON.parse(result)
     }
-    avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
-    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+    let new_flag = true
+    avatarList.forEach(avatar => {
+      if (avatar.Address == address) {
+        new_flag = false
+      }
+    })
+    if (new_flag) {
+      avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
+      await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+    }
     return true
   } catch (e) {
     console.log(e)

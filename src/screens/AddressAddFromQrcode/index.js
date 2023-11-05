@@ -13,7 +13,7 @@ const AddressAddFromQrcodeScreen = (props) => {
   const { theme } = useContext(ThemeContext)
 
   const markAddress = () => {
-    props.navigation.navigate('AddressAdd', { address: address })
+    props.navigation.replace('AddressAdd', { address: address })
   }
 
   const addHost = () => {
@@ -26,7 +26,7 @@ const AddressAddFromQrcodeScreen = (props) => {
         host: host
       })
     }
-    props.navigation.navigate('AddressAdd', { address: address })
+    props.navigation.replace('AddressAdd', { address: address })
   }
 
   useEffect(() => {

@@ -127,7 +127,7 @@ const BulletinRandomScreen = (props) => {
                   onPress={() => props.navigation.push('AddressMark',
                     { address: random.Address })}
                 >
-                  <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                  <AvatarImage address={random.address} />
                 </TouchableOpacity>
 
                 <View style={{

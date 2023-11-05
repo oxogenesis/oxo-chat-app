@@ -44,7 +44,10 @@ const AvatarSeedScreen = (props) => {
           props.dispatch({
             type: actionType.avatar.disableAvatar
           })
-          props.navigation.navigate('AvatarList')
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: 'AvatarList' }],
+          });
         }
       })
   }

@@ -81,7 +81,7 @@ const TabHomeScreen = (props) => {
           />
         )
       }} />
-      <Tab.Screen name="TabSetting" component={TabSettingScreen} options={{
+      <Tab.Screen name="设置" component={TabSettingScreen} options={{
         tabBarLabel: '设置',
         headerShown: false,
         tabBarIcon: ({ color, focusd }) => (

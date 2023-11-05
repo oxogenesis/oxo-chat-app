@@ -138,7 +138,7 @@ const SessionScreen = (props) => {
               <View key={item.Hash}>
                 <Flex justify="start" align="start">
                   <View>
-                    <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                    <AvatarImage address={item.SourAddress} />
                   </View>
                   <View
                     style={styles.view1}

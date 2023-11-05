@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity, Image } from 'react-native'
 import { ThemeContext } from '../../theme/theme-context'
 import styles from './style'
+import AvatarImage from '../../component/AvatarImage'
 
 const BaseAvatarList = ({ data = [] }) => {
   const { theme } = useContext(ThemeContext)
@@ -17,7 +18,7 @@ const BaseAvatarList = ({ data = [] }) => {
               borderColor: theme.line,
               flexDirection: 'row'
             }}>
-              <Image style={styles.img1} defaultSource={require('../../assets/app.png')} source={{ uri: `https://www.gravatar.com/avatar/${item.address}?s=${50}&d=retro&r=g` }}></Image>
+              <AvatarImage address={item.address} />
               <Text style={{
                 color: theme.text1,
                 ...styles.text,

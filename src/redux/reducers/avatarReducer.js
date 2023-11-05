@@ -29,6 +29,7 @@ function initialState() {
       FriendRequests: [],
       Follows: [],
 
+      // Bulletin
       TabBulletinList: [],
       BulletinList: [],
       CurrentBBSession: null,
@@ -39,6 +40,7 @@ function initialState() {
       QuoteWhiteList: [],
       BulletinCacheSize: DefaultBulletinCacheSize,
 
+      // Chat
       SessionMap: {},
       SessionList: [],
       UnreadMessage: 0,
@@ -112,6 +114,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('PrivateKey', null)
     .set('Database', null)
     .set('CurrentHost', null)
+    // Bulletin
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
     .set('RandomBulletin', null)
@@ -126,6 +129,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    // Chat
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
@@ -216,7 +220,6 @@ reducer.prototype[actionType.avatar.setBulletinList] = (state, action) => {
 reducer.prototype[actionType.avatar.setCurrentBulletin] = (state, action) => {
   return state.set('CurrentBulletin', action.bulletin)
 }
-
 
 reducer.prototype[actionType.avatar.setRandomBulletin] = (state, action) => {
   return state.set('RandomBulletin', action.bulletin)

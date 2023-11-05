@@ -68,6 +68,7 @@ export const actionType = {
     FetchBulletin: 'FETCH_BULLETIN',
     FetchRandomBulletin: 'FETCH_RANDOM_BULLETIN',
     PublishBulletin: 'PUBLISH_BULLETIN',
+    SaveBulletinDraft: 'SAVE_BULLETIN_DRAFT',
 
 
     //Chat

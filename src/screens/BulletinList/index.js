@@ -9,6 +9,7 @@ import { Flex, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
 import EmptyView from '../EmptyView'
+import AvatarImage from '../../component/AvatarImage'
 
 
 //公告列表
@@ -60,7 +61,7 @@ const BulletinListScreen = (props) => {
                 borderBottomColor: theme.split_line
               }}>
               <Flex justify="start" align="start">
-                <Image style={styles.img_md} source={require('../../assets/app.png')}></Image>
+                <AvatarImage address={item.Address} />
                 <View style={{
                   marginLeft: 8,
                 }}>

@@ -22,7 +22,7 @@ const AvatarCreateScreen = (props) => {
         if (result) {
           setMsg('')
           setName('')
-          props.navigation.navigate('AvatarList')
+          props.navigation.goBack()
         }
       })
   }

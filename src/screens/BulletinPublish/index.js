@@ -1,21 +1,22 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../redux/actions/actionType'
 import { AddressToName } from '../../lib/Util'
-import { Button, List, WhiteSpace } from '@ant-design/react-native'
+import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
 import { styles } from '../../theme/style'
 import { ThemeContext } from '../../theme/theme-context'
+import { ReadDraft } from '../../lib/Util'
 
 //发布公告页面
 const Item = List.Item
 const BulletinPublishScreen = props => {
   const { theme } = useContext(ThemeContext)
-  const [content, setContent] = useState('')
+  const [draft, setDrfat] = useState('')
   const [error_msg, setMsg] = useState('')
 
   const publishBulletin = () => {
-    let newContent = content.trim()
+    let newContent = draft.trim()
     if (newContent == '') {
       setMsg('公告不能为空...')
       return
@@ -24,10 +25,32 @@ const BulletinPublishScreen = props => {
       type: actionType.avatar.PublishBulletin,
       content: newContent
     })
-    setContent('')
+    setDrfat('')
     setMsg('')
     props.navigation.goBack()
   }
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      ReadDraft(props.avatar.get('Address'))
+        .then(saved_draft => {
+          if (saved_draft) {
+            setDrfat(saved_draft)
+          } else {
+            setDrfat('')
+          }
+        })
+    })
+  })
+
+  useEffect(() => {
+    return props.navigation.addListener('blur', () => {
+      props.dispatch({
+        type: actionType.avatar.SaveBulletinDraft,
+        draft: draft
+      })
+    })
+  })
 
   return (
     <View style={{
@@ -39,9 +62,9 @@ const BulletinPublishScreen = props => {
       }}>
         <TextInput
           placeholder="内容"
-          value={content}
+          value={draft}
           multiline={true}
-          onChangeText={text => setContent(text)}
+          onChangeText={text => setDrfat(text)}
           placeholderTextColor={theme.text2}
           numberOfLines={4}
           style={{

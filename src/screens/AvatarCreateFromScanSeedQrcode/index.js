@@ -15,7 +15,7 @@ const AvatarCreateFromScanSeedQrcode = (props) => {
       AvatarCreateWithSeed(result.Name, result.Seed, props.master.get('MasterKey'))
         .then(result => {
           if (result) {
-            props.navigation.replace('AvatarList')
+            props.navigation.goBack()
           }
         })
     }

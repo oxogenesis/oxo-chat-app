@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 function add0(m) { return m < 10 ? '0' + m : m }
 
 function timestamp_format(timestamp) {
@@ -26,7 +28,19 @@ function AddressToName(address_map, address) {
     return address
   }
 }
+
+async function ReadDraft(address) {
+  try {
+    const draft = await AsyncStorage.getItem(`${address}#draft`)
+    return draft
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
 export {
   timestamp_format,
-  AddressToName
+  AddressToName,
+  ReadDraft
 }

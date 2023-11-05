@@ -88,7 +88,7 @@ const StackView = (props) => {
                 name={'qrcode'}
                 size={32}
                 color={theme.text1}
-                onPress={() => navigation.navigate('AvatarCreateFromScanSeedQrcode')
+                onPress={() => navigation.replace('AvatarCreateFromScanSeedQrcode')
                 }
               />)
           })

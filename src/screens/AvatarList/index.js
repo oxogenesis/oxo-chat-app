@@ -9,7 +9,7 @@ import { styles } from '../../theme/style'
 import EmptyView from '../EmptyView'
 import { ThemeContext } from '../../theme/theme-context'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import Avatar from '../../component/Avatar'
+import AvatarImage from '../../component/AvatarImage'
 
 //登录界面
 const AvatarListScreen = props => {
@@ -55,7 +55,7 @@ const AvatarListScreen = props => {
       type: actionType.master.setMasterKey,
       MasterKey: null
     })
-    props.navigation.navigate('Unlock')
+    props.navigation.replace('Unlock')
   }
 
   return (
@@ -79,7 +79,7 @@ const AvatarListScreen = props => {
               >
                 <Flex>
                   <Flex.Item style={{ flex: 0.1 }}>
-                    <Avatar address={item.Address} />
+                    <AvatarImage address={item.Address} />
                   </Flex.Item>
                   <Flex.Item >
                     <Text style={{

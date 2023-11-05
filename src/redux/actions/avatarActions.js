@@ -715,6 +715,16 @@ VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_
   let msg = MessageGenerator.genObjectResponse(bulletin_json, address)
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
+export function* SaveBulletinDraft(action) {
+  console.log(`=================================================SaveBulletinDraft`)
+  let self_address = yield select(state => state.avatar.get('Address'))
+  try {
+    AsyncStorage.setItem(`${self_address}#draft`, action.draft).then(() => {
+    })
+  } catch (e) {
+    console.log(e)
+  }
+}
 
 export function* SaveBulletin(action) {
   let bulletin_json = action.bulletin_json

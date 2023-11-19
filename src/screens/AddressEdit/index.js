@@ -16,12 +16,12 @@ const AddressEditScreen = (props) => {
   const { theme } = useContext(ThemeContext)
 
   const saveAddressName = () => {
-    let address = address
     let newName = name.trim()
     if (name == '') {
       setMsg('name could not be blank...')
       return
     }
+    console.log(address)
     props.dispatch({
       type: actionType.avatar.saveAddressName,
       address: address,
@@ -37,8 +37,23 @@ const AddressEditScreen = (props) => {
     }}>
       <Text style={{
         color: theme.text1
-      }}>地址：{address}</Text>
+      }}>地址：</Text>
       <WhiteSpace size='lg' />
+      <TextInput
+        placeholderTextColor={theme.text2}
+        style={{
+          ...styles.input_view,
+          color: theme.text1
+        }}
+        placeholder="地址"
+        value={address}
+        editable={false}
+        multiline={false}
+        onChangeText={text => setAddress(text)}
+      />
+      <Text style={{
+        color: theme.text1
+      }}>昵称：</Text>
       <TextInput
         placeholderTextColor={theme.text2}
         style={{

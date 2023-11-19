@@ -156,7 +156,7 @@ const TabBulletinScreen = (props) => {
                       ...styles.form_view,
                       color: theme.text2
                     }}>
-                      来自：◀{item.QuoteSize}</Text>
+                      引用：◀{item.QuoteSize}</Text>
                   }
                 </View>
                 {item.Content.length <= BulletinPreviewSize ?

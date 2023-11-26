@@ -106,7 +106,7 @@ async function AvatarCreateNew(name, password) {
     if (result != null) {
       avatarList = JSON.parse(result)
     }
-    avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
+    avatarList.unshift({ Name: name, Address: address, save: JSON.stringify(save), LoginAt: Date.now() })
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {
@@ -138,7 +138,7 @@ async function AvatarCreateWithSeed(name, seed, password) {
       }
     })
     if (new_flag) {
-      avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
+      avatarList.unshift({ Name: name, Address: address, save: JSON.stringify(save), LoginAt: Date.now() })
       await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     }
     return true
@@ -171,7 +171,58 @@ async function AvatarNameEdit(name, seed, password) {
       })
       avatarList = tmp
     }
-    avatarList.push({ Name: name, Address: address, save: JSON.stringify(save) })
+    avatarList.push({ Name: name, Address: address, save: JSON.stringify(save), LoginAt: Date.now() })
+    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
+async function AvatarLoginTimeReset(timestamp) {
+  try {
+    const result = await AsyncStorage.getItem('<#Avatars#>')
+    let avatarList = []
+    if (result != null) {
+      avatarList = JSON.parse(result)
+      let tmp = []
+      avatarList.forEach(avatar => {
+        avatar.LoginAt = timestamp
+        tmp.push(avatar)
+      })
+      avatarList = tmp
+    }
+    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
+async function AvatarLoginTimeUpdate(address) {
+  console.log(`AvatarLoginTimeUpdate::::address}`)
+  try {
+    const result = await AsyncStorage.getItem('<#Avatars#>')
+    let avatarList = []
+    let logout_avatar = null
+    if (result != null) {
+      avatarList = JSON.parse(result)
+      let tmp = []
+      avatarList.forEach(avatar => {
+        if (avatar.Address != address) {
+          tmp.push(avatar)
+        } else {
+          logout_avatar = avatar
+          logout_avatar.LoginAt = Date.now()
+        }
+      })
+      avatarList = tmp
+    }
+    if (logout_avatar != null) {
+      avatarList.unshift(logout_avatar)
+    }
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {
@@ -304,6 +355,8 @@ export {
   AvatarCreateNew,
   AvatarCreateWithSeed,
   AvatarDerive,
+  AvatarLoginTimeReset,
+  AvatarLoginTimeUpdate,
   AvatarNameEdit,
   AvatarRemove,
   ParseQrcodeAddress,

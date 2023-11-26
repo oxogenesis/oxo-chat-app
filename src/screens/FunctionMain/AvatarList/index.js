@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { Button, WhiteSpace, Flex } from '@ant-design/react-native'
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AvatarDerive } from '../../../lib/OXO'
+import { AvatarDerive, AvatarLoginTimeReset } from '../../../lib/OXO'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { styles } from '../../../theme/style'
@@ -10,6 +10,7 @@ import EmptyView from '../../FunctionBase/EmptyView'
 import { ThemeContext } from '../../../theme/theme-context'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import AvatarImage from '../../../component/AvatarImage'
+import { timestamp_format } from '../../../lib/Util'
 import tw from 'twrnc'
 
 //账号选择界面
@@ -21,7 +22,20 @@ const AvatarListScreen = props => {
     try {
       AsyncStorage.getItem('<#Avatars#>').then(result => {
         if (result != null) {
-          setList(JSON.parse(result))
+          let list = JSON.parse(result)
+          let timestamp = Date.now()
+          if (list.length > 0 && list[0].LoginAt == null) {
+            for (let i = 0; i < list.length; i++) {
+              list[i].LoginAt = timestamp;
+            }
+            AvatarLoginTimeReset(timestamp)
+              .then(result => {
+                if (result) {
+                  console.log(`AvatarLoginTimeReset`)
+                }
+              })
+          }
+          setList(list)
         }
       })
     } catch (e) {
@@ -69,26 +83,19 @@ const AvatarListScreen = props => {
         {
           avatarList.length > 0 ? avatarList.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
-              <View style={{
-                ...styles.avatar_list,
-                backgroundColor: theme.base_body
-              }}
-              >
+              <View style={tw`bg-stone-100`}>
                 <Flex>
-                  <Flex.Item style={{ flex: 0.1 }}>
+                  <Flex.Item style={{ flex: 0.2 }}>
                     <AvatarImage address={item.Address} />
                   </Flex.Item>
                   <Flex.Item >
-                    <Text style={{
-                      ...styles.base_text_md,
-                      color: theme.text1
-                    }}>{item.Name}</Text>
-                    <Text style={styles.base_text_id}>{item.Address}</Text>
+                    <Text style={tw.style(`text-xl text-slate-800`)}>{item.Name}</Text>
+                    <Text style={tw.style(`text-sm text-slate-400`)}>@{timestamp_format(item.LoginAt)}</Text>
+                    <Text style={tw.style(`text-sm text-slate-400`)}>{item.Address}</Text>
                   </Flex.Item>
                 </Flex>
               </View>
             </TouchableOpacity>
-
           )) : <EmptyView pTop={1} />
         }
         <WhiteSpace size='lg' />

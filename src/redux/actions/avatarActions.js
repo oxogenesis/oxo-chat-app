@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { DefaultHost, Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema } from '../../lib/MessageSchemaVerifier'
-import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512 } from '../../lib/OXO'
+import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512, AvatarLoginTimeUpdate } from '../../lib/OXO'
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
 
@@ -350,6 +350,9 @@ export function* enableAvatar(action) {
   let timestamp = Date.now()
   let keypair = DeriveKeypair(action.seed)
   let address = DeriveAddress(keypair.publicKey)
+  // 更新登录时间
+  AvatarLoginTimeUpdate(address)
+
   yield put({ type: actionType.avatar.setAvatar, seed: action.seed, name: action.name, address: address, public_key: keypair.publicKey, private_key: keypair.privateKey })
 
   let mg = new MessageGenerator(keypair.publicKey, keypair.privateKey)
@@ -403,6 +406,8 @@ export function* disableAvatar() {
   if (ws != null) {
     yield call([ws, ws.close])
   }
+
+
 }
 
 export function* changeBulletinCacheSize(action) {

@@ -8,7 +8,6 @@ import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import tw from 'twrnc'
 
-
 //发布公告页面
 const Item = List.Item
 const BulletinPublishScreen = props => {
@@ -82,6 +81,9 @@ const BulletinPublishScreen = props => {
           </View>
         }
         <WhiteSpace size='lg' />
+        <Text style={tw.style('text-base', 'text-red-500')}>
+          {`注意：发布内容将以字符串形式进行签名，所有请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）替代，谢谢`}
+        </Text>
       </View>
 
       {
@@ -113,6 +115,7 @@ const BulletinPublishScreen = props => {
           </View>
         ))
       }
+
       <View style={styles.base_view_a}>
         <Button
           style={styles.btn_high}

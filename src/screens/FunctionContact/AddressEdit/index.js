@@ -7,6 +7,7 @@ import { WhiteSpace, Button } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import { AddressToName } from '../../../lib/Util'
+import tw from 'twrnc'
 
 //地址标记
 const AddressEditScreen = (props) => {
@@ -39,7 +40,7 @@ const AddressEditScreen = (props) => {
         color: theme.text1
       }}>地址：</Text>
       <TextInput
-        placeholderTextColor={theme.text2}
+        placeholderTextColor={tw.color('stone-500')}
         style={{
           ...styles.input_view,
           color: theme.text1
@@ -54,7 +55,7 @@ const AddressEditScreen = (props) => {
         color: theme.text1
       }}>昵称：</Text>
       <TextInput
-        placeholderTextColor={theme.text2}
+        placeholderTextColor={tw.color('stone-500')}
         style={{
           ...styles.input_view,
           color: theme.text1
@@ -68,7 +69,7 @@ const AddressEditScreen = (props) => {
       {
         error_msg.length > 0 &&
         <View>
-          <Text style={styles.required_text}>{error_msg}</Text>
+          <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
           <WhiteSpace size='lg' />
         </View>
       }

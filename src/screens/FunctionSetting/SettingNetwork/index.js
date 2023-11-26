@@ -8,6 +8,7 @@ import { ThemeContext } from '../../../theme/theme-context'
 import AlertView from '../../FunctionBase/AlertView'
 
 import { Button, WhiteSpace } from '@ant-design/react-native'
+import tw from 'twrnc'
 
 //网络设置
 const SettingNetworkScreen = (props) => {
@@ -88,7 +89,7 @@ const SettingNetworkScreen = (props) => {
           placeholder="ws://或者wss://"
           value={host_input}
           onChangeText={setHost}
-          placeholderTextColor={theme.text2}
+          placeholderTextColor={tw.color('stone-500')}
           style={{
             ...styles.input_view,
             color: theme.text1,
@@ -99,7 +100,7 @@ const SettingNetworkScreen = (props) => {
         {
           error_msg.length > 0 &&
           <View>
-            <Text style={{ color: 'red' }}>{error_msg}</Text>
+            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
             <WhiteSpace size='lg' />
           </View>
         }

@@ -86,7 +86,6 @@ const BulletinInfoScreen = (props) => {
       }
     </View>
   )
-
 }
 
 const ReduxBulletinInfoScreen = connect((state) => {

@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react'
 import { View, Text, TextInput } from 'react-native'
-import { Button, WhiteSpace } from '@ant-design/react-native'
+import { Button } from '@ant-design/react-native'
 import { AvatarCreateNew } from '../../../lib/OXO'
 import { connect } from 'react-redux'
-import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import tw from 'twrnc'
 
 //口令创建账户
 const AvatarCreateScreen = (props) => {
@@ -28,34 +28,25 @@ const AvatarCreateScreen = (props) => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view
-    }}>
-      <WhiteSpace />
-      <TextInput
-        placeholder="昵称"
-        placeholderTextColor={theme.text2}
-        style={{
-          ...styles.input_view,
-          color: theme.text1,
-        }}
-        value={name}
-        onChangeText={text => setName(text)}
-      />
-      <WhiteSpace size='lg' />
-      {
-        error_msg.length > 0 &&
-        <View>
-          <Text style={{ color: 'red' }}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
-      }
-      <Button style={{
-        height: 55
-      }} type='primary' onPress={() => createAvatar()}>
-        生成
-      </Button>
+    <View style={tw`h-full bg-stone-200`}>
+      <View style={tw.style(`my-auto`)}>
+        <TextInput
+          placeholder="昵称"
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          value={name}
+          onChangeText={text => setName(text)}
+        />
+        {
+          error_msg.length > 0 &&
+          <View>
+            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
+          </View>
+        }
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => createAvatar()}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>本地生成</Text>
+        </Button>
+      </View>
     </View>
   )
 

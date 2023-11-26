@@ -8,7 +8,7 @@ import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 const Item = List.Item
 
-//聊天对象列表
+//聊天Tab
 const TabSessionScreen = (props) => {
 
   const { theme } = useContext(ThemeContext)

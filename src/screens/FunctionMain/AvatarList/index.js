@@ -10,8 +10,9 @@ import EmptyView from '../../FunctionBase/EmptyView'
 import { ThemeContext } from '../../../theme/theme-context'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import AvatarImage from '../../../component/AvatarImage'
+import tw from 'twrnc'
 
-//登录界面
+//账号选择界面
 const AvatarListScreen = props => {
   const { theme } = useContext(ThemeContext)
   const [avatarList, setList] = useState([])
@@ -59,16 +60,12 @@ const AvatarListScreen = props => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view_r,
-      backgroundColor: theme.base_view
-    }}>
+    <View style={tw`h-full bg-stone-200`}>
       <ScrollView
         style={styles.scroll_view}
         automaticallyAdjustContentInsets={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
-        <WhiteSpace />
         {
           avatarList.length > 0 ? avatarList.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
@@ -96,8 +93,11 @@ const AvatarListScreen = props => {
         }
         <WhiteSpace size='lg' />
       </ScrollView>
+
       <View style={styles.base_view_a}>
-        <Button style={styles.btn_high} type="warning" onPress={() => lock()}>安全退出</Button>
+        <Button style={tw.style(`rounded-full bg-red-500`)} onPress={() => lock()}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>安全退出</Text>
+        </Button>
       </View>
     </View>
   )

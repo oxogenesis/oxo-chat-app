@@ -12,7 +12,7 @@ import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import Avatar from '../../../component/Avatar'
 
-//公告列表
+//公告详情
 const BulletinScreen = (props) => {
   const { theme } = useContext(ThemeContext)
   const current = props.avatar.get('CurrentBulletin')
@@ -92,8 +92,53 @@ const BulletinScreen = (props) => {
               backgroundColor: theme.base_body
             }}>
               <Flex justify="start" align="start">
-                <Avatar address={current.Address} />
-
+                <View style={{
+                }}>
+                  <Avatar address={current.Address} />
+                  {
+                    current.IsMark == "TRUE" &&
+                    <TouchableOpacity onPress={cancelCollection}>
+                      <View style={styles.icon_view}>
+                        <Icon
+                          color='red'
+                          name="star"
+                          size="md"
+                        />
+                        <Text style={styles.desc_view}>{`取消\n收藏`}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  }
+                  {
+                    current.IsMark == "FALSE" &&
+                    <TouchableOpacity onPress={handleCollection}>
+                      <View style={styles.icon_view}>
+                        <Icon
+                          name='star'
+                          size="md"
+                          color='#888'
+                        />
+                        <Text style={styles.desc_view}>收藏</Text>
+                      </View>
+                    </TouchableOpacity>
+                  }
+                  <TouchableOpacity onPress={() => {
+                    quoteBulletin(current.Address,
+                      current.Sequence,
+                      current.Hash)
+                    props.navigation.push('BulletinPublish')
+                    setShow(Math.random())
+                  }
+                  }>
+                    <View style={styles.icon_view}>
+                      <Icon
+                        name='comment'
+                        size="md"
+                        color='#888'
+                      />
+                      <Text style={styles.desc_view}>评论</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
                 <View style={{
                   marginLeft: 8
                 }}>
@@ -107,7 +152,6 @@ const BulletinScreen = (props) => {
                           { address: current.Address })}
                       >{AddressToName(props.avatar.get('AddressMap'), current.Address)}&nbsp;&nbsp;</Text>
                     </View>
-                    {/* <Text onPress={() => props.navigation.push('Bulletin', { hash: current.Hash })}                    > */}
                     <View style={{
                       borderWidth: 1,
                       borderColor: theme.split_line,
@@ -118,8 +162,37 @@ const BulletinScreen = (props) => {
                       <Text style={{
                         color: theme.text1,
                         fontSize: 18
-                      }}>{`#${current.Sequence}`}</Text>
+                      }}>
+                        {`#${current.Sequence}`}
+                      </Text>
                     </View>
+                    {
+                      current.PreHash != GenesisHash &&
+                      <TouchableOpacity onPress={() => {
+                        props.navigation.push('Bulletin', {
+                          address: current.Address,
+                          sequence: current.Sequence - 1,
+                          hash: current.PreHash,
+                          to: current.Address
+                        })
+                      }
+                      }>
+                        <View style={{
+                          borderWidth: 1,
+                          borderColor: theme.split_line,
+                          borderRadius: 6,
+                          paddingLeft: 6,
+                          paddingRight: 6,
+                        }}>
+                          <Text style={{
+                            color: theme.text1,
+                            fontSize: 18
+                          }}>
+                            上一条
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    }
                     <View style={styles.content_view}>
                       <Text style={styles.desc_view}>
                       </Text>
@@ -135,58 +208,8 @@ const BulletinScreen = (props) => {
                               borderColor: '#434343',
                             }}
                           >
-                            {
-                              current.IsMark == "TRUE" &&
-                              <TouchableOpacity onPress={cancelCollection}>
-                                <View style={styles.icon_view}>
-                                  <Icon
-                                    color='red'
-                                    name="star" size="md"
-                                  />
-                                  <Text style={styles.icon_text}>取消收藏</Text>
-                                </View>
-                              </TouchableOpacity>
-                            }
-                            {
-                              current.IsMark == "FALSE" &&
-                              <TouchableOpacity onPress={handleCollection}>
-                                <View style={styles.icon_view}>
-                                  <Icon
-                                    name='star'
-                                    size="md"
-                                    color='#fff'
-                                  />
-                                  <Text style={styles.icon_text}>收藏</Text>
-                                </View>
-                              </TouchableOpacity>
 
-                            }
-                            {
-                              current.PreHash != GenesisHash &&
-                              <TouchableOpacity onPress={() => {
-                                props.navigation.push('Bulletin', {
-                                  address: current.Address,
-                                  sequence: current.Sequence - 1,
-                                  hash: current.PreHash,
-                                  to: current.Address
-                                })
-                                setShow(Math.random())
-                              }
-                              }>
-                                <View style={styles.icon_view}>
-                                  <Icon
-                                    name='backward'
-                                    size="md"
-                                    color='#fff'
-                                    style={{
-                                      textAlign: 'center'
-                                    }}
-                                  />
-                                  <Text style={styles.icon_text}>上一个</Text>
-                                </View>
-                              </TouchableOpacity>
 
-                            }
 
                             <TouchableOpacity onPress={() => {
                               quoteBulletin(current.Address,
@@ -241,24 +264,7 @@ const BulletinScreen = (props) => {
                                 <Text style={styles.icon_text}>拷贝</Text>
                               </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => {
-                              quoteBulletin(current.Address,
-                                current.Sequence,
-                                current.Hash)
-                              props.navigation.push('BulletinPublish')
-                              setShow(Math.random())
-                            }
 
-                            }>
-                              <View style={styles.icon_view}>
-                                <Icon
-                                  name='comment'
-                                  size="md"
-                                  color='#fff'
-                                />
-                                <Text style={styles.icon_text}>评论</Text>
-                              </View>
-                            </TouchableOpacity>
                           </Popover.Item>
                         }
                       >
@@ -273,11 +279,54 @@ const BulletinScreen = (props) => {
                         }}>...</Text>
                       </Popover>
                     </View>
-                    {/* </Text> */}
                   </Text>
+
                   <Text style={styles.desc_view}>
                     {timestamp_format(current.Timestamp)}
                   </Text>
+
+                  {
+                    current.QuoteList != undefined &&
+                    <>
+                      {
+                        current.QuoteList.length > 0 &&
+                        <View style={{
+                          ...styles.link_list,
+                          backgroundColor: theme.tab_view,
+                          flexDirection: 'row',
+                          flexWrap: 'wrap'
+                        }}>
+                          {
+                            current.QuoteList.map((item, index) => (
+                              <View
+                                key={index}
+                                style={{
+                                  borderWidth: 1,
+                                  borderColor: theme.split_line,
+                                  borderRadius: 6,
+                                  paddingLeft: 6,
+                                  paddingRight: 6
+                                }}>
+                                <Text
+                                  style={{
+                                    color: theme.text1,
+                                    fontSize: 18
+                                  }}
+                                  onPress={() => props.navigation.push('Bulletin', {
+                                    address: item.Address,
+                                    sequence: item.Sequence,
+                                    hash: item.Hash,
+                                    to: current.Address
+                                  })}>
+                                  {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
+                                </Text>
+                              </View>
+                            ))
+                          }
+                        </View>
+                      }
+                    </>
+                  }
 
                   <View style={styles.content_view}>
                     <Text style={{
@@ -290,47 +339,6 @@ const BulletinScreen = (props) => {
                 </View>
               </Flex>
             </View>
-
-            {
-              current.QuoteList != undefined &&
-              <>
-                {
-                  current.QuoteList.length > 0 &&
-                  <View style={{
-                    ...styles.link_list,
-                    backgroundColor: theme.tab_view
-                  }}>
-                    {
-                      current.QuoteList.map((item, index) => (
-                        <View
-                          key={index}
-                          style={{
-                            borderWidth: 1,
-                            borderColor: theme.split_line,
-                            borderRadius: 6,
-                            paddingLeft: 6,
-                            paddingRight: 6,
-                          }}>
-                          <Text
-                            style={{
-                              color: theme.text1,
-                              fontSize: 18
-                            }}
-                            onPress={() => props.navigation.push('Bulletin', {
-                              address: item.Address,
-                              sequence: item.Sequence,
-                              hash: item.Hash,
-                              to: current.Address
-                            })}>
-                            {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                          </Text>
-                        </View>
-                      ))
-                    }
-                  </View>
-                }
-              </>
-            }
           </ScrollView>
       }
     </View>

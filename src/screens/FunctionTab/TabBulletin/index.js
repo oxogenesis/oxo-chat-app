@@ -10,8 +10,9 @@ import { ThemeContext } from '../../../theme/theme-context'
 import { styles } from '../../../theme/style'
 import { BulletinPreviewSize } from '../../../lib/Const'
 import Avatar from '../../../component/Avatar'
+import tw from 'twrnc'
 
-//公告列表
+//公告Tab
 const TabBulletinScreen = (props) => {
   const { theme } = useContext(ThemeContext)
   const [refreshFlag, setRefreshFlag] = useState(false)
@@ -32,7 +33,7 @@ const TabBulletinScreen = (props) => {
     })
   })
 
-  // 向上拉到底部，加载更到本地公告
+  //向上拉到底部，加载更到本地公告
   const loadMore = () => {
     console.log("上拉加载")
     setIsLoadMore(true)
@@ -184,10 +185,9 @@ const TabBulletinScreen = (props) => {
       />
 
       <View style={styles.base_view_a}>
-        <Button
-          style={styles.btn_high}
-          type='primary'
-          onPress={() => props.navigation.navigate('BulletinPublish')}>发布公告</Button>
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => props.navigation.navigate('BulletinPublish')}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>发布公告</Text>
+        </Button>
       </View>
     </View>
   )

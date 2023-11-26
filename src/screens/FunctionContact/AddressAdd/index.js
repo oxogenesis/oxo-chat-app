@@ -5,19 +5,20 @@ import { actionType } from '../../../redux/actions/actionType'
 import { Button, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
 import { styles } from '../../../theme/style'
+import tw from 'twrnc'
 
-//登录界面
+//添加联系人
 const AddressAddScreen = (props) => {
-  const [name, setName] = useState(undefined)
-  const [address, setAddress] = useState(undefined)
+  const [name, setName] = useState("")
+  const [address, setAddress] = useState("")
   const [error_msg, setMsg] = useState('')
   const { theme } = useContext(ThemeContext)
 
   const addAddressMark = () => {
     let newAddress = address.trim()
     let newName = name.trim()
-    if (newAddress == '' || newName == '' || newAddress == newName) {
-      setMsg('地址或昵称不能为空，地址与昵称不能相同...')
+    if (address.trim() == '' || newName == '' || newName.length > 16) {
+      setMsg('地址或昵称不能为空，昵称长度不能超过16个字符...')
       return
     } else if (newAddress == props.avatar.get('Address')) {
       setMsg('不能标记自己...')
@@ -46,7 +47,7 @@ const AddressAddScreen = (props) => {
       backgroundColor: theme.base_view
     }}>
       <TextInput
-        placeholderTextColor={theme.text2}
+        placeholderTextColor={tw.color('stone-500')}
         style={{
           ...styles.input_view,
           color: theme.text1
@@ -57,7 +58,7 @@ const AddressAddScreen = (props) => {
       />
       <WhiteSpace size='lg' />
       <TextInput
-        placeholderTextColor={theme.text2}
+        placeholderTextColor={tw.color('stone-500')}
         style={{
           ...styles.input_view,
           color: theme.text1
@@ -70,12 +71,12 @@ const AddressAddScreen = (props) => {
       {
         error_msg.length > 0 &&
         <View>
-          <Text style={styles.required_text}>{error_msg}</Text>
+          <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
           <WhiteSpace size='lg' />
         </View>
       }
       <Button
-        style={styles.btn_high}
+        style={tw.style('px-4', 'py-1', 'rounded', 'bg-blue-800', 'text-white')}
         type='primary'
         onPress={addAddressMark}
       >

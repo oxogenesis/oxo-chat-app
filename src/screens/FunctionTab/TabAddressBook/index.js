@@ -8,7 +8,7 @@ import BaseImageList from '../../FunctionBase/BaseImageList'
 import BaseAvatarList from '../../FunctionBase/BaseAvatarList'
 const Item = List.Item
 
-//地址薄
+//联系人Tab
 const TabAddressBookScreen = props => {
   const { theme } = useContext(ThemeContext)
 

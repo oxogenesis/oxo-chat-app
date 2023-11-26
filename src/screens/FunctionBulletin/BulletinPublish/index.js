@@ -6,6 +6,8 @@ import { AddressToName, ReadDraft } from '../../../lib/Util'
 import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import tw from 'twrnc'
+
 
 //发布公告页面
 const Item = List.Item
@@ -64,7 +66,7 @@ const BulletinPublishScreen = props => {
           value={draft}
           multiline={true}
           onChangeText={text => setDrfat(text)}
-          placeholderTextColor={theme.text2}
+          placeholderTextColor={tw.color('stone-500')}
           numberOfLines={4}
           style={{
             ...styles.input_view,
@@ -76,8 +78,7 @@ const BulletinPublishScreen = props => {
         {
           error_msg.length > 0 &&
           <View>
-            <Text style={styles.required_text}>{error_msg}</Text>
-            <WhiteSpace size='lg' />
+            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
           </View>
         }
         <WhiteSpace size='lg' />

@@ -5,6 +5,7 @@ import { actionType } from '../../../redux/actions/actionType'
 import { Button, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import tw from 'twrnc'
 
 //缓存设置界面
 const BulletinCacheScreen = (props) => {
@@ -39,7 +40,7 @@ const BulletinCacheScreen = (props) => {
       backgroundColor: theme.base_view
     }}>
       <TextInput
-        placeholderTextColor={theme.text2}
+        placeholderTextColor={tw.color('stone-500')}
         style={{
           ...styles.input_view,
           color: theme.text1
@@ -52,8 +53,7 @@ const BulletinCacheScreen = (props) => {
       {
         error_msg.length > 0 &&
         <View>
-          <Text style={styles.required_text}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
+          <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
         </View>
       }
       <Button style={{

@@ -299,7 +299,7 @@ const SessionScreen = (props) => {
             >发送</Button>
         }
         <TextInput
-          placeholderTextColor={theme.text2}
+          placeholderTextColor={tw.color('stone-500')}
           style={{
             ...styles.input_view,
             color: theme.text1,

@@ -8,7 +8,7 @@ import BaseList from '../../FunctionBase/BaseList'
 import { styles } from '../../../theme/style'
 
 const RadioItem = Radio.RadioItem
-//设置
+//设置Tab
 
 const TabSettingScreen = (props) => {
   const { theme, toggle } = useContext(ThemeContext)

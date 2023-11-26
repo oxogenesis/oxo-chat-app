@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TextInput } from 'react-native'
-import { Button, WhiteSpace } from '@ant-design/react-native'
+import { Button } from '@ant-design/react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { MasterKeyDerive } from '../../../lib/OXO'
 import { ThemeContext } from '../../../theme/theme-context'
-import { styles } from '../../../theme/style'
+import tw from 'twrnc'
 
-//Unlock界面
+//解锁界面
 const UnlockScreen = (props) => {
   const { theme } = useContext(ThemeContext)
   const [master_key, setKey] = useState('')
@@ -26,7 +26,7 @@ const UnlockScreen = (props) => {
           props.navigation.replace('AvatarList')
         } else {
           setKey('')
-          setMsg('invalid MasterKey...')
+          setMsg('无效口令...')
         }
       })
   }
@@ -47,32 +47,26 @@ const UnlockScreen = (props) => {
 
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view
-    }}>
-      <TextInput
-        placeholderTextColor={theme.text1}
-        style={{
-          ...styles.input_view,
-          color: theme.text1,
-          borderColor: theme.border_color
-        }}
-        secureTextEntry={true}
-        placeholder="口令"
-        value={master_key}
-        onChangeText={text => setKey(text)}
-      />
-
-      <WhiteSpace size='lg' />
-      {
-        error_msg.length > 0 &&
-        <View>
-          <Text style={styles.required_text}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
-      }
-      <Button style={styles.btn_high} type='primary' onPress={unlock}><Text>解锁</Text></Button>
+    <View style={tw`h-full bg-stone-200`}>
+      <View style={tw.style(`my-auto`)}>
+        <TextInput
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          secureTextEntry={true}
+          placeholder="口令"
+          value={master_key}
+          onChangeText={text => setKey(text)}
+        />
+        {
+          error_msg.length > 0 &&
+          <View>
+            <Text style={tw.style(`text-base text-red-500 text-center`)}>{error_msg}</Text>
+          </View>
+        }
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={unlock}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>解锁</Text>
+        </Button>
+      </View>
     </View>
   )
 }

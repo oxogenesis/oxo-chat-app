@@ -46,7 +46,7 @@ import AddressScanScreen from '../FunctionContact/AddressScan'
 import { ThemeContext } from '../../theme/theme-context'
 const Stack = createStackNavigator()
 
-const StackView = (props) => {
+const AppStack = (props) => {
   const { theme } = useContext(ThemeContext)
 
   const headerStyleOption = {
@@ -61,9 +61,21 @@ const StackView = (props) => {
 
   return (
     <Stack.Navigator initialRouteName="MasterKey">
-      <Stack.Screen name="MasterKey" component={MasterKeyScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Unlock" component={UnlockScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="TabHome" component={TabHomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="MasterKey"
+        component={MasterKeyScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Unlock"
+        component={UnlockScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TabHome"
+        component={TabHomeScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="AvatarList"
         component={AvatarListScreen}
@@ -81,7 +93,8 @@ const StackView = (props) => {
                 }
               />)
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AvatarCreate"
         component={AvatarCreateScreen}
@@ -98,7 +111,8 @@ const StackView = (props) => {
                 }
               />)
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AvatarCreateFromScanSeedQrcode"
         component={AvatarCreateFromScanSeedQrcodeScreen}
@@ -107,7 +121,8 @@ const StackView = (props) => {
             title: '种子扫描',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="Bulletin"
         component={BulletinScreen}
@@ -123,7 +138,8 @@ const StackView = (props) => {
                 onPress={() => navigation.push('BulletinInfo', { hash: route.params.hash })}
               />)
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="BulletinRandom"
         component={BulletinRandomScreen}
@@ -132,7 +148,8 @@ const StackView = (props) => {
             title: "公告：随便看看",
             ...headerStyleOption
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="Session"
         component={SessionScreen}
@@ -150,7 +167,8 @@ const StackView = (props) => {
                 })}
               />)
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="BulletinList"
         component={BulletinListScreen}
@@ -166,7 +184,8 @@ const StackView = (props) => {
                 onPress={() => navigation.navigate('BulletinPublish')}
               />)
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="BulletinPublish"
         component={BulletinPublishScreen}
@@ -175,7 +194,8 @@ const StackView = (props) => {
             title: "发布公告",
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AddressMark"
         component={AddressMarkScreen}
@@ -184,7 +204,8 @@ const StackView = (props) => {
             title: '用户信息',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AddressAdd"
         component={AddressAddScreen}
@@ -193,7 +214,8 @@ const StackView = (props) => {
             title: '标记地址',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AddressAddFromQrcode"
         component={AddressAddFromQrcodeScreen}
@@ -202,7 +224,8 @@ const StackView = (props) => {
             title: '扫描二维码标记地址',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AddressEdit"
         component={AddressEditScreen}
@@ -211,7 +234,8 @@ const StackView = (props) => {
             title: '编辑用户标记',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AddressSelect"
         component={AddressSelectScreen}
@@ -220,7 +244,8 @@ const StackView = (props) => {
             title: '选择好友',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="BulletinInfo"
         component={BulletinInfoScreen}
@@ -229,7 +254,8 @@ const StackView = (props) => {
             title: '公告信息',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AvatarNameEdit"
         component={AvatarNameEditScreen}
@@ -238,7 +264,8 @@ const StackView = (props) => {
             title: '编辑昵称',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AvatarSeed"
         component={AvatarSeedScreen}
@@ -247,7 +274,8 @@ const StackView = (props) => {
             title: '！！！查看种子！！！',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AvatarSeedQrcode"
         component={AvatarSeedQrcodeScreen}
@@ -256,7 +284,8 @@ const StackView = (props) => {
             title: '！！！种子二维码！！！',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingMe"
         component={SettingMeScreen}
@@ -266,7 +295,8 @@ const StackView = (props) => {
             title: '账户设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingNetwork"
         component={SettingNetworkScreen}
@@ -275,7 +305,8 @@ const StackView = (props) => {
             title: '网络设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingBulletin"
         component={SettingBulletinScreen}
@@ -284,7 +315,8 @@ const StackView = (props) => {
             title: '公告设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="BulletinCache"
         component={BulletinCacheScreen}
@@ -293,7 +325,8 @@ const StackView = (props) => {
             title: '公告缓存设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingAddress"
         component={SettingAddressScreen}
@@ -302,7 +335,8 @@ const StackView = (props) => {
             title: '地址设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="About"
         component={AboutScreen}
@@ -311,7 +345,8 @@ const StackView = (props) => {
             title: '关于',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingFriend"
         component={SettingFriendScreen}
@@ -320,7 +355,8 @@ const StackView = (props) => {
             title: '好友设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingFollow"
         component={SettingFollowScreen}
@@ -329,7 +365,8 @@ const StackView = (props) => {
             title: '关注设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="SettingFriendRequest"
         component={SettingFriendRequestScreen}
@@ -338,7 +375,8 @@ const StackView = (props) => {
             title: '好友申请设置',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
       <Stack.Screen
         name="AddressScan"
         component={AddressScanScreen}
@@ -347,9 +385,10 @@ const StackView = (props) => {
             title: '地址扫描',
             ...headerStyleOption,
           })
-        } />
+        }
+      />
     </Stack.Navigator>
   )
 }
 
-export default StackView
+export default AppStack

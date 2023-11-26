@@ -4,12 +4,12 @@ import { actionType } from '../../../redux/actions/actionType'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MasterKeySet } from '../../../lib/OXO'
 import { connect } from 'react-redux'
-import { Button, WhiteSpace } from '@ant-design/react-native'
-import { styles } from '../../../theme/style'
+import { Button } from '@ant-design/react-native'
 import { DefaultHost, DefaultTheme, DefaultBulletinCacheSize } from '../../../lib/Const'
 import { ThemeContext } from '../../../theme/theme-context'
+import tw from 'twrnc'
 
-//主口令设置界面
+//口令设置界面
 const MasterKeyScreen = props => {
   const { theme } = useContext(ThemeContext)
   const [masterKey, setMasterKey] = useState('')
@@ -101,43 +101,38 @@ const MasterKeyScreen = props => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view
-    }}>
-      <TextInput
-        style={styles.input_view}
-        secureTextEntry={true}
-        placeholder="口令"
-        value={masterKey}
-        onChangeText={text => setMasterKey(text)}
-      />
-      <WhiteSpace size='lg' />
-      <TextInput
-        style={styles.input_view}
-        secureTextEntry={true}
-        placeholder="口令确认"
-        value={confirm}
-        onChangeText={text => setConfirm(text)}
-      />
-      <WhiteSpace size='lg' />
-      {
-        error_msg.length > 0 &&
-        <View>
-          <Text style={styles.required_text}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
-      }
-      <Button style={styles.btn_high} type='primary' onPress={() => saveMasterKey()}>设置</Button>
-
-      <WhiteSpace size='lg' />
-      <Text style={{
-        color: 'red',
-        paddingTop: 0
-      }}>{`说明：
+    <View style={tw`h-full bg-stone-200`}>
+      <View style={tw.style(`my-auto`)}>
+        <TextInput
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          secureTextEntry={true}
+          placeholder="口令"
+          value={masterKey}
+          onChangeText={text => setMasterKey(text)}
+        />
+        <TextInput
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          secureTextEntry={true}
+          placeholder="口令确认"
+          value={confirm}
+          onChangeText={text => setConfirm(text)}
+        />
+        {
+          error_msg.length > 0 &&
+          <View>
+            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
+          </View>
+        }
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => saveMasterKey()}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>
+        </Button>
+        <Text style={tw.style('text-base', 'text-red-500')}>
+          {`说明：
 1、口令用于在本设备上加密/解密账户的种子。
 2、账户的种子是账户的唯一凭证，不可泄漏、灭失，应做好备份。
-3、本地存储的聊天和公告，未进行加密，如需销毁，请删除应用或相关数据。`}</Text>
+3、本地存储的聊天和公告，未进行加密，如需销毁，请删除应用或相关数据。`}
+        </Text>
+      </View>
     </View>
   )
 }

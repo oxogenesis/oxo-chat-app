@@ -5,9 +5,7 @@ import AvatarImage from './AvatarImage'
 
 export default function Avatar(props) {
   return (
-    <TouchableOpacity
-      onPress={props.onPress}
-    >
+    <TouchableOpacity onPress={props.onPress}    >
       <AvatarImage address={props.address} />
     </TouchableOpacity>
   )

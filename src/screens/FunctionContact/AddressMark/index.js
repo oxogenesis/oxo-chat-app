@@ -6,10 +6,10 @@ import { actionType } from '../../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
-import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import AlertView from '../../FunctionBase/AlertView'
 import BaseList from '../../FunctionBase/BaseList'
+import tw from 'twrnc'
 
 const Item = List.Item
 const Brief = Item.Brief
@@ -172,42 +172,27 @@ const AddressMarkScreen = (props) => {
           }
 
           {
-            IsMark && <Button style={{
-              height: 55,
-              backgroundColor: theme.base_body,
-              borderColor: theme.line,
-            }}
-              onPress={delAddressMark}
-            ><Text style={{
-              color: 'red',
-            }}>删除</Text></Button>
+            IsMark &&
+            <Button style={tw.style(`rounded-full bg-red-500`)} onPress={delAddressMark}>
+              <Text style={tw.style(`text-xl text-slate-100`)}>删除</Text>
+            </Button>
           }
           {
             IsMark && <WhiteSpace size='lg' />
           }
           {
-            IsMark && currentFriend && <Button
-              style={{
-                height: 55,
-                backgroundColor: theme.base_body,
-                borderColor: theme.line,
-              }}
-              onPress={() =>
-                props.navigation.push('Session', { address: Address })}
-            ><Text style={{
-              color: '#389e0d'
-            }}>开始聊天</Text></Button>
+            IsMark && currentFriend &&
+            <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() =>
+              props.navigation.push('Session', { address: Address })}>
+              <Text style={tw.style(`text-xl text-slate-100`)}>开始聊天</Text>
+            </Button>
           }
 
           {
             !IsMark &&
-            <Button
-              style={styles.btn_high}
-              type='primary'
-              onPress={() => props.navigation.navigate('AddressAdd',
-                { address: Address })}
-            >
-              标记地址
+            <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => props.navigation.navigate('AddressAdd',
+              { address: Address })}>
+              <Text style={tw.style(`text-xl text-slate-100`)}>标记地址</Text>
             </Button>
           }
         </>

@@ -7,6 +7,7 @@ import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import tw from 'twrnc'
+import LinkPublishQuote from '../../../component/LinkPulishQuote'
 
 //发布公告页面
 const Item = List.Item
@@ -70,7 +71,7 @@ const BulletinPublishScreen = props => {
           style={{
             ...styles.input_view,
             color: theme.text1,
-            height: 200,
+            height: 400,
             textAlignVertical: 'top'
           }}
         />
@@ -80,50 +81,50 @@ const BulletinPublishScreen = props => {
             <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
           </View>
         }
-        <WhiteSpace size='lg' />
-        <Text style={tw.style('text-base', 'text-red-500')}>
-          {`注意：发布内容将以字符串形式进行签名，所有请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）替代，谢谢`}
-        </Text>
+
       </View>
 
       {
-        props.avatar.get('QuoteList').map((item, index) => (
-          <View key={item.Hash}>
-            <Text style={{
-              ...styles.link_list_text,
-              color: theme.link_color,
-              borderColor: theme.line,
-            }} onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
-              {AddressToName(props.avatar.get('AddressMap'), item.Address)}#{item.Sequence}
-              {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
-            </Text>
-            <WhiteSpace size='lg' />
-            <View style={{
-              padding: 6,
-            }}>
-              <Text
-                onPress={() => props.dispatch({
-                  type: actionType.avatar.delQuote,
-                  hash: item.Hash
-                })}
+        props.avatar.get('QuoteList').length > 0 &&
+        <View style={{
+          ...styles.link_list,
+          backgroundColor: theme.tab_view,
+          flexDirection: 'row',
+          flexWrap: 'wrap'
+        }}>
+          {
+            props.avatar.get('QuoteList').map((item, index) => (
+              <View
+                key={item.Hash}
                 style={{
-                  ...styles.cancel_text,
-                  color: theme.link_color
-                }}>取消引用</Text>
-            </View>
-            <WhiteSpace size='lg' />
-          </View>
-        ))
+                  borderWidth: 1,
+                  borderColor: theme.split_line,
+                  borderRadius: 6,
+                  paddingLeft: 6,
+                  paddingRight: 6
+                }}>
+                <LinkPublishQuote
+                  name={AddressToName(props.avatar.get('AddressMap'), item.Address)}
+                  sequence={item.Sequence}
+                  onPressQuote={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                  onPressCancel={() => props.dispatch({
+                    type: actionType.avatar.delQuote,
+                    hash: item.Hash
+                  })} />
+              </View>
+            ))
+          }
+        </View>
       }
-
+      <Text style={tw.style('text-base', 'text-red-500')}>
+        {`注意：发布内容将以字符串类型进行签名，所有请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）替代，谢谢`}
+      </Text>
       <View style={styles.base_view_a}>
-        <Button
-          style={styles.btn_high}
-          type='primary'
-          onPress={() => publishBulletin()}
-        >发布</Button>
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => publishBulletin()}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>发布</Text>
+        </Button>
       </View>
-    </View>
+    </View >
   )
 }
 

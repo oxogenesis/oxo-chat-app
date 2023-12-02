@@ -65,11 +65,9 @@ const AvatarNameEditScreen = (props) => {
           <WhiteSpace size='lg' />
         </View>
       }
-      <Button
-        style={styles.btn_high}
-        type='primary'
-        onPress={saveName}
-      >保存</Button>
+      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={saveName}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>保存</Text>
+      </Button>
     </View>
   )
 }

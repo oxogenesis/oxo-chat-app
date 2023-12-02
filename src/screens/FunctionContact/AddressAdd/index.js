@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { Button, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
-import { styles } from '../../../theme/style'
 import tw from 'twrnc'
 
 //添加联系人
@@ -42,46 +41,33 @@ const AddressAddScreen = (props) => {
 
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view
-    }}>
-      <TextInput
-        placeholderTextColor={tw.color('stone-500')}
-        style={{
-          ...styles.input_view,
-          color: theme.text1
-        }}
-        placeholder="地址"
-        value={address}
-        onChangeText={text => setAddress(text)}
-      />
-      <WhiteSpace size='lg' />
-      <TextInput
-        placeholderTextColor={tw.color('stone-500')}
-        style={{
-          ...styles.input_view,
-          color: theme.text1
-        }}
-        placeholder="昵称"
-        value={name}
-        onChangeText={text => setName(text)}
-      />
-      <WhiteSpace size='lg' />
-      {
-        error_msg.length > 0 &&
-        <View>
-          <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
-      }
-      <Button
-        style={tw.style('px-4', 'py-1', 'rounded', 'bg-blue-800', 'text-white')}
-        type='primary'
-        onPress={addAddressMark}
-      >
-        标记
-      </Button>
+    <View style={tw`h-full bg-stone-200`}>
+      <View style={tw.style(`my-auto`)}>
+        <TextInput
+          placeholder="地址"
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          value={address}
+          onChangeText={text => setAddress(text)}
+        />
+        <TextInput
+          placeholder="昵称"
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          value={name}
+          onChangeText={text => setName(text)}
+        />
+        {
+          error_msg.length > 0 &&
+          <View>
+            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
+            <WhiteSpace size='lg' />
+          </View>
+        }
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addAddressMark}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>标记</Text>
+        </Button>
+      </View>
     </View>
   )
 }

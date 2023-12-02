@@ -8,6 +8,7 @@ import { ThemeContext } from '../../../theme/theme-context'
 import Clipboard from '@react-native-clipboard/clipboard'
 import AlertView from '../../FunctionBase/AlertView'
 import { styles } from '../../../theme/style'
+import tw from 'twrnc'
 
 //地址标记
 const AvatarSeedScreen = (props) => {
@@ -67,7 +68,9 @@ const AvatarSeedScreen = (props) => {
       }}>{`注意：查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。`}</Text>
 
       <View style={styles.base_view_a}>
-        <Button style={styles.btn_high} type="warning" onPress={() => viewRemoveAvatar()}>删除账号</Button>
+        <Button style={tw.style(`rounded-full bg-red-500`)} onPress={() => viewRemoveAvatar()}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>删除账号</Text>
+        </Button>
       </View>
       <AlertView
         visible={visible}

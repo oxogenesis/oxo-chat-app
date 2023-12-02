@@ -8,7 +8,7 @@ import TabSettingScreen from '../TabSetting'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import { connect } from 'react-redux'
 import { ThemeContext } from '../../../theme/theme-context'
-
+import tw from 'twrnc'
 
 const Tab = createBottomTabNavigator()
 

@@ -3,14 +3,17 @@ import { View, ScrollView, RefreshControl, Text, Image, TouchableOpacity } from 
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Icon, WhiteSpace, Toast, Popover } from '@ant-design/react-native'
+import { Icon, Toast } from '@ant-design/react-native'
 import { timestamp_format, AddressToName } from '../../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Flex } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import Avatar from '../../../component/Avatar'
+import LinkBulletin from '../../../component/LinkBulletin'
+import tw from 'twrnc'
 
-//公告列表
+//公告：随便看看
 const BulletinRandomScreen = (props) => {
   const { theme } = useContext(ThemeContext)
   const random = props.avatar.get('RandomBulletin')
@@ -123,44 +126,166 @@ const BulletinRandomScreen = (props) => {
               backgroundColor: theme.base_body
             }}>
               <Flex justify="start" align="start">
-                <TouchableOpacity
-                  onPress={() => props.navigation.push('AddressMark',
-                    { address: random.Address })}
-                >
-                  <AvatarImage address={random.address} />
-                </TouchableOpacity>
-
-                <View style={{
-                  marginLeft: 8
-                }}>
-                  <Text>
-                    <View>
-                      <Text style={{
-                        ...styles.name2,
-                        color: theme.link_color,
-                      }}
-                        onPress={() => props.navigation.push('AddressMark',
-                          { address: random.Address })}
-                      >{AddressToName(props.avatar.get('AddressMap'), random.Address)}&nbsp;&nbsp;</Text>
+                <View>
+                  <View style={tw`mx-auto mt-2`}>
+                    <Avatar address={random.Address} />
+                  </View>
+                  {/* 取消收藏按键 */}
+                  {
+                    random.IsMark == "TRUE" &&
+                    <View style={tw`mx-auto mt-2`}>
+                      <TouchableOpacity onPress={cancelCollection}>
+                        <Icon
+                          name="star"
+                          size="md"
+                          color={tw.color('red-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>{`取消\n收藏`}</Text>
+                      </TouchableOpacity>
                     </View>
+                  }
+                  {/* 收藏按键 */}
+                  {
+                    random.IsMark == "FALSE" &&
+                    <View style={tw`mx-auto mt-2`}>
+                      <TouchableOpacity onPress={handleCollection}>
+                        <Icon
+                          name='star'
+                          size="md"
+                          color={tw.color('slate-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>收藏</Text>
+                      </TouchableOpacity>
+                    </View>
+                  }
+
+                  {/* 评论按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      quoteBulletin(random.Address,
+                        random.Sequence,
+                        random.Hash)
+                      props.navigation.push('BulletinPublish')
+                      setShow(Math.random())
+                    }
+                    }>
+                      <Icon
+                        name='comment'
+                        size="md"
+                        color={tw.color('slate-500')}
+                      />
+                      <Text style={tw.style(`text-sm text-slate-500`)}>评论</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* 引用按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      quoteBulletin(random.Address,
+                        random.Sequence,
+                        random.Hash)
+                      quote()
+                    }
+                    }
+                    >
+                      <View style={styles.icon_view}>
+                        <Icon
+                          name='link'
+                          size="md"
+                          color={tw.color('slate-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>引用</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* 分享按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      props.navigation.push('AddressSelect', {
+                        content: {
+                          ObjectType: "Bulletin",
+                          Address: random.Address,
+                          Sequence: random.Sequence,
+                          Hash: random.Hash
+                        }
+                      })
+                      setShow(Math.random())
+                    }
+                    }>
+                      <View style={styles.icon_view}>
+                        <Icon
+                          name='branches'
+                          size="md"
+                          color={tw.color('slate-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>分享</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* 拷贝按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      copyToClipboard()
+                    }}>
+                      <View style={styles.icon_view}>
+                        <Icon
+                          name='block'
+                          size="md"
+                          color={tw.color('slate-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>拷贝</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View >
+                  <View>
                     <Text>
-                      <View style={{
-                        borderWidth: 1,
-                        borderColor: theme.split_line,
-                        borderRadius: 6,
-                        paddingLeft: 6,
-                        paddingRight: 6,
-                      }}>
-                        <Text style={{
-                          color: theme.text1,
-                          fontSize: 18
-                        }}>{`#${random.Sequence}`}</Text>
+                      <View>
+                        <Text style={tw.style(`text-base text-slate-800 bg-indigo-500 rounded-full`)}
+                          onPress={() => props.navigation.push('AddressMark',
+                            { address: random.Address })}
+                        >{AddressToName(props.avatar.get('AddressMap'), random.Address)}</Text>
+                      </View>
+                      <View>
+                        <Text style={tw.style(`text-base text-slate-800 bg-yellow-500 rounded-full`)}>
+                          {`#${random.Sequence}`}
+                        </Text>
                       </View>
                     </Text>
-                  </Text>
-                  <Text style={styles.desc_view}>
-                    {timestamp_format(random.Timestamp)}
-                  </Text>
+
+                    <Text style={styles.desc_view}>
+                      {timestamp_format(random.Timestamp)}
+                    </Text>
+
+                    {
+                      random.QuoteList != undefined &&
+                      <>
+                        {
+                          random.QuoteList.length > 0 &&
+                          <View style={tw.style(`flex flex-row flex-nowrap`)}>
+                            {
+                              random.QuoteList.map((item, index) => (
+                                <LinkBulletin
+                                  key={index}
+                                  onPress={() => props.navigation.push('Bulletin', {
+                                    address: item.Address,
+                                    sequence: item.Sequence,
+                                    hash: item.Hash,
+                                    to: random.Address
+                                  })}
+                                  name={AddressToName(props.avatar.get('AddressMap'), item.Address)}
+                                  sequence={item.Sequence} />
+                              ))
+                            }
+                          </View>
+                        }
+                      </>
+                    }
+                  </View>
 
                   <View style={styles.content_view}>
                     <Text style={{
@@ -170,157 +295,9 @@ const BulletinRandomScreen = (props) => {
                       {random.Content}
                     </Text>
                   </View>
-                  <WhiteSpace size='lg' />
-                  <View style={styles.content_view}>
-                    <Text style={styles.desc_view}>
-                    </Text>
-                    <Popover
-                      key={show}
-                      overlay={
-                        <Popover.Item
-                          style={{
-                            backgroundColor: '#434343',
-                            flexDirection: 'row',
-                            justifyContent: 'flex-end',
-                            borderRadius: 5,
-                            borderColor: '#434343',
-                          }}
-                        >
-                          {
-                            random.IsMark == "TRUE" &&
-                            <TouchableOpacity onPress={cancelCollection}>
-                              <View style={styles.icon_view}>
-                                <Icon
-                                  color='red'
-                                  name="star" size="md"
-                                />
-                                <Text style={styles.icon_text}>取消收藏</Text>
-                              </View>
-                            </TouchableOpacity>
-                          }
-                          {
-                            random.IsMark == "FALSE" &&
-                            <TouchableOpacity onPress={handleCollection}>
-                              <View style={styles.icon_view}>
-                                <Icon
-                                  name='star'
-                                  size="md"
-                                  color='#fff'
-                                />
-                                <Text style={styles.icon_text}>收藏</Text>
-                              </View>
-                            </TouchableOpacity>
-
-                          }
-
-                          <TouchableOpacity onPress={() => {
-                            quoteBulletin(random.Address,
-                              random.Sequence,
-                              random.Hash)
-                            quote()
-                          }
-                          }
-                          >
-                            <View style={styles.icon_view}>
-                              <Icon
-                                name='link'
-                                size="md"
-                                color='#fff' />
-                              <Text style={styles.icon_text}>引用</Text>
-                            </View>
-                          </TouchableOpacity>
-
-                          <TouchableOpacity onPress={() => {
-                            props.navigation.push('AddressSelect', {
-                              content: {
-                                ObjectType: "Bulletin",
-                                Address: random.Address,
-                                Sequence: random.Sequence,
-                                Hash: random.Hash
-                              }
-
-                            })
-                            setShow(Math.random())
-                          }
-
-                          }>
-                            <View style={styles.icon_view}>
-                              <Icon
-                                name='branches'
-                                size="md"
-                                color='#fff'
-
-                              />
-                              <Text style={styles.icon_text}>分享</Text>
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => {
-                            copyToClipboard()
-                          }}>
-                            <View style={styles.icon_view}>
-                              <Icon
-                                name='block'
-                                color='#fff'
-                                size="md"
-                              />
-                              <Text style={styles.icon_text}>拷贝</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </Popover.Item>
-                      }
-                    >
-                      <Text style={{
-                        fontSize: 24,
-                        backgroundColor: theme.icon_view,
-                        lineHeight: 20,
-                        width: 32,
-                        height: 25,
-                        textAlign: 'center',
-                        color: theme.text1
-                      }}>...</Text>
-                    </Popover>
-                  </View>
-                  <WhiteSpace />
-
-
                 </View>
               </Flex>
             </View>
-
-            {
-              random.QuoteList != undefined &&
-              <>
-                {
-                  random.QuoteList.length > 0 &&
-                  <View style={{
-                    ...styles.link_list,
-                    backgroundColor: theme.tab_view
-                  }}>
-                    {
-                      random.QuoteList.map((item, index) => (
-                        <View
-                          key={index}
-                          style={{
-                            borderWidth: 1,
-                            borderColor: theme.split_line,
-                            borderRadius: 6,
-                            paddingLeft: 6,
-                            paddingRight: 6,
-                          }}>
-                          <Text
-                            style={{
-                              color: theme.text1,
-                              fontSize: 18
-                            }}>
-                            {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                          </Text>
-                        </View>
-                      ))
-                    }
-                  </View>
-                }
-              </>
-            }
           </ScrollView>
       }
     </View>

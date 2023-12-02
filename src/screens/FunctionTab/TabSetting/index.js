@@ -6,6 +6,7 @@ import { Button, WhiteSpace, Radio } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
 import BaseList from '../../FunctionBase/BaseList'
 import { styles } from '../../../theme/style'
+import tw from 'twrnc'
 
 const RadioItem = Radio.RadioItem
 //设置Tab
@@ -55,28 +56,19 @@ const TabSettingScreen = (props) => {
         },
       ]} />
       <WhiteSpace size='lg' />
-      <Button style={{
-        ...styles.btn_high,
-        backgroundColor: theme.base_body,
-        borderColor: theme.line,
-      }} onPress={() => {
-        props.dispatch({
-          type: actionType.avatar.disableAvatar
-        })
-        props.navigation.replace('AvatarList')
-      }}><Text style={{
-        color: 'red'
-      }}>切换账户</Text></Button>
+      <Button style={tw.style(`rounded-full bg-red-500`)}
+        onPress={() => {
+          props.dispatch({
+            type: actionType.avatar.disableAvatar
+          })
+          props.navigation.replace('AvatarList')
+        }}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>切换账户</Text>
+      </Button>
 
       <WhiteSpace size='lg' />
-      <Button style={{
-        ...styles.btn_high,
-        backgroundColor: theme.base_body,
-        borderColor: theme.line,
-      }} onPress={() => {
-        props.navigation.navigate('About')
-      }}>
-        <Text style={{ color: theme.text1 }}>关于</Text>
+      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => { props.navigation.navigate('About') }}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>关于</Text>
       </Button>
     </View >
   )

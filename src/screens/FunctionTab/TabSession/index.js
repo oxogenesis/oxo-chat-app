@@ -7,6 +7,7 @@ import EmptyView from '../../FunctionBase/EmptyView'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 const Item = List.Item
+import tw from 'twrnc'
 
 //聊天Tab
 const TabSessionScreen = (props) => {
@@ -21,18 +22,10 @@ const TabSessionScreen = (props) => {
       showsVerticalScrollIndicator={true}
     >
       {
-        !props.avatar.get('ConnStatus') && <View style={{
-          alignItems: 'center',
-          backgroundColor: theme.off_line_view,
-          height: 55,
-          lineHeight: 55,
-        }} >
-          <Text style={{
-            lineHeight: 55,
-            fontSize: 16,
-            color: theme.off_line_text
-          }}>
-            当前网络不可用，请检查你的网络设置
+        !props.avatar.get('ConnStatus') &&
+        <View style={tw.style(`bg-red-200 p-4`)}>
+          <Text style={tw.style(`text-base text-center`)}>
+            未连接服务器，请检查网络设置或连通性
           </Text>
         </View>
       }

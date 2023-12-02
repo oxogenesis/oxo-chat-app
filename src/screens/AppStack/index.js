@@ -1,6 +1,7 @@
 
 import React, { useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
+import { actionType } from '../../redux/actions/actionType'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconFeather from 'react-native-vector-icons/Feather'
 //import IconEntypo from 'react-native-vector-icons/Entypo'
@@ -44,6 +45,8 @@ import AddressEditScreen from '../FunctionContact/AddressEdit'
 import AddressScanScreen from '../FunctionContact/AddressScan'
 
 import { ThemeContext } from '../../theme/theme-context'
+import tw from 'twrnc'
+
 const Stack = createStackNavigator()
 
 const AppStack = (props) => {
@@ -144,9 +147,16 @@ const AppStack = (props) => {
         name="BulletinRandom"
         component={BulletinRandomScreen}
         options={
-          ({ route, navigation }) => ({
+          ({ route, navigation, props }) => ({
             title: "公告：随便看看",
-            ...headerStyleOption
+            ...headerStyleOption,
+            headerRight: () => (
+              <IconMaterial
+                name={'refresh'}
+                size={32}
+                color={theme.text1}
+                onPress={() => navigation.replace('BulletinRandom')}
+              />)
           })
         }
       />

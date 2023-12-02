@@ -10,6 +10,7 @@ import { connect } from 'react-redux'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import tw from 'twrnc'
 
 //聊天会话界面
 const SessionScreen = (props) => {

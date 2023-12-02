@@ -64,18 +64,10 @@ const SettingNetworkScreen = (props) => {
       padding: 0,
     }}>
       {
-        !props.avatar.get('ConnStatus') && <View style={{
-          alignItems: 'center',
-          backgroundColor: theme.off_line_view,
-          height: 55,
-          lineHeight: 55,
-        }} >
-          <Text style={{
-            lineHeight: 55,
-            fontSize: 16,
-            color: theme.off_line_text
-          }}>
-            当前网络不可用，请检查你的网络设置
+        !props.avatar.get('ConnStatus') &&
+        <View style={tw.style(`bg-red-200 p-4`)}>
+          <Text style={tw.style(`text-base text-center`)}>
+            未连接服务器，请检查网络设置或连通性
           </Text>
         </View>
       }
@@ -104,9 +96,9 @@ const SettingNetworkScreen = (props) => {
             <WhiteSpace size='lg' />
           </View>
         }
-        <Button type='primary' style={{
-          height: 55
-        }} onPress={addHost}>设置</Button>
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addHost}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>
+        </Button>
         <WhiteSpace size='md' />
         <FlatList
           data={props.avatar.get('HostList')}
@@ -156,27 +148,15 @@ const SettingNetworkScreen = (props) => {
                       </View>
                       :
                       <>
-                        <View style={{ flex: 0.25 }} >
-                          <Text style={{
-                            textAlign: 'right'
-                          }}>
-                            <Button type='primary' onPress={() => changeCurrentHost(item.Address)} style={{
-                              height: 40,
-                              marginTop: 4,
-                              width: 70,
-                            }}>使用</Button>
-                          </Text>
+                        <View style={{ flex: 0.20 }} >
+                          <Button style={tw.style(`rounded-full bg-green-500 w-15`)} onPress={() => changeCurrentHost(item.Address)}>
+                            <Text style={tw.style(`text-xs text-slate-100`)}>使用</Text>
+                          </Button>
                         </View>
-                        <View style={{ flex: 0.25 }} >
-                          <Text style={{
-                            textAlign: 'right'
-                          }}>
-                            <Button onPress={() => delHostAlert(item.Address)} type='warning' style={{
-                              height: 40,
-                              marginTop: 4,
-                              width: 70,
-                            }}>删除</Button>
-                          </Text>
+                        <View style={{ flex: 0.20 }} >
+                          <Button style={tw.style(`rounded-full bg-red-500 w-15`)} onPress={() => delHostAlert(item.Address)}>
+                            <Text style={tw.style(`text-xs text-slate-100`)}>删除</Text>
+                          </Button>
                         </View>
                       </>
                   }

@@ -56,9 +56,9 @@ const BulletinCacheScreen = (props) => {
           <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
         </View>
       }
-      <Button style={{
-        height: 55
-      }} type='primary' onPress={setBulletinCacheSize}>设置</Button>
+      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={setBulletinCacheSize}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>
+      </Button>
       <WhiteSpace size='lg' />
       <Text style={{
         color: 'red',

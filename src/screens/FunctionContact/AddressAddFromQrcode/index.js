@@ -5,6 +5,7 @@ import { actionType } from '../../../redux/actions/actionType'
 import { Button, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import tw from 'twrnc'
 
 //登录界面
 const AddressAddFromQrcodeScreen = (props) => {
@@ -91,11 +92,12 @@ const AddressAddFromQrcodeScreen = (props) => {
       </View>
 
       <WhiteSpace size='md' />
-      <Button type='primary' style={{ height: 55 }}
-        onPress={markAddress}>标记地址</Button>
-      <WhiteSpace size='md' />
-      <Button type='primary' style={{ height: 55 }}
-        onPress={addHost}>标记地址 + 保存服务器网址</Button>
+      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={markAddress}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>标记地址</Text>
+      </Button>
+      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addHost}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>标记地址 + 保存服务器网址</Text>
+      </Button>
     </View>
   )
 }

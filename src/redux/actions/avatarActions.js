@@ -361,8 +361,7 @@ export function* loadFromDB(action) {
 
 export function* enableAvatar(action) {
   let timestamp = Date.now()
-  let keypair = DeriveKeypair(`xxRjGjcR1VgDgvRhPZJTstfk4s4GT`)
-  // let keypair = DeriveKeypair(action.seed)
+  let keypair = DeriveKeypair(action.seed)
   let address = DeriveAddress(keypair.publicKey)
   // 更新登录时间
   AvatarLoginTimeUpdate(address)

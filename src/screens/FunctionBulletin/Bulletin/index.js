@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { View, ScrollView, Text, Image, TouchableOpacity } from 'react-native'
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
@@ -12,7 +12,10 @@ import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import Avatar from '../../../component/Avatar'
 import LinkBulletin from '../../../component/LinkBulletin'
+import LinkBulletinStr from '../../../component/LinkBulletinStr'
+import LinkName from '../../../component/LinkName'
 import tw from 'twrnc'
+import StrSequence from '../../../component/StrSequence'
 
 //公告详情
 const BulletinScreen = (props) => {
@@ -88,173 +91,133 @@ const BulletinScreen = (props) => {
           :
           <ScrollView>
             <Flex justify="start" align="start">
-              <View>
-                <View style={tw`mx-auto mt-2`}>
-                  <Avatar address={current.Address} />
-                </View>
-                {/* 取消收藏按键 */}
-                {
-                  current.IsMark == "TRUE" &&
+              <View style={tw`mt-5px ml-5px`}>
+                <Avatar address={current.Address} />
+
+                <View style={tw`mx-auto mt-5`}>
+                  {/* 取消收藏按键 */}
+                  {
+                    current.IsMark == "TRUE" &&
+                    <View style={tw`mx-auto mt-2`}>
+                      <TouchableOpacity onPress={cancelCollection}>
+                        <Icon
+                          name="star"
+                          size="md"
+                          color={tw.color('red-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>{`取消\n收藏`}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  }
+                  {/* 收藏按键 */}
+                  {
+                    current.IsMark == "FALSE" &&
+                    <View style={tw`mx-auto mt-2`}>
+                      <TouchableOpacity onPress={handleCollection}>
+                        <Icon
+                          name='star'
+                          size="md"
+                          color={tw.color('slate-500')}
+                        />
+                        <Text style={tw.style(`text-sm text-slate-500`)}>收藏</Text>
+                      </TouchableOpacity>
+                    </View>
+                  }
+
+                  {/* 评论按键 */}
                   <View style={tw`mx-auto mt-2`}>
-                    <TouchableOpacity onPress={cancelCollection}>
+                    <TouchableOpacity onPress={() => {
+                      quoteBulletin(current.Address,
+                        current.Sequence,
+                        current.Hash)
+                      props.navigation.push('BulletinPublish')
+                      setShow(Math.random())
+                    }
+                    }>
                       <Icon
-                        name="star"
-                        size="md"
-                        color={tw.color('red-500')}
-                      />
-                      <Text style={tw.style(`text-sm text-slate-500`)}>{`取消\n收藏`}</Text>
-                    </TouchableOpacity>
-                  </View>
-                }
-                {/* 收藏按键 */}
-                {
-                  current.IsMark == "FALSE" &&
-                  <View style={tw`mx-auto mt-2`}>
-                    <TouchableOpacity onPress={handleCollection}>
-                      <Icon
-                        name='star'
+                        name='comment'
                         size="md"
                         color={tw.color('slate-500')}
                       />
-                      <Text style={tw.style(`text-sm text-slate-500`)}>收藏</Text>
+                      <Text style={tw.style(`text-sm text-slate-500`)}>评论</Text>
                     </TouchableOpacity>
                   </View>
-                }
 
-                {/* 评论按键 */}
-                <View style={tw`mx-auto mt-2`}>
-                  <TouchableOpacity onPress={() => {
-                    quoteBulletin(current.Address,
-                      current.Sequence,
-                      current.Hash)
-                    props.navigation.push('BulletinPublish')
-                    setShow(Math.random())
-                  }
-                  }>
-                    <Icon
-                      name='comment'
-                      size="md"
-                      color={tw.color('slate-500')}
-                    />
-                    <Text style={tw.style(`text-sm text-slate-500`)}>评论</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* 引用按键 */}
-                <View style={tw`mx-auto mt-2`}>
-                  <TouchableOpacity onPress={() => {
-                    quoteBulletin(current.Address,
-                      current.Sequence,
-                      current.Hash)
-                    quote()
-                  }
-                  }
-                  >
-                    <View style={styles.icon_view}>
+                  {/* 引用按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      quoteBulletin(current.Address,
+                        current.Sequence,
+                        current.Hash)
+                      quote()
+                    }
+                    }
+                    >
                       <Icon
                         name='link'
                         size="md"
                         color={tw.color('slate-500')}
                       />
                       <Text style={tw.style(`text-sm text-slate-500`)}>引用</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                    </TouchableOpacity>
+                  </View>
 
-                {/* 分享按键 */}
-                <View style={tw`mx-auto mt-2`}>
-                  <TouchableOpacity onPress={() => {
-                    props.navigation.push('AddressSelect', {
-                      content: {
-                        ObjectType: "Bulletin",
-                        Address: current.Address,
-                        Sequence: current.Sequence,
-                        Hash: current.Hash
-                      }
-                    })
-                    setShow(Math.random())
-                  }
-                  }>
-                    <View style={styles.icon_view}>
+                  {/* 分享按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      props.navigation.push('AddressSelect', {
+                        content: {
+                          ObjectType: "Bulletin",
+                          Address: current.Address,
+                          Sequence: current.Sequence,
+                          Hash: current.Hash
+                        }
+                      })
+                      setShow(Math.random())
+                    }
+                    }>
                       <Icon
                         name='branches'
                         size="md"
                         color={tw.color('slate-500')}
                       />
                       <Text style={tw.style(`text-sm text-slate-500`)}>分享</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                    </TouchableOpacity>
+                  </View>
 
-                {/* 拷贝按键 */}
-                <View style={tw`mx-auto mt-2`}>
-                  <TouchableOpacity onPress={() => {
-                    copyToClipboard()
-                  }}>
-                    <View style={styles.icon_view}>
+                  {/* 拷贝按键 */}
+                  <View style={tw`mx-auto mt-2`}>
+                    <TouchableOpacity onPress={() => {
+                      copyToClipboard()
+                    }}>
                       <Icon
                         name='block'
                         size="md"
                         color={tw.color('slate-500')}
                       />
                       <Text style={tw.style(`text-sm text-slate-500`)}>拷贝</Text>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
 
-              <View >
+              <View style={tw`mt-5px`}>
                 <View>
                   <Text>
-                    <View>
-                      <Text style={{
-                        ...styles.name2,
-                        color: theme.link_color,
-                      }}
-                        onPress={() => props.navigation.push('AddressMark',
-                          { address: current.Address })}
-                      >{AddressToName(props.avatar.get('AddressMap'), current.Address)}&nbsp;&nbsp;</Text>
-                    </View>
-                    <View style={{
-                      borderWidth: 1,
-                      borderColor: theme.split_line,
-                      borderRadius: 6,
-                      paddingLeft: 6,
-                      paddingRight: 6,
-                    }}>
-                      <Text style={{
-                        color: theme.text1,
-                        fontSize: 18
-                      }}>
-                        {`#${current.Sequence}`}
-                      </Text>
-                    </View>
+                    <LinkName onPress={() => props.navigation.push('AddressMark', { address: current.Address })} name={AddressToName(props.avatar.get('AddressMap'), current.Address)} />
+                    <StrSequence sequence={current.Sequence} />
                     {
-                      current.PreHash != GenesisHash &&
-                      <TouchableOpacity onPress={() => {
-                        props.navigation.push('Bulletin', {
+                      current.PreHash != GenesisHash && (props.avatar.get('Follows').includes(current.Address) || props.avatar.get('Address') == current.Address) &&
+                      <LinkBulletinStr
+                        onPress={() => props.navigation.push('Bulletin', {
                           address: current.Address,
                           sequence: current.Sequence - 1,
                           hash: current.PreHash,
                           to: current.Address
                         })
-                      }
-                      }>
-                        <View style={{
-                          borderWidth: 1,
-                          borderColor: theme.split_line,
-                          borderRadius: 6,
-                          paddingLeft: 6,
-                          paddingRight: 6,
-                        }}>
-                          <Text style={{
-                            color: theme.text1,
-                            fontSize: 18
-                          }}>
-                            上一条
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
+                        }
+                        str={`上一条`}
+                      />
                     }
                   </Text>
 
@@ -267,7 +230,7 @@ const BulletinScreen = (props) => {
                     <>
                       {
                         current.QuoteList.length > 0 &&
-                        <View style={tw.style(`flex flex-row flex-nowrap`)}>
+                        <Text style={tw.style(`flex flex-row flex-nowrap`)}>
                           {
                             current.QuoteList.map((item, index) => (
                               <LinkBulletin
@@ -282,17 +245,14 @@ const BulletinScreen = (props) => {
                                 sequence={item.Sequence} />
                             ))
                           }
-                        </View>
+                        </Text>
                       }
                     </>
                   }
                 </View>
 
                 <View style={styles.content_view}>
-                  <Text style={{
-                    ...styles.content_text,
-                    color: theme.text1
-                  }}>
+                  <Text style={tw.style(`text-base`)}>
                     {current.Content}
                   </Text>
                 </View>

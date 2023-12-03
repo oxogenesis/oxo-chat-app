@@ -5,6 +5,7 @@ import { AvatarCreateNew } from '../../../lib/OXO'
 import { connect } from 'react-redux'
 import { ThemeContext } from '../../../theme/theme-context'
 import tw from 'twrnc'
+import ErrorMsg from '../../../component/ErrorMsg'
 
 //口令创建账户
 const AvatarCreateScreen = (props) => {
@@ -39,9 +40,7 @@ const AvatarCreateScreen = (props) => {
         />
         {
           error_msg.length > 0 &&
-          <View>
-            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-          </View>
+          <ErrorMsg error_msg={error_msg} />
         }
         <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => createAvatar()}>
           <Text style={tw.style(`text-xl text-slate-100`)}>本地生成</Text>

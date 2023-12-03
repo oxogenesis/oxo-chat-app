@@ -7,7 +7,8 @@ import { timestamp_format, AddressToName } from '../../../lib/Util'
 import { my_styles, styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import EmptyView from '../../FunctionBase/EmptyView'
-import { WhiteSpace } from '@ant-design/react-native'
+import LinkBulletin from '../../../component/LinkBulletin'
+import tw from 'twrnc'
 
 //公告列表
 const BulletinInfoScreen = (props) => {
@@ -57,28 +58,30 @@ const BulletinInfoScreen = (props) => {
             <Text style={{
               color: theme.text1
             }}>{`引用：${props.avatar.get('CurrentBulletin').QuoteSize}`}</Text>
+            {
+              <Text style={tw.style(`flex flex-row flex-nowrap`)}>
+                {
+                  props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
+                    <LinkBulletin
+                      key={index}
+                      onPress={() => props.navigation.push('Bulletin', {
+                        address: item.Address,
+                        sequence: item.Sequence,
+                        hash: item.Hash,
+                        to: props.avatar.get('CurrentBulletin').Address
+                      })}
+                      name={AddressToName(props.avatar.get('AddressMap'), item.Address)}
+                      sequence={item.Sequence} />
+                  ))
+                }
+              </Text>
+            }
             <ScrollView>
               <Text style={{
                 color: theme.text1
-              }}>{props.avatar.get('CurrentBulletin').Content}</Text>
-              <WhiteSpace size='lg' />
-              {
-                props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
-                  <Text key={index} style={{
-                    ...styles.link_list_text,
-                    color: theme.link_color,
-                    borderColor: theme.line,
-                  }} onPress={() => props.navigation.push('Bulletin', {
-                    address: item.Address,
-                    sequence: item.Sequence,
-                    hash: item.Hash,
-                    to: props.avatar.get('CurrentBulletin').Address
-                  })}>
-                    {`${AddressToName(props.avatar.get('AddressMap'), item.Address)}#${item.Sequence}`}
-                    {props.avatar.get('CurrentBulletin').QuoteList.length - 1 !== index && ','}
-                  </Text>
-                ))
-              }
+              }}>
+                {props.avatar.get('CurrentBulletin').Content}
+              </Text>
             </ScrollView>
 
 

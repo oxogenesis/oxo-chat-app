@@ -3,11 +3,11 @@ import { View, Text, TextInput, FlatList } from 'react-native'
 
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import AlertView from '../../FunctionBase/AlertView'
 
 import { Button, WhiteSpace } from '@ant-design/react-native'
+import ErrorMsg from '../../../component/ErrorMsg'
 import tw from 'twrnc'
 
 //网络设置
@@ -58,11 +58,7 @@ const SettingNetworkScreen = (props) => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view,
-      padding: 0,
-    }}>
+    <View>
       {
         !props.avatar.get('ConnStatus') &&
         <View style={tw.style(`bg-red-200 p-4`)}>
@@ -82,19 +78,12 @@ const SettingNetworkScreen = (props) => {
           value={host_input}
           onChangeText={setHost}
           placeholderTextColor={tw.color('stone-500')}
-          style={{
-            ...styles.input_view,
-            color: theme.text1,
-            backgroundColor: theme.base_body
-          }}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
         />
         <WhiteSpace size='md' />
         {
           error_msg.length > 0 &&
-          <View>
-            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-            <WhiteSpace size='lg' />
-          </View>
+          <ErrorMsg error_msg={error_msg} />
         }
         <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addHost}>
           <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>

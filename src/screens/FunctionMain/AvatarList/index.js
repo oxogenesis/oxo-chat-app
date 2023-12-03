@@ -74,7 +74,7 @@ const AvatarListScreen = props => {
   }
 
   return (
-    <View style={tw`h-full bg-stone-200`}>
+    <View style={tw`h-full bg-stone-200 p-5px`}>
       <ScrollView
         style={styles.scroll_view}
         automaticallyAdjustContentInsets={false}
@@ -85,12 +85,20 @@ const AvatarListScreen = props => {
             <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
               <View style={tw`bg-stone-100`}>
                 <Flex>
-                  <Flex.Item style={{ flex: 0.2 }}>
+                  <Flex.Item style={{ flex: 0.15 }}>
                     <AvatarImage address={item.Address} />
                   </Flex.Item>
                   <Flex.Item >
-                    <Text style={tw.style(`text-xl text-slate-800`)}>{item.Name}</Text>
-                    <Text style={tw.style(`text-sm text-slate-400`)}>@{timestamp_format(item.LoginAt)}</Text>
+                    <Text>
+                      <View style={tw.style(`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`)}>
+                        <Text style={tw.style(`text-base text-slate-800 text-center`)}>
+                          {`${item.Name}`}
+                        </Text>
+                      </View>
+                      <View style={tw.style(`rounded-full px-1 border-1 border-gray-300`)}>
+                        <Text style={tw.style(`text-base text-slate-400`)}>@{timestamp_format(item.LoginAt)}</Text>
+                      </View>
+                    </Text>
                     <Text style={tw.style(`text-sm text-slate-400`)}>{item.Address}</Text>
                   </Flex.Item>
                 </Flex>

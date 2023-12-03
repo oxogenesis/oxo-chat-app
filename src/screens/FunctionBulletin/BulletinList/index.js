@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import { View, Text, ScrollView, Image } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
@@ -9,7 +9,10 @@ import { Flex, WhiteSpace } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import EmptyView from '../../FunctionBase/EmptyView'
-import AvatarImage from '../../../component/AvatarImage'
+import Avatar from '../../../component/Avatar'
+import LinkBulletinStr from '../../../component/LinkBulletinStr'
+import LinkName from '../../../component/LinkName'
+import tw from 'twrnc'
 
 
 //公告列表
@@ -61,61 +64,36 @@ const BulletinListScreen = (props) => {
                 borderBottomColor: theme.split_line
               }}>
               <Flex justify="start" align="start">
-                <AvatarImage address={item.Address} />
-                <View style={{
-                  marginLeft: 8,
-                }}>
+                <Avatar address={item.Address} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} />
+                <View style={tw`ml-2px`}>
                   <Text style={{
                     marginBottom: 6
                   }}>
-                    {
-                      props.avatar.get('Address') == item.Address ? <View>
-                        <Text style={{
-                          ...styles.name2,
-                          color: theme.link_color,
-                        }}
-                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
-                      </View> : <View>
-                        <Text style={{
-                          ...styles.name2,
-                          color: theme.link_color,
-                        }}
-                          onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
-                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
-                      </View>
-                    }
-                    <Text onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
-                      <View style={{
-                        borderWidth: 1,
-                        borderColor: theme.split_line,
-                        borderRadius: 6,
-                        paddingLeft: 6,
-                        paddingRight: 6,
-
-                      }}>
-                        <Text style={{
-                          color: theme.text1,
-                          fontSize: 16
-                        }}>{item.Sequence}</Text>
-                      </View>
-                    </Text>
+                    <LinkName onPress={() => props.navigation.push('AddressMark', { address: item.Address })} name={AddressToName(props.avatar.get('AddressMap'), item.Address)} />
+                    <LinkBulletinStr
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                      str={`#${item.Sequence}`}
+                    />
                   </Text>
 
-
-                  <View style={styles.content_view}>
-                    <WhiteSpace size='lg' />
+                  <View style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    paddingRight: 50,
+                  }}>
                     <Text style={{
-                      ...styles.format_text1,
+                      ...styles.content_view,
                       color: theme.text2
                     }}>{timestamp_format(item.Timestamp)}</Text>
                     {
                       item.QuoteSize != 0 && <Text style={{
-                        ...styles.format_text2,
+                        ...styles.form_view,
                         color: theme.text2
                       }}>
                         引用：◀{item.QuoteSize}</Text>
                     }
                   </View>
+
                   {item.Content.length <= BulletinPreviewSize ?
                     <View style={styles.content_view}>
                       <Text style={{

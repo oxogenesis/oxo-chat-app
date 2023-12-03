@@ -25,7 +25,7 @@ function AddressToName(address_map, address) {
   if (address_map[address] != null) {
     return address_map[address]
   } else {
-    return address
+    return `${address.substr(0, 9)}...`
   }
 }
 

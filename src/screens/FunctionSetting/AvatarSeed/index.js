@@ -7,7 +7,6 @@ import { Toast, Button } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
 import Clipboard from '@react-native-clipboard/clipboard'
 import AlertView from '../../FunctionBase/AlertView'
-import { styles } from '../../../theme/style'
 import tw from 'twrnc'
 
 //地址标记
@@ -43,12 +42,13 @@ const AvatarSeedScreen = (props) => {
       .then((result) => {
         if (result) {
           props.dispatch({
-            type: actionType.avatar.disableAvatar
+            type: actionType.avatar.disableAvatar,
+            flag_clear_db: true
           })
           props.navigation.reset({
             index: 0,
             routes: [{ name: 'AvatarList' }],
-          });
+          })
         }
       })
   }
@@ -67,7 +67,7 @@ const AvatarSeedScreen = (props) => {
         color: theme.text2
       }}>{`注意：查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。`}</Text>
 
-      <View style={styles.base_view_a}>
+      <View>
         <Button style={tw.style(`rounded-full bg-red-500`)} onPress={() => viewRemoveAvatar()}>
           <Text style={tw.style(`text-xl text-slate-100`)}>删除账号</Text>
         </Button>

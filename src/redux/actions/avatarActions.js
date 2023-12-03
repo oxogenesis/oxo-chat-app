@@ -61,8 +61,9 @@ function createWebSocketChannel(ws) {
     // Pass websocket messages straight though
     ws.onmessage = (event) => {
       console.log(`======================================================onmessage`)
-      emit(event.data)
       console.log(event.data)
+      console.log(`======================================================onmessage`)
+      emit(event.data)
     }
 
     // Close the channel as appropriate
@@ -112,12 +113,16 @@ export function* Conn(action) {
 
     // Handle messages as they come in
     while (true) {
-      console.log(`======================================================yield take(channel)`)
+      console.log(`======================================================yield take(1channel)`)
       let payload = yield take(channel)
-      console.log(payload)
+      // console.log(`======================================================payload`)
+      // console.log(payload)
+      // console.log(`======================================================payload`)
       let json = JSON.parse(payload)
-      console.log(json)
-      console.log(`======================================================yield take(channel)`)
+      // console.log(`======================================================json`)
+      // console.log(json)
+      // console.log(`======================================================json`)
+      console.log(`======================================================yield take(2channel)`)
       //save bulletin from server cache
       if (json.ObjectType == ObjectType.Bulletin && checkBulletinSchema(json)) {
         let address = DeriveAddress(json.PublicKey)
@@ -197,8 +202,13 @@ export function* Conn(action) {
       //yield put(nowPlayingUpdate(stationName, artist, title, artUrl))
     }
   } catch (error) {
-    // console.log(`======================================================Conn-catch`)
-    // console.log(error)
+    console.log(`======================================================Conn-catch-error`)
+    console.log(error)
+    if (error.name == 'SyntaxError' && error.message == 'JSON Parse error: Unexpected identifier "object"') {
+      console.log(`======================================================never go here${error}`)
+    } else {
+
+    }
     // let regx = /^failed to connect to/
     // let rs = regx.exec(error.message)
     // if (rs != null) {
@@ -221,7 +231,9 @@ export function* Conn(action) {
     if (typeof ws !== 'undefined') {
       ws.close()
     }
+    //断开，等待3秒，重连
     yield call(DelayExec, 3 * 1000)
+    console.log(`======================================================reconnect`)
     yield put({ type: actionType.avatar.Conn, host: action.host, timestamp: action.timestamp })
     // console.log(`======================================================reconnect`)
     // if (yield cancelled()) {
@@ -238,6 +250,7 @@ export function* Conn(action) {
 }
 
 export function* SendMessage(action) {
+  console.log(`======================================================SendMessage`)
   console.log(action)
   let ws = yield select(state => state.avatar.get('WebSocket'))
   if (ws != null && ws.readyState == WebSocket.OPEN) {
@@ -348,7 +361,8 @@ export function* loadFromDB(action) {
 
 export function* enableAvatar(action) {
   let timestamp = Date.now()
-  let keypair = DeriveKeypair(action.seed)
+  let keypair = DeriveKeypair(`xxRjGjcR1VgDgvRhPZJTstfk4s4GT`)
+  // let keypair = DeriveKeypair(action.seed)
   let address = DeriveAddress(keypair.publicKey)
   // 更新登录时间
   AvatarLoginTimeUpdate(address)
@@ -369,13 +383,15 @@ export function* enableAvatar(action) {
   let host_list = yield select(state => state.avatar.get('HostList'))
   let current_host = host_list[0].Address
   yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host, current_host_timestamp: timestamp })
+  console.log(`======================================================enableAvatar`)
   yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
   // update
   yield put({ type: actionType.avatar.UpdateFollowBulletin })
 }
 
-export function* disableAvatar() {
+export function* disableAvatar(action) {
   let db = yield select(state => state.avatar.get('Database'))
+  let self_address = yield select(state => state.avatar.get('Address'))
 
   // 清理多余缓存公告
   let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
@@ -392,7 +408,7 @@ export function* disableAvatar() {
   }
 
   // 关闭数据库
-  yield call([db, db.closeDB])
+  yield call([db, db.closeDB], action.flag_clear_db, self_address)
   yield put({ type: actionType.avatar.resetAvatar })
 
   // 关闭网络
@@ -406,8 +422,6 @@ export function* disableAvatar() {
   if (ws != null) {
     yield call([ws, ws.close])
   }
-
-
 }
 
 export function* changeBulletinCacheSize(action) {
@@ -580,6 +594,7 @@ export function* changeCurrentHost(action) {
     yield call([ws, ws.close])
   }
   yield put({ type: actionType.avatar.setCurrentHost, current_host: action.host, current_host_timestamp: timestamp })
+  console.log(`======================================================changeCurrentHost`)
   yield put({ type: actionType.avatar.Conn, host: action.host, timestamp: timestamp })
 
   let host_list = yield select(state => state.avatar.get('HostList'))
@@ -622,6 +637,7 @@ export function* LoadCurrentBulletin(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `SELECT * FROM BULLETINS WHERE hash = "${action.hash}" LIMIT 1`
   let item = yield call([db, db.getOne], sql)
+  console.log(item)
   if (item != null) {
     let bulletin = {
       "Address": item.address,
@@ -738,6 +754,7 @@ export function* SaveBulletin(action) {
   let hash = quarterSHA512(strJson)
 
   if (VerifyJsonSignature(bulletin_json) == true) {
+    bulletin_json.Address = object_address
     let timestamp = Date.now()
     let db = yield select(state => state.avatar.get('Database'))
     let self_address = yield select(state => state.avatar.get('Address'))
@@ -745,7 +762,7 @@ export function* SaveBulletin(action) {
     let quote_white_list = yield select(state => state.avatar.get('QuoteWhiteList'))
     let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
 
-    let randonm_bulletin_flag = yield select(state => state.avatar.get('RandomBulletinFlag'))
+    let random_bulletin_flag = yield select(state => state.avatar.get('RandomBulletinFlag'))
 
     // console.log(quote_white_list)
 
@@ -796,6 +813,7 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
       yield call([db, db.runSQL], sql)
       let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
       if (current_bulletin == null) {
+        // bulletin_json.Address = object_address
         yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
       }
     } else if (message_white_list.includes(hash)) {
@@ -807,6 +825,7 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
       yield call([db, db.runSQL], sql)
       let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
       if (current_bulletin == null) {
+        // bulletin_json.Address = object_address
         yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
       }
     } else if (self_address == object_address) {
@@ -817,14 +836,14 @@ VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash
       //save bulletin
       yield call([db, db.runSQL], sql)
       yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
-    } else if (randonm_bulletin_flag) {
-      //bulletin from myself
+    } else if (random_bulletin_flag) {
+      //bulletin from random
       let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
       VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
 
       //save bulletin
       yield call([db, db.runSQL], sql)
-      bulletin_json.Address = object_address
+      // bulletin_json.Address = object_address
       yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
       yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
     }
@@ -920,7 +939,7 @@ export function* LoadBulletinList(action) {
   }
 
   // 获取更新
-  // 甚至是自己的公告，为切回设备后从服务器取回历史公告 && action.address != self_address
+  // 甚至是自己的公告，为切换设备后从服务器取回历史公告 && action.address != self_address
   if (action.session == BulletinAddressSession) {
     let next_sequence = 1
     if (bulletin_list.length != 0) {

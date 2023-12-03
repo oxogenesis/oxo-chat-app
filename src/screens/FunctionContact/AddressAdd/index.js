@@ -2,8 +2,9 @@ import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button, WhiteSpace } from '@ant-design/react-native'
+import { Button } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
+import ErrorMsg from '../../../component/ErrorMsg'
 import tw from 'twrnc'
 
 //添加联系人
@@ -59,10 +60,7 @@ const AddressAddScreen = (props) => {
         />
         {
           error_msg.length > 0 &&
-          <View>
-            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-            <WhiteSpace size='lg' />
-          </View>
+          <ErrorMsg error_msg={error_msg} />
         }
         <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addAddressMark}>
           <Text style={tw.style(`text-xl text-slate-100`)}>标记</Text>

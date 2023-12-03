@@ -3,10 +3,10 @@ import { View, Text, TextInput } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { WhiteSpace, Button } from '@ant-design/react-native'
-import { styles } from '../../../theme/style'
+import { Button } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
 import { AddressToName } from '../../../lib/Util'
+import ErrorMsg from '../../../component/ErrorMsg'
 import tw from 'twrnc'
 
 //地址标记
@@ -32,50 +32,33 @@ const AddressEditScreen = (props) => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_body
-    }}>
-      <Text style={{
-        color: theme.text1
-      }}>地址：</Text>
-      <TextInput
-        placeholderTextColor={tw.color('stone-500')}
-        style={{
-          ...styles.input_view,
-          color: theme.text1
-        }}
-        placeholder="地址"
-        value={address}
-        editable={false}
-        multiline={false}
-        onChangeText={text => setAddress(text)}
-      />
-      <Text style={{
-        color: theme.text1
-      }}>昵称：</Text>
-      <TextInput
-        placeholderTextColor={tw.color('stone-500')}
-        style={{
-          ...styles.input_view,
-          color: theme.text1
-        }}
-        placeholder="昵称"
-        value={name}
-        multiline={false}
-        onChangeText={text => setName(text)}
-      />
-      <WhiteSpace size='lg' />
-      {
-        error_msg.length > 0 &&
-        <View>
-          <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
-      }
-      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={saveAddressName}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>保存</Text>
-      </Button>
+    <View style={tw`h-full bg-stone-200`}>
+      <View style={tw.style(`my-auto`)}>
+        <TextInput
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          placeholder="地址"
+          value={address}
+          editable={false}
+          multiline={false}
+          onChangeText={text => setAddress(text)}
+        />
+        <TextInput
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          placeholder="昵称"
+          value={name}
+          multiline={false}
+          onChangeText={text => setName(text)}
+        />
+        {
+          error_msg.length > 0 &&
+          <ErrorMsg error_msg={error_msg} />
+        }
+        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={saveAddressName}>
+          <Text style={tw.style(`text-xl text-slate-100`)}>保存</Text>
+        </Button>
+      </View>
     </View>
   )
 }

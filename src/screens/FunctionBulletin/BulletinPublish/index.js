@@ -8,6 +8,7 @@ import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import tw from 'twrnc'
 import LinkPublishQuote from '../../../component/LinkPulishQuote'
+import ErrorMsg from '../../../component/ErrorMsg'
 
 //发布公告页面
 const Item = List.Item
@@ -77,9 +78,7 @@ const BulletinPublishScreen = props => {
         />
         {
           error_msg.length > 0 &&
-          <View>
-            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-          </View>
+          <ErrorMsg error_msg={error_msg} />
         }
 
       </View>

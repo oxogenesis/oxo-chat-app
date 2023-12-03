@@ -5,7 +5,6 @@ import { actionType } from '../../../redux/actions/actionType'
 import { Button, WhiteSpace, Radio } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
 import BaseList from '../../FunctionBase/BaseList'
-import { styles } from '../../../theme/style'
 import tw from 'twrnc'
 
 const RadioItem = Radio.RadioItem
@@ -32,10 +31,7 @@ const TabSettingScreen = (props) => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view,
-    }}>
+    <View style={tw.style(`rounded-full p-2`)}>
       <WhiteSpace size='lg' />
       <BaseList data={[{ title: '账号设置', onpress: () => { props.navigation.navigate('SettingMe') } }]} />
       <WhiteSpace size='lg' />
@@ -59,7 +55,8 @@ const TabSettingScreen = (props) => {
       <Button style={tw.style(`rounded-full bg-red-500`)}
         onPress={() => {
           props.dispatch({
-            type: actionType.avatar.disableAvatar
+            type: actionType.avatar.disableAvatar,
+            flag_clear_db: false
           })
           props.navigation.replace('AvatarList')
         }}>

@@ -10,6 +10,8 @@ import { ThemeContext } from '../../../theme/theme-context'
 import { styles } from '../../../theme/style'
 import { BulletinPreviewSize } from '../../../lib/Const'
 import Avatar from '../../../component/Avatar'
+import LinkBulletinStr from '../../../component/LinkBulletinStr'
+import LinkName from '../../../component/LinkName'
 import tw from 'twrnc'
 
 //公告Tab
@@ -76,7 +78,7 @@ const TabBulletinScreen = (props) => {
         style={{
           ...styles.base_color,
           backgroundColor: theme.base_body,
-          marginBottom: 60
+          marginBottom: 50
         }}
         data={list}
         keyExtractor={item => item.Hash}
@@ -93,46 +95,15 @@ const TabBulletinScreen = (props) => {
             }}>
             <Flex justify="start" align="start">
               <Avatar address={item.Address} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} />
-              <View style={{
-                marginLeft: 8,
-              }}>
+              <View style={tw`ml-2px`}>
                 <Text style={{
                   marginBottom: 6
                 }}>
-                  {
-                    props.avatar.get('Address') == item.Address ?
-                      <View>
-                        <Text style={{
-                          ...styles.name2,
-                          color: theme.link_color,
-                        }}
-                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;&nbsp;</Text>
-                      </View>
-                      :
-                      <View>
-                        <Text style={{
-                          ...styles.name2,
-                          color: theme.link_color,
-                        }}
-                          onPress={() => props.navigation.push('AddressMark', { address: item.Address })}
-                        >{AddressToName(props.avatar.get('AddressMap'), item.Address)}&nbsp;</Text>
-                      </View>
-                  }
-                  <Text onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}>
-                    <View style={{
-                      borderWidth: 1,
-                      borderColor: theme.split_line,
-                      borderRadius: 6,
-                      paddingLeft: 6,
-                      paddingRight: 6,
-
-                    }}>
-                      <Text style={{
-                        color: theme.text1,
-                        fontSize: 16
-                      }}>{`#${item.Sequence}`}</Text>
-                    </View>
-                  </Text>
+                  <LinkName onPress={() => props.navigation.push('AddressMark', { address: item.Address })} name={AddressToName(props.avatar.get('AddressMap'), item.Address)} />
+                  <LinkBulletinStr
+                    onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    str={`#${item.Sequence}`}
+                  />
                 </Text>
 
                 <View style={{

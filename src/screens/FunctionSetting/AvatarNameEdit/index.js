@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { AvatarNameEdit } from '../../../lib/OXO'
 import { actionType } from '../../../redux/actions/actionType'
 import { WhiteSpace, Button } from '@ant-design/react-native'
-import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
+import ErrorMsg from '../../../component/ErrorMsg'
 import tw from 'twrnc'
 
 //地址标记
@@ -38,20 +38,12 @@ const AvatarNameEditScreen = (props) => {
   }
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_body
-    }}>
-      <Text style={{
-        color: theme.text1
-      }}>地址：{address}</Text>
+    <View>
+      <Text style={tw.style(`text-base text-left`)}>地址：{address}</Text>
       <WhiteSpace size='lg' />
       <TextInput
         placeholderTextColor={tw.color('stone-500')}
-        style={{
-          ...styles.input_view,
-          color: theme.text1
-        }}
+        style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
         placeholder="昵称"
         value={name}
         multiline={false}
@@ -60,10 +52,7 @@ const AvatarNameEditScreen = (props) => {
       <WhiteSpace size='lg' />
       {
         error_msg.length > 0 &&
-        <View>
-          <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-          <WhiteSpace size='lg' />
-        </View>
+        <ErrorMsg error_msg={error_msg} />
       }
       <Button style={tw.style(`rounded-full bg-green-500`)} onPress={saveName}>
         <Text style={tw.style(`text-xl text-slate-100`)}>保存</Text>

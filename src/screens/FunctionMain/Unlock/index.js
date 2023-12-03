@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { MasterKeyDerive } from '../../../lib/OXO'
 import { ThemeContext } from '../../../theme/theme-context'
+import ErrorMsg from '../../../component/ErrorMsg'
 import tw from 'twrnc'
 
 //解锁界面
@@ -59,9 +60,7 @@ const UnlockScreen = (props) => {
         />
         {
           error_msg.length > 0 &&
-          <View>
-            <Text style={tw.style(`text-base text-red-500 text-center`)}>{error_msg}</Text>
-          </View>
+          <ErrorMsg error_msg={error_msg} />
         }
         <Button style={tw.style(`rounded-full bg-green-500`)} onPress={unlock}>
           <Text style={tw.style(`text-xl text-slate-100`)}>解锁</Text>

@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { Button } from '@ant-design/react-native'
 import { DefaultHost, DefaultTheme, DefaultBulletinCacheSize } from '../../../lib/Const'
 import { ThemeContext } from '../../../theme/theme-context'
+import ErrorMsg from '../../../component/ErrorMsg'
 import tw from 'twrnc'
 
 //口令设置界面
@@ -119,9 +120,7 @@ const MasterKeyScreen = props => {
         />
         {
           error_msg.length > 0 &&
-          <View>
-            <Text style={tw.style('text-base', 'text-red-500')}>{error_msg}</Text>
-          </View>
+          <ErrorMsg error_msg={error_msg} />
         }
         <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => saveMasterKey()}>
           <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>

@@ -178,13 +178,20 @@ export default class Database {
     })
   }
 
-  closeDB() {
+  closeDB(flag_clear_db, address) {
     console.log("DB Checking")
     if (this.db) {
       console.log("DB Closing")
       this.db.close()
         .then(() => {
           console.log("DB closed")
+          if (flag_clear_db) {
+            SQLite.deleteDatabase({ name: address, location: 'default' }, () => {
+              console.log(`Database ${address} deleted successfully.`)
+            }, error => {
+              console.log(`Error while deleting database ${address}: `, error)
+            })
+          }
         })
         .catch(error => {
           console.log(error)

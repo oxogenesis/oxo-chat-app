@@ -96,7 +96,11 @@ const AddressMarkScreen = (props) => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      loadAddressMark()
+      if (props.avatar.get('Address') == props.route.params.address) {
+        props.navigation.replace('SettingMe')
+      } else {
+        loadAddressMark()
+      }
     })
   })
 

@@ -59,6 +59,9 @@ const BulletinPublishScreen = props => {
       ...styles.base_body1,
       backgroundColor: theme.base_view
     }}>
+      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => publishBulletin()}>
+        <Text style={tw.style(`text-xl text-slate-100`)}>发布</Text>
+      </Button>
       <View style={{
         padding: 6
       }}>
@@ -94,7 +97,7 @@ const BulletinPublishScreen = props => {
           {
             props.avatar.get('QuoteList').map((item, index) => (
               <View
-                key={item.Hash}
+                key={index}
                 style={{
                   borderWidth: 1,
                   borderColor: theme.split_line,
@@ -102,27 +105,15 @@ const BulletinPublishScreen = props => {
                   paddingLeft: 6,
                   paddingRight: 6
                 }}>
-                <LinkPublishQuote
-                  name={AddressToName(props.avatar.get('AddressMap'), item.Address)}
-                  sequence={item.Sequence}
-                  onPressQuote={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                  onPressCancel={() => props.dispatch({
-                    type: actionType.avatar.delQuote,
-                    hash: item.Hash
-                  })} />
+                <LinkPublishQuote address={item.Address} sequence={item.Sequence} hash={item.Hash} to={item.Address} />
               </View>
             ))
           }
         </View>
       }
       <Text style={tw.style('text-base', 'text-red-500')}>
-        {`注意：发布内容将以字符串类型进行签名，所有请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）替代，谢谢`}
+        {`注意：发布内容将以字符串类型进行签名，所以请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）替代，谢谢`}
       </Text>
-      <View style={styles.base_view_a}>
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => publishBulletin()}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>发布</Text>
-        </Button>
-      </View>
     </View >
   )
 }

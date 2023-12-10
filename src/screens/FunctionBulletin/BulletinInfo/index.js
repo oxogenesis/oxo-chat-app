@@ -62,16 +62,7 @@ const BulletinInfoScreen = (props) => {
               <Text style={tw.style(`flex flex-row flex-nowrap`)}>
                 {
                   props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
-                    <LinkBulletin
-                      key={index}
-                      onPress={() => props.navigation.push('Bulletin', {
-                        address: item.Address,
-                        sequence: item.Sequence,
-                        hash: item.Hash,
-                        to: props.avatar.get('CurrentBulletin').Address
-                      })}
-                      name={AddressToName(props.avatar.get('AddressMap'), item.Address)}
-                      sequence={item.Sequence} />
+                    <LinkBulletin key={index} address={item.Address} sequence={item.Sequence} hash={item.Hash} to={props.avatar.get('CurrentBulletin').Address} />
                   ))
                 }
               </Text>

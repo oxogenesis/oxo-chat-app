@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { View, Alert, Appearance } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { connect } from 'react-redux'
-import { actionType } from '../../../redux/actions/actionType'
+import { BulletinAddressSession } from '../../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Toast } from '@ant-design/react-native'
 import { List, WhiteSpace } from '@ant-design/react-native'
@@ -56,6 +56,12 @@ const SettingMeScreen = (props) => {
       </View>
       <WhiteSpace size='lg' />
       <BaseList data={[
+        {
+          title: '我的公告', onpress: () => {
+            props.navigation.push('BulletinList',
+              { session: BulletinAddressSession, address: props.avatar.get('Address') })
+          }
+        },
         { title: props.avatar.get('Address'), icon: 'block', onpress: copyToClipboard },
         { title: props.avatar.get('Name'), onpress: () => { props.navigation.navigate('AvatarNameEdit') } },
         { title: '查看种子二维码', onpress: viewSeedQrcodeAlert },

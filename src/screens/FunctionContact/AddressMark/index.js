@@ -98,6 +98,8 @@ const AddressMarkScreen = (props) => {
     return props.navigation.addListener('focus', () => {
       if (props.avatar.get('Address') == props.route.params.address) {
         props.navigation.replace('SettingMe')
+      } else if (props.avatar.get('AddressMap')[props.route.params.address] == null) {
+        props.navigation.replace('AddressAdd', { address: props.route.params.address })
       } else {
         loadAddressMark()
       }
@@ -123,7 +125,7 @@ const AddressMarkScreen = (props) => {
   }
 
   const current = props.avatar.get('CurrentAddressMark')
-  const { Name, Address, IsMark, IsFriend, IsFollow } = current || {}
+  const { Name, Address, IsFriend, IsFollow } = current || {}
   const currentFriend = isFriend === undefined ? IsFriend : isFriend
   const currentFollow = isFollow === undefined ? IsFollow : isFollow
 
@@ -143,22 +145,21 @@ const AddressMarkScreen = (props) => {
 
           <WhiteSpace size='lg' />
 
-          {
-            IsMark && <BaseList data={[
-              {
-                title: '添加好友',
-                type: 'switch',
-                checked: currentFriend,
-                onChange: onSwitchChange,
-              },
-              {
-                title: '关注公告',
-                type: 'switch',
-                checked: currentFollow,
-                onChange: onSwitchChangeFollow,
-              },
-            ]} />
-          }
+
+          <BaseList data={[
+            {
+              title: '添加好友',
+              type: 'switch',
+              checked: currentFriend,
+              onChange: onSwitchChange,
+            },
+            {
+              title: '关注公告',
+              type: 'switch',
+              checked: currentFollow,
+              onChange: onSwitchChangeFollow,
+            },
+          ]} />
 
           {
             currentFollow &&
@@ -171,34 +172,22 @@ const AddressMarkScreen = (props) => {
             ]} />
           }
 
-          {
-            IsMark && <WhiteSpace size='lg' />
-          }
+          <WhiteSpace size='lg' />
 
+
+          <Button style={tw.style(`rounded-full bg-red-500`)} onPress={delAddressMark}>
+            <Text style={tw.style(`text-xl text-slate-100`)}>删除</Text>
+          </Button>
+          <WhiteSpace size='lg' />
           {
-            IsMark &&
-            <Button style={tw.style(`rounded-full bg-red-500`)} onPress={delAddressMark}>
-              <Text style={tw.style(`text-xl text-slate-100`)}>删除</Text>
-            </Button>
-          }
-          {
-            IsMark && <WhiteSpace size='lg' />
-          }
-          {
-            IsMark && currentFriend &&
+            currentFriend &&
             <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() =>
               props.navigation.push('Session', { address: Address })}>
               <Text style={tw.style(`text-xl text-slate-100`)}>开始聊天</Text>
             </Button>
           }
 
-          {
-            !IsMark &&
-            <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => props.navigation.navigate('AddressAdd',
-              { address: Address })}>
-              <Text style={tw.style(`text-xl text-slate-100`)}>标记地址</Text>
-            </Button>
-          }
+
         </>
       }
       <AlertView

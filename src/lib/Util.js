@@ -12,7 +12,7 @@ function timestamp_format(timestamp) {
   let s = time.getSeconds()
 
   timestamp = new Date()
-  let tmp = ''
+  let tmp = '@'
   if (y != timestamp.getFullYear()) {
     tmp += y + '-' + add0(m) + '-' + add0(d) + ' '
   } else {

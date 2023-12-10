@@ -68,6 +68,7 @@ export default class Database {
           file_sha1 VARCHAR(40)
           )`)
 
+      // bulletin
       await this.createTable('BULLETINS', `CREATE TABLE IF NOT EXISTS BULLETINS(
           hash VARCHAR(32) PRIMARY KEY,
           address VARCHAR(35) NOT NULL,
@@ -87,6 +88,15 @@ export default class Database {
           is_mark BOOLEAN DEFAULT FALSE,
           is_cache BOOLEAN DEFAULT TRUE
           )`)
+
+      // quote
+      await this.createTable('QUOTES', `CREATE TABLE IF NOT EXISTS QUOTES(
+        main_hash VARCHAR(32) NOT NULL PRIMARY KEY,
+        address VARCHAR(35) NOT NULL,
+        sequence INTEGER NOT NULL,
+        content text NOT NULL,
+        signed_at INTEGER NOT NULL
+        )`)
 
       //group
       await this.createTable('GROUPS', `CREATE TABLE IF NOT EXISTS GROUPS(

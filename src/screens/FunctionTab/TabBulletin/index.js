@@ -3,15 +3,14 @@ import { View, Text, FlatList } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { timestamp_format, AddressToName } from '../../../lib/Util'
+import { timestamp_format } from '../../../lib/Util'
 import { Button, Flex } from '@ant-design/react-native'
 import EmptyView from '../../FunctionBase/EmptyView'
 import { ThemeContext } from '../../../theme/theme-context'
 import { styles } from '../../../theme/style'
 import { BulletinPreviewSize } from '../../../lib/Const'
 import Avatar from '../../../component/Avatar'
-import LinkBulletinStr from '../../../component/LinkBulletinStr'
-import LinkName from '../../../component/LinkName'
+import LinkBulletin from '../../../component/LinkBulletin'
 import tw from 'twrnc'
 
 //公告Tab
@@ -99,11 +98,7 @@ const TabBulletinScreen = (props) => {
                 <Text style={{
                   marginBottom: 6
                 }}>
-                  <LinkName onPress={() => props.navigation.push('AddressMark', { address: item.Address })} name={AddressToName(props.avatar.get('AddressMap'), item.Address)} />
-                  <LinkBulletinStr
-                    onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                    str={`#${item.Sequence}`}
-                  />
+                  <LinkBulletin address={item.Address} sequence={item.Sequence} hash={item.Hash} to={item.Address} />
                 </Text>
 
                 <View style={{

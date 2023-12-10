@@ -38,6 +38,7 @@ function initialState() {
       RandomBulletinFlag: false,
       QuoteList: [],
       QuoteWhiteList: [],
+      ReplyList: [],
       BulletinCacheSize: DefaultBulletinCacheSize,
 
       // Chat
@@ -84,6 +85,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('ReplyList', [])
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
@@ -129,6 +131,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('ReplyList', [])
     // Chat
     .set('SessionMap', {})
     .set('SessionList', [])
@@ -161,7 +164,6 @@ reducer.prototype[actionType.avatar.setCurrentAddressMark] = (state, action) => 
   let tmp = {}
   tmp.Address = action.address
   tmp.Name = AddressToName(state.get('AddressMap'), action.address)
-  tmp.IsMark = (tmp.Address != tmp.Name)
   tmp.IsFollow = state.get('Follows').includes(tmp.Address)
   tmp.IsFriend = state.get('Friends').includes(tmp.Address)
   return state.set('CurrentAddressMark', tmp)
@@ -239,6 +241,10 @@ reducer.prototype[actionType.avatar.setQuoteList] = (state, action) => {
 
 reducer.prototype[actionType.avatar.setQuoteWhiteList] = (state, action) => {
   return state.set('QuoteWhiteList', action.quote_white_list)
+}
+
+reducer.prototype[actionType.avatar.setReplyList] = (state, action) => {
+  return state.set('ReplyList', action.reply_list)
 }
 
 reducer.prototype[actionType.avatar.addQuote] = (state, action) => {

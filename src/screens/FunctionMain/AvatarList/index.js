@@ -2,7 +2,8 @@ import React, { useContext, useState, useEffect } from 'react'
 import { Button, WhiteSpace, Flex } from '@ant-design/react-native'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AvatarDerive, AvatarLoginTimeReset } from '../../../lib/OXO'
+import { AvatarDerive } from '../../../lib/OXO'
+// import { AvatarDerive, AvatarLoginTimeReset } from '../../../lib/OXO'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { styles } from '../../../theme/style'
@@ -23,18 +24,18 @@ const AvatarListScreen = props => {
       AsyncStorage.getItem('<#Avatars#>').then(result => {
         if (result != null) {
           let list = JSON.parse(result)
-          let timestamp = Date.now()
-          if (list.length > 0 && list[0].LoginAt == null) {
-            for (let i = 0; i < list.length; i++) {
-              list[i].LoginAt = timestamp;
-            }
-            AvatarLoginTimeReset(timestamp)
-              .then(result => {
-                if (result) {
-                  console.log(`AvatarLoginTimeReset`)
-                }
-              })
-          }
+          // let timestamp = Date.now()
+          // if (list.length > 0 && list[0].LoginAt == null) {
+          //   for (let i = 0; i < list.length; i++) {
+          //     list[i].LoginAt = timestamp;
+          //   }
+          //   AvatarLoginTimeReset(timestamp)
+          //     .then(result => {
+          //       if (result) {
+          //         console.log(`AvatarLoginTimeReset`)
+          //       }
+          //     })
+          // }
           setList(list)
         }
       })
@@ -48,7 +49,6 @@ const AvatarListScreen = props => {
       loadAvatarList()
     })
   })
-
 
   const enableAvatar = (address, name) => {
     let avatar = avatarList.filter(item => item.Address == address)[0]
@@ -81,30 +81,33 @@ const AvatarListScreen = props => {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
         {
-          avatarList.length > 0 ? avatarList.map((item, index) => (
-            <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
-              <View style={tw`bg-stone-100`}>
-                <Flex>
-                  <Flex.Item style={{ flex: 0.15 }}>
-                    <AvatarImage address={item.Address} />
-                  </Flex.Item>
-                  <Flex.Item >
-                    <Text>
-                      <View style={tw.style(`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`)}>
-                        <Text style={tw.style(`text-base text-slate-800 text-center`)}>
-                          {`${item.Name}`}
-                        </Text>
-                      </View>
-                      <View style={tw.style(`rounded-full px-1 border-1 border-gray-300`)}>
-                        <Text style={tw.style(`text-base text-slate-400`)}>@{timestamp_format(item.LoginAt)}</Text>
-                      </View>
-                    </Text>
-                    <Text style={tw.style(`text-sm text-slate-400`)}>{item.Address}</Text>
-                  </Flex.Item>
-                </Flex>
-              </View>
-            </TouchableOpacity>
-          )) : <EmptyView pTop={1} />
+          avatarList.length > 0 ?
+            avatarList.map((item, index) => (
+              <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
+                <View style={tw`bg-stone-100`}>
+                  <Flex>
+                    <Flex.Item style={{ flex: 0.15 }}>
+                      <AvatarImage address={item.Address} />
+                    </Flex.Item>
+                    <Flex.Item >
+                      <Text>
+                        <View style={tw.style(`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`)}>
+                          <Text style={tw.style(`text-base text-slate-800 text-center`)}>
+                            {`${item.Name}`}
+                          </Text>
+                        </View>
+                        <View style={tw.style(`rounded-full px-1`)}>
+                          <Text style={tw.style(`text-base text-slate-400`)}>{timestamp_format(item.LoginAt)}</Text>
+                        </View>
+                      </Text>
+                      <Text style={tw.style(`text-sm text-slate-400`)}>{item.Address}</Text>
+                    </Flex.Item>
+                  </Flex>
+                </View>
+              </TouchableOpacity>
+            ))
+            :
+            <EmptyView pTop={1} />
         }
         <WhiteSpace size='lg' />
       </ScrollView>
@@ -117,7 +120,6 @@ const AvatarListScreen = props => {
     </View>
   )
 }
-
 
 const ReduxAvatarListScreen = connect((state) => {
   return {

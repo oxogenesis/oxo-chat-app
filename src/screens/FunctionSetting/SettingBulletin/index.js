@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
-import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession } from '../../../lib/Const'
+import { BulletinHistorySession, BulletinMarkSession } from '../../../lib/Const'
 import { actionType } from '../../../redux/actions/actionType'
 import { List, WhiteSpace } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
@@ -36,12 +36,6 @@ const SettingBulletinScreen = (props) => {
       <WhiteSpace size='lg' />
 
       <BaseList data={[
-        {
-          title: '我的公告', onpress: () => {
-            props.navigation.push('BulletinList',
-              { session: BulletinAddressSession, address: props.avatar.get('Address') })
-          }
-        },
         { title: '收藏公告', onpress: () => { props.navigation.push('BulletinList', { session: BulletinMarkSession }) } },
         { title: '浏览历史', onpress: () => { props.navigation.push('BulletinList', { session: BulletinHistorySession }) } },
       ]} />

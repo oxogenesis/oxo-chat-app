@@ -10,8 +10,7 @@ import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import EmptyView from '../../FunctionBase/EmptyView'
 import Avatar from '../../../component/Avatar'
-import LinkBulletinStr from '../../../component/LinkBulletinStr'
-import LinkName from '../../../component/LinkName'
+import LinkBulletin from '../../../component/LinkBulletin'
 import tw from 'twrnc'
 
 
@@ -57,64 +56,46 @@ const BulletinListScreen = (props) => {
       {
         props.avatar.get('BulletinList').length > 0 ?
           props.avatar.get('BulletinList').map((item, index) => (
-            <View
-              key={index}
-              style={{
-                ...styles.list_border,
-                borderBottomColor: theme.split_line
-              }}>
-              <Flex justify="start" align="start">
-                <Avatar address={item.Address} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} />
-                <View style={tw`ml-2px`}>
-                  <Text style={{
-                    marginBottom: 6
-                  }}>
-                    <LinkName onPress={() => props.navigation.push('AddressMark', { address: item.Address })} name={AddressToName(props.avatar.get('AddressMap'), item.Address)} />
-                    <LinkBulletinStr
-                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                      str={`#${item.Sequence}`}
-                    />
+            <Flex key={index} justify="start" align="start" style={tw`mt-5px border-b border-stone-500`}>
+              <Avatar address={item.Address} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} />
+              <View style={tw`ml-2px`}>
+                <Text>
+                  <LinkBulletin address={item.Address} sequence={item.Sequence} hash={item.Hash} to={item.Address} />
+
+                </Text>
+
+                <View style={tw`flex flex-row w-100`}>
+                  <Text style={tw`basis-1/2 flex-auto text-stone-500`}>
+                    {timestamp_format(item.Timestamp)}
                   </Text>
-
-                  <View style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    paddingRight: 50,
-                  }}>
-                    <Text style={{
-                      ...styles.content_view,
-                      color: theme.text2
-                    }}>{timestamp_format(item.Timestamp)}</Text>
-                    {
-                      item.QuoteSize != 0 && <Text style={{
-                        ...styles.form_view,
-                        color: theme.text2
-                      }}>
-                        引用：◀{item.QuoteSize}</Text>
-                    }
-                  </View>
-
-                  {item.Content.length <= BulletinPreviewSize ?
-                    <View style={styles.content_view}>
-                      <Text style={{
-                        ...styles.content_text,
-                        color: theme.text1
-                      }}
-                        onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                      >{item.Content}</Text>
-                    </View>
-                    : <View style={styles.content_view}>
-                      <Text style={{
-                        ...styles.content_text,
-                        color: theme.text1
-                      }}
-                        onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                      >{item.Content.slice(0, BulletinPreviewSize)}</Text>
-                    </View>
+                  {
+                    item.QuoteSize != 0 &&
+                    <Text style={tw`basis-1/2 text-stone-500`}>
+                      引用：◀{item.QuoteSize}
+                    </Text>
                   }
                 </View>
-              </Flex>
-            </View>
+
+                {item.Content.length <= BulletinPreviewSize ?
+                  <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    >{item.Content}</Text>
+                  </View>
+                  : <View style={styles.content_view}>
+                    <Text style={{
+                      ...styles.content_text,
+                      color: theme.text1
+                    }}
+                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
+                    >{item.Content.slice(0, BulletinPreviewSize)}</Text>
+                  </View>
+                }
+              </View>
+            </Flex>
           ))
           :
           <EmptyView />

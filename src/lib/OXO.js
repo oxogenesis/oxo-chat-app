@@ -180,26 +180,26 @@ async function AvatarNameEdit(name, seed, password) {
   }
 }
 
-async function AvatarLoginTimeReset(timestamp) {
-  try {
-    const result = await AsyncStorage.getItem('<#Avatars#>')
-    let avatarList = []
-    if (result != null) {
-      avatarList = JSON.parse(result)
-      let tmp = []
-      avatarList.forEach(avatar => {
-        avatar.LoginAt = timestamp
-        tmp.push(avatar)
-      })
-      avatarList = tmp
-    }
-    await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
-    return true
-  } catch (e) {
-    console.log(e)
-    return false
-  }
-}
+// async function AvatarLoginTimeReset(timestamp) {
+//   try {
+//     const result = await AsyncStorage.getItem('<#Avatars#>')
+//     let avatarList = []
+//     if (result != null) {
+//       avatarList = JSON.parse(result)
+//       let tmp = []
+//       avatarList.forEach(avatar => {
+//         avatar.LoginAt = timestamp
+//         tmp.push(avatar)
+//       })
+//       avatarList = tmp
+//     }
+//     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
+//     return true
+//   } catch (e) {
+//     console.log(e)
+//     return false
+//   }
+// }
 
 async function AvatarLoginTimeUpdate(address) {
   console.log(`AvatarLoginTimeUpdate::::address}`)
@@ -355,7 +355,7 @@ export {
   AvatarCreateNew,
   AvatarCreateWithSeed,
   AvatarDerive,
-  AvatarLoginTimeReset,
+  // AvatarLoginTimeReset,
   AvatarLoginTimeUpdate,
   AvatarNameEdit,
   AvatarRemove,

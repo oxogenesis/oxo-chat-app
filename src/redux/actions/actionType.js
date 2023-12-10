@@ -45,6 +45,7 @@ export const actionType = {
     delQuote: "DEL_QUOTE",
     setQuoteList: 'SET_QUOTE_LIST',
     setQuoteWhiteList: 'SET_QUOTE_WHITE_LIST',
+    setReplyList: 'SET_REPLY_LIST',
 
     setTabBulletinList: 'SET_TAB_BULLETIN_LIST',
     setBulletinList: 'SET_BULLETIN_LIST',

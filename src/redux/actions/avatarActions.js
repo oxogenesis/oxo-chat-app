@@ -636,7 +636,6 @@ export function* LoadCurrentBulletin(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `SELECT * FROM BULLETINS WHERE hash = "${action.hash}" LIMIT 1`
   let item = yield call([db, db.getOne], sql)
-  console.log(item)
   if (item != null) {
     let bulletin = {
       "Address": item.address,
@@ -653,7 +652,7 @@ export function* LoadCurrentBulletin(action) {
       "PreHash": item.pre_hash,
       "QuoteList": []
     }
-    if (item.QuoteSize != 0) {
+    if (bulletin.QuoteSize != 0) {
       let json = JSON.parse(item.json)
       bulletin.QuoteList = json.Quote
     }
@@ -668,8 +667,18 @@ export function* LoadCurrentBulletin(action) {
         quote_white_list.push(quote.Hash)
       }
     }
-    quote_white_list = quote_white_list.filter((item) => item != bulletin.Hash)
+    quote_white_list = quote_white_list.filter((quote) => quote != bulletin.Hash)
     yield put({ type: actionType.avatar.setQuoteWhiteList, quote_white_list: quote_white_list })
+
+    // reply
+    sql = `SELECT * FROM QUOTES WHERE main_hash = "${bulletin.Hash}" ORDER BY signed_at ASC`
+    let reply_list = yield call([db, db.getAll], sql)
+    if (reply_list.length > 0) {
+      yield put({ type: actionType.avatar.setReplyList, reply_list: reply_list })
+      // console.log(reply_list)
+    } else {
+      yield put({ type: actionType.avatar.setReplyList, reply_list: [] })
+    }
   } else {
     //fetch from network
     //action[address, sequence, to]
@@ -773,78 +782,105 @@ export function* SaveBulletin(action) {
 
     //WTF:is_file = 'false', not is_file = false
 
-    if (follow_list.includes(object_address)) {
-      //bulletin from follow
-      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'FALSE')`
-
-      //save bulletin
-      yield call([db, db.runSQL], sql)
-      let bulletin = {
-        "Address": object_address,
-        "Timestamp": bulletin_json.Timestamp,
-        "CreatedAt": timestamp,
-        'Sequence': bulletin_json.Sequence,
-        "Content": bulletin_json.Content,
-        "Hash": hash,
-        "QuoteSize": bulletin_json.Quote.length,
-        "IsMark": false
+    let sql = `SELECT * FROM BULLETINS WHERE address = "${object_address}" AND sequence = ${bulletin_json.Sequence} LIMIT 1`
+    let bulletin = yield call([db, db.getOne], sql)
+    if (bulletin != null) {
+      // 已经保存了
+      if (follow_list.includes(object_address)) {
+        yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+      } else if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
+        let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
+        if (current_bulletin == null) {
+          yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
+        }
+      } else if (self_address == object_address) {
+        yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+      } else if (random_bulletin_flag) {
+        yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
+        yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
       }
-      //刷新TabBulletin页
-      let tab_bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
-      tab_bulletin_list.unshift(bulletin)
-      yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: tab_bulletin_list })
+    } else {
+      if (follow_list.includes(object_address)) {
+        //bulletin from follow
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'FALSE')`
 
-      let current_BB_session = yield select(state => state.avatar.get('CurrentBBSession'))
-      if (current_BB_session == object_address) {
-        let bulletin_list = yield select(state => state.avatar.get('BulletinList'))
-        // 刷新FollowBulletinList页
-        bulletin_list.unshift(bulletin)
-        yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
+        //save bulletin
+        yield call([db, db.runSQL], sql)
+        let bulletin = {
+          "Address": object_address,
+          "Timestamp": bulletin_json.Timestamp,
+          "CreatedAt": timestamp,
+          'Sequence': bulletin_json.Sequence,
+          "Content": bulletin_json.Content,
+          "Hash": hash,
+          "QuoteSize": bulletin_json.Quote.length,
+          "IsMark": false
+        }
+        //刷新TabBulletin页
+        let tab_bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
+        tab_bulletin_list.unshift(bulletin)
+        yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: tab_bulletin_list })
+
+        let current_BB_session = yield select(state => state.avatar.get('CurrentBBSession'))
+        if (current_BB_session == object_address) {
+          let bulletin_list = yield select(state => state.avatar.get('BulletinList'))
+          // 刷新FollowBulletinList页
+          bulletin_list.unshift(bulletin)
+          yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
+        }
+        yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+      } else if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
+        //bulletin from quote
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+        //save bulletin
+        yield call([db, db.runSQL], sql)
+        let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
+        if (current_bulletin == null) {
+          yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
+        }
+        // } else if (message_white_list.includes(hash)) {
+        //   //bulletin from message
+        //   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+        // VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+        //   //save bulletin
+        //   yield call([db, db.runSQL], sql)
+        //   let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
+        //   if (current_bulletin == null) {
+        //     yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
+        //   }
+      } else if (self_address == object_address) {
+        //bulletin from myself
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+        //save bulletin
+        yield call([db, db.runSQL], sql)
+        // save quote
+        if (bulletin_json.Quote.length > 0) {
+          for (let index = 0; index < bulletin_json.Quote.length; index++) {
+            const quote = bulletin_json.Quote[index];
+            sql = `INSERT INTO QUOTES (main_hash, address, sequence, content, signed_at)
+        VALUES ('${quote.Hash}', '${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.Content}', '${bulletin_json.Timestamp}')`
+            yield call([db, db.runSQL], sql)
+          }
+        }
+
+        yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+      } else if (random_bulletin_flag) {
+        //bulletin from random
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+
+        //save bulletin
+        yield call([db, db.runSQL], sql)
+        bulletin_json.Hash = hash
+        yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
+        yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
       }
-      yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
-    } else if (quote_white_list.includes(hash)) {
-      //bulletin from quote
-      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
-
-      //save bulletin
-      yield call([db, db.runSQL], sql)
-      let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
-      if (current_bulletin == null) {
-        // bulletin_json.Address = object_address
-        yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
-      }
-    } else if (message_white_list.includes(hash)) {
-      //bulletin from message
-      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
-
-      //save bulletin
-      yield call([db, db.runSQL], sql)
-      let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
-      if (current_bulletin == null) {
-        // bulletin_json.Address = object_address
-        yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
-      }
-    } else if (self_address == object_address) {
-      //bulletin from myself
-      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-      VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
-
-      //save bulletin
-      yield call([db, db.runSQL], sql)
-      yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
-    } else if (random_bulletin_flag) {
-      //bulletin from random
-      let sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-      VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
-
-      //save bulletin
-      yield call([db, db.runSQL], sql)
-      // bulletin_json.Address = object_address
-      yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
-      yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
     }
   }
 }
@@ -910,8 +946,34 @@ export function* LoadBulletinList(action) {
   let bulletin_list_size = bulletin_list.length
 
   if (action.session == BulletinAddressSession) {
+    // 显示本地数据
     yield put({ type: actionType.avatar.setCurrentBBSession, current_BB_session: action.address })
     sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
+    // 获取更新
+    // 甚至是自己的公告，为切换设备后从服务器取回历史公告 && action.address != self_address
+    let next_sequence = 1
+    let sql2 = `SELECT sequence FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC`
+    let sequence_list = yield call([db, db.getAll], sql2)
+    let length = sequence_list.length
+    if (length == 0 || sequence_list[length - 1] != 1) {
+    } else if (length == sequence_list[0]) {
+      next_sequence = sequence_list[0] + 1
+    } else {
+      let tmp = 0
+      while (sequence_list.length > 0) {
+        if (tmp + 1 == sequence_list.pop()) {
+          tmp = tmp + 1
+        } else {
+          break
+        }
+      }
+      next_sequence = tmp + 1
+    }
+    if (action.address != self_address) {
+      yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: action.address })
+    } else {
+      yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: GenesisAddress })
+    }
   } else if (action.session == BulletinHistorySession) {
     sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
   } else if (action.session == BulletinMarkSession) {
@@ -935,20 +997,6 @@ export function* LoadBulletinList(action) {
   if (tmp.length != 0) {
     bulletin_list = bulletin_list.concat(tmp)
     yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
-  }
-
-  // 获取更新
-  // 甚至是自己的公告，为切换设备后从服务器取回历史公告 && action.address != self_address
-  if (action.session == BulletinAddressSession) {
-    let next_sequence = 1
-    if (bulletin_list.length != 0) {
-      next_sequence = bulletin_list[0].Sequence + 1
-    }
-    if (action.address != self_address) {
-      yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: action.address })
-    } else {
-      yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: GenesisAddress })
-    }
   }
 }
 

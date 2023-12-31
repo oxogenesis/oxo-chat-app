@@ -61,8 +61,8 @@ const SettingNetworkScreen = (props) => {
     <View>
       {
         !props.avatar.get('ConnStatus') &&
-        <View style={tw.style(`bg-red-200 p-4`)}>
-          <Text style={tw.style(`text-base text-center`)}>
+        <View style={tw`bg-red-200 p-4`}>
+          <Text style={tw`text-base text-center`}>
             未连接服务器，请检查网络设置或连通性
           </Text>
         </View>
@@ -78,15 +78,15 @@ const SettingNetworkScreen = (props) => {
           value={host_input}
           onChangeText={setHost}
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
         />
         <WhiteSpace size='md' />
         {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addHost}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>
+        <Button style={tw`rounded-full bg-green-500`} onPress={addHost}>
+          <Text style={tw`text-xl text-slate-100`}>设置</Text>
         </Button>
         <WhiteSpace size='md' />
         <FlatList
@@ -138,13 +138,13 @@ const SettingNetworkScreen = (props) => {
                       :
                       <>
                         <View style={{ flex: 0.20 }} >
-                          <Button style={tw.style(`rounded-full bg-green-500 w-15`)} onPress={() => changeCurrentHost(item.Address)}>
-                            <Text style={tw.style(`text-xs text-slate-100`)}>使用</Text>
+                          <Button style={tw`rounded-full bg-green-500 w-15`} onPress={() => changeCurrentHost(item.Address)}>
+                            <Text style={tw`text-xs text-slate-100`}>使用</Text>
                           </Button>
                         </View>
                         <View style={{ flex: 0.20 }} >
-                          <Button style={tw.style(`rounded-full bg-red-500 w-15`)} onPress={() => delHostAlert(item.Address)}>
-                            <Text style={tw.style(`text-xs text-slate-100`)}>删除</Text>
+                          <Button style={tw`rounded-full bg-red-500 w-15`} onPress={() => delHostAlert(item.Address)}>
+                            <Text style={tw`text-xs text-slate-100`}>删除</Text>
                           </Button>
                         </View>
                       </>

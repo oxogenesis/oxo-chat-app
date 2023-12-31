@@ -51,8 +51,8 @@ const AvatarSeedQrcodeScreen = (props) => {
         color: theme.text2
       }}>{`注意：查看种子二维码，应回避具备视觉的生物或设备，应在私密可控环境下。`}</Text>
       <WhiteSpace size='lg' />
-      <Button style={tw.style(`rounded-full bg-red-500`)} onPress={viewSeedAlert}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>查看种子</Text>
+      <Button style={tw`rounded-full bg-red-500`} onPress={viewSeedAlert}>
+        <Text style={tw`text-xl text-slate-100`}>查看种子</Text>
       </Button>
       <AlertView
         visible={visible}

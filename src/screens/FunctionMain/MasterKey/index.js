@@ -103,16 +103,16 @@ const MasterKeyScreen = props => {
 
   return (
     <View style={tw`h-full bg-stone-200`}>
-      <View style={tw.style(`my-auto`)}>
+      <View style={tw`my-auto`}>
         <TextInput
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           secureTextEntry={true}
           placeholder="口令"
           value={masterKey}
           onChangeText={text => setMasterKey(text)}
         />
         <TextInput
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           secureTextEntry={true}
           placeholder="口令确认"
           value={confirm}
@@ -122,10 +122,10 @@ const MasterKeyScreen = props => {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => saveMasterKey()}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>
+        <Button style={tw`rounded-full bg-green-500`} onPress={() => saveMasterKey()}>
+          <Text style={tw`text-xl text-slate-100`}>设置</Text>
         </Button>
-        <Text style={tw.style('text-base', 'text-red-500')}>
+        <Text style={tw`text-base text-red-500`}>
           {`说明：
 1、口令用于在本设备上加密/解密账户的种子。
 2、账户的种子是账户的唯一凭证，不可泄漏、灭失，应做好备份。

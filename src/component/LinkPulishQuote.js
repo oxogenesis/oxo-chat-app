@@ -8,11 +8,11 @@ import tw from 'twrnc'
 
 const LinkPublishQuote = (props) => {
   return (
-    <View style={tw.style(`flex-row rounded-lg border-2 border-gray-400`)}>
+    <View style={tw`flex-row rounded-lg border-2 border-gray-400`}>
       <LinkBulletin address={props.address} sequence={props.sequence} hash={props.hash} to={props.to} />
-      <View style={tw.style(`bg-gray-300 rounded-full px-2`)}>
+      <View style={tw`bg-gray-300 rounded-full px-2`}>
         <Text
-          style={tw.style(`text-base text-red-500 text-center`)}
+          style={tw`text-base text-red-500 text-center`}
           onPress={() => props.dispatch({
             type: actionType.avatar.delQuote,
             hash: props.hash

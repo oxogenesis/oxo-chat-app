@@ -92,11 +92,11 @@ const AddressAddFromQrcodeScreen = (props) => {
       </View>
 
       <WhiteSpace size='md' />
-      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={markAddress}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>标记地址</Text>
+      <Button style={tw`rounded-full bg-green-500`} onPress={markAddress}>
+        <Text style={tw`text-xl text-slate-100`}>标记地址</Text>
       </Button>
-      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addHost}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>标记地址 + 保存服务器网址</Text>
+      <Button style={tw`rounded-full bg-green-500`} onPress={addHost}>
+        <Text style={tw`text-xl text-slate-100`}>标记地址 + 保存服务器网址</Text>
       </Button>
     </View>
   )

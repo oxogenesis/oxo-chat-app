@@ -38,25 +38,33 @@ const AvatarNameEditScreen = (props) => {
   }
 
   return (
-    <View>
-      <Text style={tw.style(`text-base text-left`)}>地址：{address}</Text>
-      <WhiteSpace size='lg' />
-      <TextInput
-        placeholderTextColor={tw.color('stone-500')}
-        style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
-        placeholder="昵称"
-        value={name}
-        multiline={false}
-        onChangeText={text => setName(text)}
-      />
-      <WhiteSpace size='lg' />
-      {
-        error_msg.length > 0 &&
-        <ErrorMsg error_msg={error_msg} />
-      }
-      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={saveName}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>保存</Text>
-      </Button>
+    <View style={tw`h-full bg-stone-200`}>
+      <View style={tw`my-auto`}>
+        <TextInput
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
+          placeholder="地址"
+          value={address}
+          editable={false}
+          multiline={false}
+          onChangeText={text => setAddress(text)}
+        />
+        <TextInput
+          placeholderTextColor={tw.color('stone-500')}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
+          placeholder="昵称"
+          value={name}
+          multiline={false}
+          onChangeText={text => setName(text)}
+        />
+        {
+          error_msg.length > 0 &&
+          <ErrorMsg error_msg={error_msg} />
+        }
+        <Button style={tw`rounded-full bg-green-500`} onPress={saveName}>
+          <Text style={tw`text-xl text-slate-100`}>保存</Text>
+        </Button>
+      </View>
     </View>
   )
 }

@@ -463,6 +463,8 @@ export function* saveAddressName(action) {
   yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
   address_map[action.address] = action.name
+  console.log(`========================saveAddressName`)
+  console.log(address_map)
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 }
 

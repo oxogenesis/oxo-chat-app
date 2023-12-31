@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { Button, WhiteSpace, Flex } from '@ant-design/react-native'
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AvatarDerive } from '../../../lib/OXO'
 // import { AvatarDerive, AvatarLoginTimeReset } from '../../../lib/OXO'
@@ -14,10 +14,13 @@ import AvatarImage from '../../../component/AvatarImage'
 import { timestamp_format } from '../../../lib/Util'
 import tw from 'twrnc'
 
+
+
 //账号选择界面
 const AvatarListScreen = props => {
   const { theme } = useContext(ThemeContext)
   const [avatarList, setList] = useState([])
+  const [flagLoading, setFlagLoading] = useState(false)
 
   const loadAvatarList = () => {
     try {
@@ -32,7 +35,7 @@ const AvatarListScreen = props => {
           //   AvatarLoginTimeReset(timestamp)
           //     .then(result => {
           //       if (result) {
-          //         console.log(`AvatarLoginTimeReset`)
+          //         console.log(`AvatarLoginTimeReset`
           //       }
           //     })
           // }
@@ -50,7 +53,22 @@ const AvatarListScreen = props => {
     })
   })
 
+  // useEffect(() => {
+  //   console.log('>>>>>>>>>useEffect flagLoading is: ', props.flagLoading);
+  // }, [props.flagLoading])
+
+  // useEffect(() => {
+  //   console.log('>>>>>>>>>useEffect master is: ', props.master);
+  // }, [props.master])
+
+  useEffect(() => {
+    if (props.avatar.get('Database') != null && props.avatar.get('Database') != null) {
+      props.navigation.replace('TabHome')
+    }
+  }, [props.avatar])
+
   const enableAvatar = (address, name) => {
+    setFlagLoading(true)
     let avatar = avatarList.filter(item => item.Address == address)[0]
     AvatarDerive(avatar.save, props.master.get('MasterKey'))
       .then(result => {
@@ -60,7 +78,8 @@ const AvatarListScreen = props => {
             seed: result,
             name: name
           })
-          props.navigation.replace('TabHome')
+        } else {
+          setFlagLoading(false)
         }
       })
   }
@@ -74,50 +93,58 @@ const AvatarListScreen = props => {
   }
 
   return (
-    <View style={tw`h-full bg-stone-200 p-5px`}>
-      <ScrollView
-        style={styles.scroll_view}
-        automaticallyAdjustContentInsets={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
-        {
-          avatarList.length > 0 ?
-            avatarList.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
-                <View style={tw`bg-stone-100`}>
-                  <Flex>
-                    <Flex.Item style={{ flex: 0.15 }}>
-                      <AvatarImage address={item.Address} />
-                    </Flex.Item>
-                    <Flex.Item >
-                      <Text>
-                        <View style={tw.style(`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`)}>
-                          <Text style={tw.style(`text-base text-slate-800 text-center`)}>
-                            {`${item.Name}`}
-                          </Text>
-                        </View>
-                        <View style={tw.style(`rounded-full px-1`)}>
-                          <Text style={tw.style(`text-base text-slate-400`)}>{timestamp_format(item.LoginAt)}</Text>
-                        </View>
-                      </Text>
-                      <Text style={tw.style(`text-sm text-slate-400`)}>{item.Address}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </TouchableOpacity>
-            ))
-            :
-            <EmptyView pTop={1} />
-        }
-        <WhiteSpace size='lg' />
-      </ScrollView>
+    <View>
+      {
+        flagLoading == false ?
+          <View style={tw`h-full bg-stone-200 p-5px`}>
+            <ScrollView
+              style={styles.scroll_view}
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}>
+              {
+                avatarList.length > 0 ?
+                  avatarList.map((item, index) => (
+                    <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
+                      <View style={tw`bg-stone-100`}>
+                        <Flex>
+                          <Flex.Item style={{ flex: 0.15 }}>
+                            <AvatarImage address={item.Address} />
+                          </Flex.Item>
+                          <Flex.Item >
+                            <Text>
+                              <View style={tw`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`}>
+                                <Text style={tw`text-base text-slate-800 text-center`}>
+                                  {`${item.Name}`}
+                                </Text>
+                              </View>
+                              <View style={tw`rounded-full px-1`}>
+                                <Text style={tw`text-base text-slate-400`}>{timestamp_format(item.LoginAt)}</Text>
+                              </View>
+                            </Text>
+                            <Text style={tw`text-sm text-slate-400`}>{item.Address}</Text>
+                          </Flex.Item>
+                        </Flex>
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                  :
+                  <EmptyView pTop={1} />
+              }
+              <WhiteSpace size='lg' />
+            </ScrollView>
 
-      <View style={styles.base_view_a}>
-        <Button style={tw.style(`rounded-full bg-red-500`)} onPress={() => lock()}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>安全退出</Text>
-        </Button>
-      </View>
+            <View style={styles.base_view_a}>
+              <Button style={tw`rounded-full bg-red-500`} onPress={() => lock()}>
+                <Text style={tw`text-xl text-slate-100`}>安全退出</Text>
+              </Button>
+            </View>
+          </View>
+          :
+          <ActivityIndicator size="large" color={tw.color('blue-500')} />
+      }
     </View>
+
   )
 }
 

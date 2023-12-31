@@ -30,8 +30,14 @@ const TabSettingScreen = (props) => {
     }
   }
 
+  useEffect(() => {
+    if (props.avatar.get('Database') == null && props.avatar.get('Database') == null) {
+      props.navigation.replace('AvatarList')
+    }
+  }, [props.avatar])
+
   return (
-    <View style={tw.style(`rounded-full p-2`)}>
+    <View style={tw`rounded-full p-2`}>
       <WhiteSpace size='lg' />
       <BaseList data={[{ title: '账号设置', onpress: () => { props.navigation.navigate('SettingMe') } }]} />
       <WhiteSpace size='lg' />
@@ -52,20 +58,19 @@ const TabSettingScreen = (props) => {
         },
       ]} />
       <WhiteSpace size='lg' />
-      <Button style={tw.style(`rounded-full bg-red-500`)}
+      <Button style={tw`rounded-full bg-red-500`}
         onPress={() => {
           props.dispatch({
             type: actionType.avatar.disableAvatar,
             flag_clear_db: false
           })
-          props.navigation.replace('AvatarList')
         }}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>切换账户</Text>
+        <Text style={tw`text-xl text-slate-100`}>切换账户</Text>
       </Button>
 
       <WhiteSpace size='lg' />
-      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => { props.navigation.navigate('About') }}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>关于</Text>
+      <Button style={tw`rounded-full bg-green-500`} onPress={() => { props.navigation.navigate('About') }}>
+        <Text style={tw`text-xl text-slate-100`}>关于</Text>
       </Button>
     </View >
   )

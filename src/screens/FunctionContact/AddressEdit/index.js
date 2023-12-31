@@ -33,10 +33,10 @@ const AddressEditScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-stone-200`}>
-      <View style={tw.style(`my-auto`)}>
+      <View style={tw`my-auto`}>
         <TextInput
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           placeholder="地址"
           value={address}
           editable={false}
@@ -45,7 +45,7 @@ const AddressEditScreen = (props) => {
         />
         <TextInput
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           placeholder="昵称"
           value={name}
           multiline={false}
@@ -55,8 +55,8 @@ const AddressEditScreen = (props) => {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={saveAddressName}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>保存</Text>
+        <Button style={tw`rounded-full bg-green-500`} onPress={saveAddressName}>
+          <Text style={tw`text-xl text-slate-100`}>保存</Text>
         </Button>
       </View>
     </View>

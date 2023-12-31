@@ -67,8 +67,8 @@ const TabBulletinScreen = (props) => {
     >
       {
         !props.avatar.get('ConnStatus') &&
-        <View style={tw.style(`bg-red-200 p-4`)}>
-          <Text style={tw.style(`text-base text-center`)}>
+        <View style={tw`bg-red-200 p-4`}>
+          <Text style={tw`text-base text-center`}>
             未连接服务器，请检查网络设置或连通性
           </Text>
         </View>
@@ -142,9 +142,9 @@ const TabBulletinScreen = (props) => {
         )}
       />
 
-      <View style={tw.style(`absolute inset-x-0 bottom-0 bg-stone-200 z-50`)}>
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => props.navigation.navigate('BulletinPublish')}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>发布公告</Text>
+      <View style={tw`absolute inset-x-0 bottom-0 bg-stone-200 z-50`}>
+        <Button style={tw`rounded-full bg-green-500`} onPress={() => props.navigation.navigate('BulletinPublish')}>
+          <Text style={tw`text-xl text-slate-100`}>发布公告</Text>
         </Button>
       </View>
     </View>

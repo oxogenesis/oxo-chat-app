@@ -1,6 +1,5 @@
 import { actionType } from '../actions/actionType'
 import { fromJS, set } from 'immutable'
-import { AddressToName } from '../../lib/Util'
 import { DefaultTheme, DefaultBulletinCacheSize } from '../../lib/Const'
 
 function initialState() {
@@ -163,7 +162,6 @@ reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {
 reducer.prototype[actionType.avatar.setCurrentAddressMark] = (state, action) => {
   let tmp = {}
   tmp.Address = action.address
-  tmp.Name = AddressToName(state.get('AddressMap'), action.address)
   tmp.IsFollow = state.get('Follows').includes(tmp.Address)
   tmp.IsFriend = state.get('Friends').includes(tmp.Address)
   return state.set('CurrentAddressMark', tmp)

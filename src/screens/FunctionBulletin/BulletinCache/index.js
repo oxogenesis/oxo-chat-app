@@ -36,11 +36,11 @@ const BulletinCacheScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-stone-200`}>
-      <View style={tw.style(`my-auto`)}>
+      <View style={tw`my-auto`}>
         <TextInput
           placeholder={`公告缓存数量:${props.avatar.get('BulletinCacheSize')}`}
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           value={size}
           onChangeText={text => setSize(text)}
         />
@@ -48,8 +48,8 @@ const BulletinCacheScreen = (props) => {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={setBulletinCacheSize}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>设置</Text>
+        <Button style={tw`rounded-full bg-green-500`} onPress={setBulletinCacheSize}>
+          <Text style={tw`text-xl text-slate-100`}>设置</Text>
         </Button>
         <WhiteSpace size='lg' />
         <Text style={{

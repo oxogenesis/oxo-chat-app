@@ -9,6 +9,7 @@ import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
 import { ThemeContext } from '../../../theme/theme-context'
 import AlertView from '../../FunctionBase/AlertView'
 import BaseList from '../../FunctionBase/BaseList'
+import { AddressToName } from '../../../lib/Util'
 import tw from 'twrnc'
 
 const Item = List.Item
@@ -125,7 +126,7 @@ const AddressMarkScreen = (props) => {
   }
 
   const current = props.avatar.get('CurrentAddressMark')
-  const { Name, Address, IsFriend, IsFollow } = current || {}
+  const { Address, IsFriend, IsFollow } = current || {}
   const currentFriend = isFriend === undefined ? IsFriend : isFriend
   const currentFollow = isFollow === undefined ? IsFollow : isFollow
 
@@ -140,7 +141,7 @@ const AddressMarkScreen = (props) => {
         <>
           <BaseList data={[
             { title: Address, icon: 'block', onpress: copyToClipboard },
-            { title: Name, onpress: () => props.navigation.navigate('AddressEdit', { address: Address }) },
+            { title: AddressToName(props.avatar.get('AddressMap'), Address), onpress: () => props.navigation.navigate('AddressEdit', { address: Address }) },
           ]} />
 
           <WhiteSpace size='lg' />
@@ -175,15 +176,15 @@ const AddressMarkScreen = (props) => {
           <WhiteSpace size='lg' />
 
 
-          <Button style={tw.style(`rounded-full bg-red-500`)} onPress={delAddressMark}>
-            <Text style={tw.style(`text-xl text-slate-100`)}>删除</Text>
+          <Button style={tw`rounded-full bg-red-500`} onPress={delAddressMark}>
+            <Text style={tw`text-xl text-slate-100`}>删除</Text>
           </Button>
           <WhiteSpace size='lg' />
           {
             currentFriend &&
-            <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() =>
+            <Button style={tw`rounded-full bg-green-500`} onPress={() =>
               props.navigation.push('Session', { address: Address })}>
-              <Text style={tw.style(`text-xl text-slate-100`)}>开始聊天</Text>
+              <Text style={tw`text-xl text-slate-100`}>开始聊天</Text>
             </Button>
           }
 

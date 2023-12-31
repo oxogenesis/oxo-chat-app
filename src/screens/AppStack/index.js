@@ -1,12 +1,10 @@
 
 import React, { useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import { actionType } from '../../redux/actions/actionType'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconFeather from 'react-native-vector-icons/Feather'
-//import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
-import IconFontisto from 'react-native-vector-icons/Fontisto'
+import IconEntypo from 'react-native-vector-icons/Entypo'
 
 import MasterKeyScreen from '../FunctionMain/MasterKey'
 import UnlockScreen from '../FunctionMain/Unlock'
@@ -64,6 +62,7 @@ const AppStack = (props) => {
 
   return (
     <Stack.Navigator initialRouteName="MasterKey">
+      {/* main */}
       <Stack.Screen
         name="MasterKey"
         component={MasterKeyScreen}
@@ -126,6 +125,7 @@ const AppStack = (props) => {
           })
         }
       />
+      {/* bulletin */}
       <Stack.Screen
         name="Bulletin"
         component={BulletinScreen}
@@ -134,8 +134,8 @@ const AppStack = (props) => {
             title: "公告",
             ...headerStyleOption,
             headerRight: () => (
-              <IconFontisto
-                name={'info'}
+              <IconAnt
+                name={'earth'}
                 size={32}
                 color={theme.text1}
                 onPress={() => navigation.push('BulletinInfo', { hash: route.params.hash })}

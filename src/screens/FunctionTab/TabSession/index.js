@@ -23,8 +23,8 @@ const TabSessionScreen = (props) => {
     >
       {
         !props.avatar.get('ConnStatus') &&
-        <View style={tw.style(`bg-red-200 p-4`)}>
-          <Text style={tw.style(`text-base text-center`)}>
+        <View style={tw`bg-red-200 p-4`}>
+          <Text style={tw`text-base text-center`}>
             未连接服务器，请检查网络设置或连通性
           </Text>
         </View>

@@ -40,37 +40,36 @@ const BulletinInfoScreen = (props) => {
           <EmptyView />
           :
           <>
-            <Text style={{
-              color: theme.text1
-            }}>{`哈希：${props.route.params.hash}`}</Text>
-            <Text style={{
-              color: theme.text1
-            }}>{`地址：${props.avatar.get('CurrentBulletin').Address}`}</Text>
-            <Text style={{
-              color: theme.text1
-            }}>{`昵称：${AddressToName(props.avatar.get('AddressMap'), props.avatar.get('CurrentBulletin').Address)}`}</Text>
-            <Text style={{
-              color: theme.text1
-            }}>{`序号：${props.avatar.get('CurrentBulletin').Sequence}`}</Text>
-            <Text style={{
-              color: theme.text1
-            }}>{`时间：${timestamp_format(props.avatar.get('CurrentBulletin').Timestamp)}`}</Text>
-            <Text style={{
-              color: theme.text1
-            }}>{`引用：${props.avatar.get('CurrentBulletin').QuoteSize}`}</Text>
-            {
-              <Text style={tw.style(`flex flex-row flex-nowrap`)}>
-                {
-                  props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
-                    <LinkBulletin key={index} address={item.Address} sequence={item.Sequence} hash={item.Hash} to={props.avatar.get('CurrentBulletin').Address} />
-                  ))
-                }
+            <View style={tw`border-b border-stone-500`}>
+              <Text style={{ color: theme.text1 }}>
+                {`哈希：${props.route.params.hash}`}
               </Text>
-            }
+              <Text style={{ color: theme.text1 }}>
+                {`地址：${props.avatar.get('CurrentBulletin').Address}`}
+              </Text>
+              <Text style={{ color: theme.text1 }}>
+                {`序号：${props.avatar.get('CurrentBulletin').Sequence}`}
+              </Text>
+              <Text style={{ color: theme.text1 }}>
+                {`时间：${props.avatar.get('CurrentBulletin').Timestamp}`}
+              </Text>
+              <Text style={{ color: theme.text1 }}>
+                {`引用：${props.avatar.get('CurrentBulletin').QuoteSize}`}
+              </Text>
+              {
+                <View>
+                  {
+                    props.avatar.get('CurrentBulletin').QuoteList.map((item, index) => (
+                      <Text key={index} style={{ color: theme.text1 }}>
+                        {index + 1} : {item.Address}#{item.Sequence}({item.Hash})
+                      </Text>
+                    ))
+                  }
+                </View>
+              }
+            </View>
             <ScrollView>
-              <Text style={{
-                color: theme.text1
-              }}>
+              <Text style={{ color: theme.text1 }}>
                 {props.avatar.get('CurrentBulletin').Content}
               </Text>
             </ScrollView>

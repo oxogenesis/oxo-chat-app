@@ -68,8 +68,8 @@ const AvatarSeedScreen = (props) => {
       }}>{`注意：查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。`}</Text>
 
       <View>
-        <Button style={tw.style(`rounded-full bg-red-500`)} onPress={() => viewRemoveAvatar()}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>删除账号</Text>
+        <Button style={tw`rounded-full bg-red-500`} onPress={() => viewRemoveAvatar()}>
+          <Text style={tw`text-xl text-slate-100`}>删除账号</Text>
         </Button>
       </View>
       <AlertView

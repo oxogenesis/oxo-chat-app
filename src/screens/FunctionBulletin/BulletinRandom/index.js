@@ -143,7 +143,7 @@ const BulletinRandomScreen = (props) => {
                     <>
                       {
                         random.QuoteList.length > 0 &&
-                        <Text style={tw.style(`flex flex-row flex-nowrap`)}>
+                        <Text style={tw`flex flex-row flex-nowrap`}>
                           {
                             random.QuoteList.map((item, index) => (
                               <LinkBulletin key={index} address={item.Address} sequence={item.Sequence} hash={item.Hash} to={random.Address} />
@@ -245,7 +245,7 @@ const BulletinRandomScreen = (props) => {
                 </View>
 
                 <View style={tw`pr-50px`}>
-                  <Text style={tw.style(`text-base`)}>
+                  <Text style={tw`text-base`}>
                     {random.Content}
                   </Text>
                 </View>

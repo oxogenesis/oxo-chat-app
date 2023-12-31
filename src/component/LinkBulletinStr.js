@@ -6,9 +6,9 @@ import tw from 'twrnc'
 
 const LinkBulletinStr = (props) => {
   return (
-    <View style={tw.style(`bg-yellow-500 rounded-full px-1 border-2 border-gray-300`)}>
+    <View style={tw`bg-yellow-500 rounded-full px-1 border-2 border-gray-300`}>
       <Text
-        style={tw.style(`text-base text-slate-800 text-center`)}
+        style={tw`text-base text-slate-800 text-center`}
         onPress={() => props.navigation.push('Bulletin', { hash: props.hash })}>
         {props.str}
       </Text>

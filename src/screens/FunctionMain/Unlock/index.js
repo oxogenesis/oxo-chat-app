@@ -49,21 +49,22 @@ const UnlockScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-stone-200`}>
-      <View style={tw.style(`my-auto`)}>
+      <View style={tw`my-auto`}>
         <TextInput
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           secureTextEntry={true}
           placeholder="口令"
           value={master_key}
+          multiline={false}
           onChangeText={text => setKey(text)}
         />
         {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={unlock}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>解锁</Text>
+        <Button style={tw`rounded-full bg-green-500`} onPress={unlock}>
+          <Text style={tw`text-xl text-slate-100`}>解锁</Text>
         </Button>
       </View>
     </View>

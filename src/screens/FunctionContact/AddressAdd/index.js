@@ -43,18 +43,18 @@ const AddressAddScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-stone-200`}>
-      <View style={tw.style(`my-auto`)}>
+      <View style={tw`my-auto`}>
         <TextInput
           placeholder="地址"
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           value={address}
           onChangeText={text => setAddress(text)}
         />
         <TextInput
           placeholder="昵称"
           placeholderTextColor={tw.color('stone-500')}
-          style={tw.style(`rounded-full border-solid border-2 border-gray-300 text-base text-center`)}
+          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
           value={name}
           onChangeText={text => setName(text)}
         />
@@ -62,8 +62,8 @@ const AddressAddScreen = (props) => {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw.style(`rounded-full bg-green-500`)} onPress={addAddressMark}>
-          <Text style={tw.style(`text-xl text-slate-100`)}>标记</Text>
+        <Button style={tw`rounded-full bg-green-500`} onPress={addAddressMark}>
+          <Text style={tw`text-xl text-slate-100`}>标记</Text>
         </Button>
       </View>
     </View>

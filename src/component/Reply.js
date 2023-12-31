@@ -27,7 +27,7 @@ const Reply = (props) => {
           </View>
 
           <View style={tw`pr-110px`}>
-            <Text style={tw.style(`text-base`)}>
+            <Text style={tw`text-base`}>
               {props.reply.content}
             </Text>
           </View>

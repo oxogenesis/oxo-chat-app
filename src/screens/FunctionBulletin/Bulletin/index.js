@@ -4,6 +4,9 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { Icon, Toast } from '@ant-design/react-native'
+import IconFontisto from 'react-native-vector-icons/Fontisto'
+import IconEntypo from 'react-native-vector-icons/Entypo'
+import IconMaterial from 'react-native-vector-icons/MaterialIcons'
 import { GenesisHash } from '../../../lib/Const'
 import { timestamp_format, AddressToName } from '../../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
@@ -113,10 +116,10 @@ const BulletinScreen = (props) => {
                   {/* 帖子引用 */}
                   {
                     current.QuoteList != undefined &&
-                    <>
+                    <View style={tw`flex flex-row flex-wrap bg-yellow-100 w-100`}>
                       {
                         current.QuoteList.length > 0 &&
-                        <Text style={tw.style(`flex flex-row flex-nowrap`)}>
+                        <Text>
                           {
                             current.QuoteList.map((item, index) => (
                               <LinkBulletin key={index} address={item.Address} sequence={item.Sequence} hash={item.Hash} to={current.Address} />
@@ -124,7 +127,7 @@ const BulletinScreen = (props) => {
                           }
                         </Text>
                       }
-                    </>
+                    </View>
                   }
 
                   {/* 快捷操作 */}
@@ -133,9 +136,9 @@ const BulletinScreen = (props) => {
                     {
                       current.IsMark == "TRUE" &&
                       <TouchableOpacity onPress={cancelCollection}>
-                        <Icon
-                          name="star"
-                          size="lg"
+                        <IconEntypo
+                          name={"star"}
+                          size={32}
                           color={tw.color('red-500')}
                         />
                       </TouchableOpacity>
@@ -144,9 +147,9 @@ const BulletinScreen = (props) => {
                     {
                       current.IsMark == "FALSE" &&
                       <TouchableOpacity onPress={handleCollection}>
-                        <Icon
-                          name='star'
-                          size="lg"
+                        <IconEntypo
+                          name={"star-outlined"}
+                          size={32}
                           color={tw.color('blue-500')}
                         />
                       </TouchableOpacity>
@@ -161,9 +164,9 @@ const BulletinScreen = (props) => {
                       setShow(Math.random())
                     }
                     }>
-                      <Icon
-                        name='comment'
-                        size="lg"
+                      <IconFontisto
+                        name={"comments"}
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -177,9 +180,9 @@ const BulletinScreen = (props) => {
                     }
                     }
                     >
-                      <Icon
+                      <IconFontisto
                         name='link'
-                        size="lg"
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -197,9 +200,9 @@ const BulletinScreen = (props) => {
                       setShow(Math.random())
                     }
                     }>
-                      <Icon
-                        name='branches'
-                        size="lg"
+                      <IconFontisto
+                        name='share-a'
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -208,9 +211,20 @@ const BulletinScreen = (props) => {
                     <TouchableOpacity onPress={() => {
                       copyToClipboard()
                     }}>
-                      <Icon
-                        name='block'
-                        size="lg"
+                      <IconFontisto
+                        name='copy'
+                        size={32}
+                        color={tw.color('blue-500')}
+                      />
+                    </TouchableOpacity>
+
+                    {/* 原始信息 */}
+                    <TouchableOpacity onPress={() => {
+                      props.navigation.push('BulletinInfo', { hash: current.Hash })
+                    }}>
+                      <IconMaterial
+                        name='info-outline'
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -218,7 +232,7 @@ const BulletinScreen = (props) => {
                 </View>
 
                 <View style={tw`pr-50px`}>
-                  <Text style={tw.style(`text-base`)}>
+                  <Text style={tw`text-base`}>
                     {current.Content}
                   </Text>
                 </View>
@@ -228,7 +242,7 @@ const BulletinScreen = (props) => {
             {/* reply */}
             {
               props.avatar.get('ReplyList').length > 0 &&
-              <View style={tw.style(`flex flex-row flex-nowrap`)}>
+              <View style={tw`flex flex-row flex-nowrap`}>
                 {
                   props.avatar.get('ReplyList').map((reply, index) => (
                     <Reply key={index} reply={reply} />

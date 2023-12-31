@@ -59,8 +59,8 @@ const BulletinPublishScreen = props => {
       ...styles.base_body1,
       backgroundColor: theme.base_view
     }}>
-      <Button style={tw.style(`rounded-full bg-green-500`)} onPress={() => publishBulletin()}>
-        <Text style={tw.style(`text-xl text-slate-100`)}>发布</Text>
+      <Button style={tw`rounded-full bg-green-500`} onPress={() => publishBulletin()}>
+        <Text style={tw`text-xl text-slate-100`}>发布</Text>
       </Button>
       <View style={{
         padding: 6
@@ -111,7 +111,7 @@ const BulletinPublishScreen = props => {
           }
         </View>
       }
-      <Text style={tw.style('text-base', 'text-red-500')}>
+      <Text style={tw`text-base text-red-500`}>
         {`注意：发布内容将以字符串类型进行签名，所以请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）替代，谢谢`}
       </Text>
     </View >

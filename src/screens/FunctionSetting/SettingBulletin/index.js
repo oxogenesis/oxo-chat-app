@@ -38,6 +38,7 @@ const SettingBulletinScreen = (props) => {
       <BaseList data={[
         { title: '收藏公告', onpress: () => { props.navigation.push('BulletinList', { session: BulletinMarkSession }) } },
         { title: '浏览历史', onpress: () => { props.navigation.push('BulletinList', { session: BulletinHistorySession }) } },
+        { title: '随便看看', onpress: () => { props.navigation.push('BulletinRandom') } },
       ]} />
       <WhiteSpace size='lg' />
       <BaseList data={[

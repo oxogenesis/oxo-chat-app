@@ -7,6 +7,9 @@ import TabAddressBookScreen from '../TabAddressBook'
 import TabSettingScreen from '../TabSetting'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import { connect } from 'react-redux'
+import TabBulletinHeader from '../../../component/TabBulletinHeader'
+import TabSessionHeader from '../../../component/TabSessionHeader'
+import TabAddressBookHeader from '../../../component/TabAddressBookHeader'
 import { ThemeContext } from '../../../theme/theme-context'
 import tw from 'twrnc'
 
@@ -18,7 +21,7 @@ const TabHomeScreen = (props) => {
   return (
     <Tab.Navigator
       screenOptions={{
-        "tabBarActiveTintColor": theme.tab_selected_text,
+        "tabBarActiveTintColor": tw.color('green-500'),
         "tabBarInactiveTintColor": theme.tab_text,
         "tabBarActiveBackgroundColor": theme.tab_view,
         "tabBarInactiveBackgroundColor": theme.tab_view,
@@ -30,8 +33,7 @@ const TabHomeScreen = (props) => {
           null
         ]
       }}>
-      <Tab.Screen name="聊天" component={TabSessionScreen} options={{
-        tabBarLabel: '聊天',
+      <Tab.Screen name="公告" component={TabBulletinScreen} options={{
         headerShown: true,
         headerStyle: {
           backgroundColor: theme.tab_view,
@@ -39,6 +41,26 @@ const TabHomeScreen = (props) => {
         headerTitleStyle: {
           color: theme.tab_text,
         },
+        headerTitle: (props) => <TabBulletinHeader {...props} />,
+        tabBarLabel: '公告',
+        tabBarIcon: ({ color, focusd }) => (
+          <IconAnt
+            name={'notification'}
+            size={32}
+            color={color}
+          />
+        )
+      }} />
+      <Tab.Screen name="聊天" component={TabSessionScreen} options={{
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: theme.tab_view,
+        },
+        headerTitleStyle: {
+          color: theme.tab_text,
+        },
+        headerTitle: (props) => <TabSessionHeader {...props} />,
+        tabBarLabel: '聊天',
         tabBarBadge: props.avatar.get("CountUnreadMessage"),
         tabBarIcon: ({ color }) => {
           return <IconAnt
@@ -48,31 +70,15 @@ const TabHomeScreen = (props) => {
           />
         }
       }} />
-      <Tab.Screen name="公告" component={TabBulletinScreen} options={{
-        tabBarLabel: '公告',
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: theme.tab_view,
-        },
-        headerTitleStyle: {
-          color: theme.tab_text,
-        },
-        tabBarIcon: ({ color, focusd }) => (
-          <IconAnt
-            name={'notification'}
-            size={32}
-            color={color}
-          />
-        )
-      }} />
       <Tab.Screen name="地址薄" component={TabAddressBookScreen} options={{
-        tabBarLabel: '地址薄',
         headerStyle: {
           backgroundColor: theme.tab_view,
         },
         headerTitleStyle: {
           color: theme.tab_text,
         },
+        headerTitle: (props) => <TabAddressBookHeader {...props} />,
+        tabBarLabel: '地址薄',
         tabBarIcon: ({ color, focusd }) => (
           <IconAnt
             name={'contacts'}
@@ -82,8 +88,8 @@ const TabHomeScreen = (props) => {
         )
       }} />
       <Tab.Screen name="设置" component={TabSettingScreen} options={{
-        tabBarLabel: '设置',
         headerShown: false,
+        tabBarLabel: '设置',
         tabBarIcon: ({ color, focusd }) => (
           <IconAnt
             name={'setting'}

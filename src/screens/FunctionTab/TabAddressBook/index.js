@@ -25,7 +25,7 @@ const TabAddressBookScreen = props => {
       automaticallyAdjustContentInsets={false}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
-      <WhiteSpace />
+      {/* <WhiteSpace />
       <View>
         <Text style={{
           paddingLeft: 12,
@@ -46,19 +46,16 @@ const TabAddressBookScreen = props => {
           onpress: () => props.navigation.navigate('AddressAdd')
         }]} />
       </View>
-      <WhiteSpace />
+      <WhiteSpace /> */}
 
 
       {
-        props.avatar.get('AddressArray').length > 0 ? <View>
-          <Text style={{
-            paddingLeft: 12,
-            color: theme.text2,
-            borderColor: theme.line,
-          }}>全部好友</Text>
-          <WhiteSpace />
-          <BaseAvatarList data={lists} />
-        </View> : <EmptyView />
+        props.avatar.get('AddressArray').length > 0 ?
+          <View>
+            <BaseAvatarList data={lists} />
+          </View>
+          :
+          <EmptyView />
       }
     </ScrollView>
   )

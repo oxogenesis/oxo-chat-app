@@ -77,7 +77,7 @@ const TabBulletinScreen = (props) => {
         style={{
           ...styles.base_color,
           backgroundColor: theme.base_body,
-          marginBottom: 50
+          marginBottom: 0
         }}
         data={list}
         keyExtractor={item => item.Hash}
@@ -142,11 +142,11 @@ const TabBulletinScreen = (props) => {
         )}
       />
 
-      <View style={tw`absolute inset-x-0 bottom-0 bg-stone-200 z-50`}>
+      {/* <View style={tw`absolute inset-x-0 bottom-0 bg-stone-200 z-50`}>
         <Button style={tw`rounded-full bg-green-500`} onPress={() => props.navigation.navigate('BulletinPublish')}>
           <Text style={tw`text-xl text-slate-100`}>发布公告</Text>
         </Button>
-      </View>
+      </View> */}
     </View>
   )
 }

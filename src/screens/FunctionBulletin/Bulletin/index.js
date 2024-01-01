@@ -3,9 +3,10 @@ import { View, ScrollView, Text, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Icon, Toast } from '@ant-design/react-native'
+import { Toast } from '@ant-design/react-native'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
 import IconEntypo from 'react-native-vector-icons/Entypo'
+import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
 import { GenesisHash } from '../../../lib/Const'
 import { timestamp_format, AddressToName } from '../../../lib/Util'
@@ -164,8 +165,8 @@ const BulletinScreen = (props) => {
                       setShow(Math.random())
                     }
                     }>
-                      <IconFontisto
-                        name={"comments"}
+                      <IconAnt
+                        name={'addfile'}
                         size={32}
                         color={tw.color('blue-500')}
                       />

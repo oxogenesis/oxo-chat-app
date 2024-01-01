@@ -3,7 +3,9 @@ import { View, ScrollView, RefreshControl, Text, Image, TouchableOpacity } from 
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Icon, Toast } from '@ant-design/react-native'
+import { Toast } from '@ant-design/react-native'
+import IconFontisto from 'react-native-vector-icons/Fontisto'
+import IconAnt from 'react-native-vector-icons/AntDesign'
 import { timestamp_format, AddressToName } from '../../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Flex } from '@ant-design/react-native'
@@ -160,9 +162,9 @@ const BulletinRandomScreen = (props) => {
                     {
                       random.IsMark == "TRUE" &&
                       <TouchableOpacity onPress={cancelCollection}>
-                        <Icon
-                          name="star"
-                          size="lg"
+                        <IconEntypo
+                          name={"star"}
+                          size={32}
                           color={tw.color('red-500')}
                         />
                       </TouchableOpacity>
@@ -171,9 +173,9 @@ const BulletinRandomScreen = (props) => {
                     {
                       random.IsMark == "FALSE" &&
                       <TouchableOpacity onPress={handleCollection}>
-                        <Icon
-                          name='star'
-                          size="lg"
+                        <IconEntypo
+                          name={"star-outlined"}
+                          size={32}
                           color={tw.color('blue-500')}
                         />
                       </TouchableOpacity>
@@ -188,9 +190,9 @@ const BulletinRandomScreen = (props) => {
                       setShow(Math.random())
                     }
                     }>
-                      <Icon
-                        name='comment'
-                        size="lg"
+                      <IconAnt
+                        name={'addfile'}
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -204,9 +206,9 @@ const BulletinRandomScreen = (props) => {
                     }
                     }
                     >
-                      <Icon
+                      <IconFontisto
                         name='link'
-                        size="lg"
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -224,9 +226,9 @@ const BulletinRandomScreen = (props) => {
                       setShow(Math.random())
                     }
                     }>
-                      <Icon
-                        name='branches'
-                        size="lg"
+                      <IconFontisto
+                        name='share-a'
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>
@@ -235,9 +237,20 @@ const BulletinRandomScreen = (props) => {
                     <TouchableOpacity onPress={() => {
                       copyToClipboard()
                     }}>
-                      <Icon
-                        name='block'
-                        size="lg"
+                      <IconFontisto
+                        name='copy'
+                        size={32}
+                        color={tw.color('blue-500')}
+                      />
+                    </TouchableOpacity>
+
+                    {/* 原始信息 */}
+                    <TouchableOpacity onPress={() => {
+                      props.navigation.push('BulletinInfo', { hash: random.Hash })
+                    }}>
+                      <IconMaterial
+                        name='info-outline'
+                        size={32}
                         color={tw.color('blue-500')}
                       />
                     </TouchableOpacity>

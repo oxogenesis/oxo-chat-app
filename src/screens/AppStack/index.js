@@ -149,14 +149,7 @@ const AppStack = (props) => {
         options={
           ({ route, navigation, props }) => ({
             title: "公告：随便看看",
-            ...headerStyleOption,
-            headerRight: () => (
-              <IconMaterial
-                name={'refresh'}
-                size={32}
-                color={theme.text1}
-                onPress={() => navigation.replace('BulletinRandom')}
-              />)
+            ...headerStyleOption
           })
         }
       />

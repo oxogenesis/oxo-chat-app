@@ -1,12 +1,17 @@
 import React, { useContext } from 'react'
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { connect } from 'react-redux'
-import { List, WhiteSpace } from '@ant-design/react-native'
+import { List } from '@ant-design/react-native'
+import { WhiteSpace, Flex } from '@ant-design/react-native'
 import EmptyView from '../../FunctionBase/EmptyView'
 import { ThemeContext } from '../../../theme/theme-context'
+import AvatarImage from '../../../component/AvatarImage'
+import { BulletinAddressSession } from '../../../lib/Const'
 import BaseImageList from '../../FunctionBase/BaseImageList'
 import BaseAvatarList from '../../FunctionBase/BaseAvatarList'
 const Item = List.Item
+import { styles } from '../../../theme/style'
+import tw from 'twrnc'
 
 //联系人Tab
 const TabAddressBookScreen = props => {
@@ -51,8 +56,60 @@ const TabAddressBookScreen = props => {
 
       {
         props.avatar.get('AddressArray').length > 0 ?
-          <View>
-            <BaseAvatarList data={lists} />
+          <View style={tw`h-full bg-stone-200 p-5px`}>
+            <ScrollView
+              style={styles.scroll_view}
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}>
+              {
+                props.avatar.get('AddressArray').length > 0 ?
+                  props.avatar.get('AddressArray').map((item, index) => (
+                    <View key={index} style={tw`bg-stone-100`}>
+                      <Flex>
+                        <Flex.Item style={{ flex: 0.15 }}>
+                          <AvatarImage address={item.Address} />
+                        </Flex.Item>
+                        <Flex.Item >
+                          <View style={tw`flex flex-row`}>
+                            <TouchableOpacity onPress={() => props.navigation.push('AddressMark', { address: item.Address })}>
+                              <View style={tw`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`}>
+                                <Text style={tw`text-base text-slate-800 text-center`}>
+                                  {`${item.Name}`}
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                            {
+                              props.avatar.get('Follows').includes(item.Address) &&
+                              <TouchableOpacity onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: item.Address })}>
+                                <View style={tw`bg-yellow-500 rounded-full px-2 border-2 border-gray-300`}>
+                                  <Text style={tw`text-base text-slate-800 text-center`}>
+                                    公告
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            }
+                            {
+                              props.avatar.get('Friends').includes(item.Address) &&
+                              <TouchableOpacity onPress={() => props.navigation.push('Session', { address: item.Address })}>
+                                <View style={tw`bg-green-500 rounded-full px-2 border-2 border-gray-300`}>
+                                  <Text style={tw`text-base text-slate-800 text-center`}>
+                                    聊天
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            }
+                          </View>
+                          <Text style={tw`text-sm text-slate-400`}>{item.Address}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </View>
+                  ))
+                  :
+                  <EmptyView pTop={1} />
+              }
+              <WhiteSpace size='lg' />
+            </ScrollView>
           </View>
           :
           <EmptyView />

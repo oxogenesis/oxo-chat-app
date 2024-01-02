@@ -13,7 +13,7 @@ const TabAddressBookHeader = (props) => {
         <IconAnt
           name={'adduser'}
           size={24}
-          color={tw.color('blue-500')}
+          color={tw.color('indigo-500')}
           onPress={() => props.navigation.navigate('AddressAdd')}
         />
       </View>
@@ -31,8 +31,8 @@ const TabAddressBookHeader = (props) => {
         <IconAnt
           name={'qrcode'}
           size={24}
-          color={tw.color('blue-500')}
-          onPress={() => props.navigation.replace('AddressScan')
+          color={tw.color('indigo-500')}
+          onPress={() => props.navigation.navigate('AddressScan')
           }
         />
       </View>

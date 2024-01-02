@@ -146,7 +146,6 @@ const AddressMarkScreen = (props) => {
 
           <WhiteSpace size='lg' />
 
-
           <BaseList data={[
             {
               title: '添加好友',

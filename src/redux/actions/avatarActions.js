@@ -261,7 +261,6 @@ export function* SendMessage(action) {
 // Avatar
 export function* loadFromDB(action) {
   let db = yield select(state => state.avatar.get('Database'))
-  let timestamp = Date.now()
   let address = yield select(state => state.avatar.get('Address'))
   let name = yield select(state => state.avatar.get('Name'))
 
@@ -440,7 +439,7 @@ export function* addAddressMark(action) {
   let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `INSERT INTO ADDRESS_MARKS (address, name, created_at, updated_at)
-VALUES ('${action.address}', '${action.name}', ${timestamp}, ${timestamp})`
+  VALUES ('${action.address}', '${action.name}', ${timestamp}, ${timestamp})`
   yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
   address_map[action.address] = action.name

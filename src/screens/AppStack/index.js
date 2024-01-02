@@ -125,6 +125,36 @@ const AppStack = (props) => {
           })
         }
       />
+      <Stack.Screen
+        name="AvatarNameEdit"
+        component={AvatarNameEditScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '编辑昵称',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="AvatarSeed"
+        component={AvatarSeedScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '！！！查看种子！！！',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="AvatarSeedQrcode"
+        component={AvatarSeedQrcodeScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '！！！种子二维码！！！',
+            ...headerStyleOption,
+          })
+        }
+      />
       {/* bulletin */}
       <Stack.Screen
         name="Bulletin"
@@ -150,25 +180,6 @@ const AppStack = (props) => {
           ({ route, navigation, props }) => ({
             title: "公告：随便看看",
             ...headerStyleOption
-          })
-        }
-      />
-      <Stack.Screen
-        name="Session"
-        component={SessionScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: "会话",
-            ...headerStyleOption,
-            headerRight: () => (
-              <IconFeather
-                name={'more-horizontal'}
-                size={32}
-                color={theme.text1}
-                onPress={() => navigation.push('AddressMark', {
-                  address: route.params.address
-                })}
-              />)
           })
         }
       />
@@ -199,6 +210,37 @@ const AppStack = (props) => {
           })
         }
       />
+      <Stack.Screen
+        name="BulletinInfo"
+        component={BulletinInfoScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '公告信息',
+            ...headerStyleOption,
+          })
+        }
+      />
+      {/* chat */}
+      <Stack.Screen
+        name="Session"
+        component={SessionScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: "会话",
+            ...headerStyleOption,
+            headerRight: () => (
+              <IconFeather
+                name={'more-horizontal'}
+                size={32}
+                color={theme.text1}
+                onPress={() => navigation.push('AddressMark', {
+                  address: route.params.address
+                })}
+              />)
+          })
+        }
+      />
+      {/* contact */}
       <Stack.Screen
         name="AddressMark"
         component={AddressMarkScreen}
@@ -250,45 +292,16 @@ const AppStack = (props) => {
         }
       />
       <Stack.Screen
-        name="BulletinInfo"
-        component={BulletinInfoScreen}
+        name="AddressScan"
+        component={AddressScanScreen}
         options={
           ({ route, navigation }) => ({
-            title: '公告信息',
+            title: '地址扫描',
             ...headerStyleOption,
           })
         }
       />
-      <Stack.Screen
-        name="AvatarNameEdit"
-        component={AvatarNameEditScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '编辑昵称',
-            ...headerStyleOption,
-          })
-        }
-      />
-      <Stack.Screen
-        name="AvatarSeed"
-        component={AvatarSeedScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '！！！查看种子！！！',
-            ...headerStyleOption,
-          })
-        }
-      />
-      <Stack.Screen
-        name="AvatarSeedQrcode"
-        component={AvatarSeedQrcodeScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '！！！种子二维码！！！',
-            ...headerStyleOption,
-          })
-        }
-      />
+      {/* setting */}
       <Stack.Screen
         name="SettingMe"
         component={SettingMeScreen}
@@ -376,16 +389,6 @@ const AppStack = (props) => {
         options={
           ({ route, navigation }) => ({
             title: '好友申请设置',
-            ...headerStyleOption,
-          })
-        }
-      />
-      <Stack.Screen
-        name="AddressScan"
-        component={AddressScanScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '地址扫描',
             ...headerStyleOption,
           })
         }

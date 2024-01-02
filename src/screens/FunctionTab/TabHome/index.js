@@ -21,7 +21,7 @@ const TabHomeScreen = (props) => {
   return (
     <Tab.Navigator
       screenOptions={{
-        "tabBarActiveTintColor": tw.color('green-500'),
+        "tabBarActiveTintColor": theme.tab_text,
         "tabBarInactiveTintColor": theme.tab_text,
         "tabBarActiveBackgroundColor": theme.tab_view,
         "tabBarInactiveBackgroundColor": theme.tab_view,
@@ -43,13 +43,21 @@ const TabHomeScreen = (props) => {
         },
         headerTitle: (props) => <TabBulletinHeader {...props} />,
         tabBarLabel: '公告',
-        tabBarIcon: ({ color, focusd }) => (
-          <IconAnt
-            name={'notification'}
-            size={32}
-            color={color}
-          />
-        )
+        tabBarIcon: ({ focused, color, size }) => {
+          if (focused) {
+            return <IconAnt
+              name={'notification'}
+              size={32}
+              color={tw.color('yellow-500')}
+            />
+          } else {
+            return < IconAnt
+              name={'notification'}
+              size={32}
+              color={color}
+            />
+          }
+        }
       }} />
       <Tab.Screen name="聊天" component={TabSessionScreen} options={{
         headerShown: true,
@@ -62,12 +70,20 @@ const TabHomeScreen = (props) => {
         headerTitle: (props) => <TabSessionHeader {...props} />,
         tabBarLabel: '聊天',
         tabBarBadge: props.avatar.get("CountUnreadMessage"),
-        tabBarIcon: ({ color }) => {
-          return <IconAnt
-            name={'message1'}
-            size={32}
-            color={color}
-          />
+        tabBarIcon: ({ focused, color, size }) => {
+          if (focused) {
+            return <IconAnt
+              name={'message1'}
+              size={32}
+              color={tw.color('green-500')}
+            />
+          } else {
+            return < IconAnt
+              name={'message1'}
+              size={32}
+              color={color}
+            />
+          }
         }
       }} />
       <Tab.Screen name="地址薄" component={TabAddressBookScreen} options={{
@@ -79,24 +95,40 @@ const TabHomeScreen = (props) => {
         },
         headerTitle: (props) => <TabAddressBookHeader {...props} />,
         tabBarLabel: '地址薄',
-        tabBarIcon: ({ color, focusd }) => (
-          <IconAnt
-            name={'contacts'}
-            size={32}
-            color={color}
-          />
-        )
+        tabBarIcon: ({ focused, color, size }) => {
+          if (focused) {
+            return <IconAnt
+              name={'contacts'}
+              size={32}
+              color={tw.color('indigo-500')}
+            />
+          } else {
+            return < IconAnt
+              name={'contacts'}
+              size={32}
+              color={color}
+            />
+          }
+        }
       }} />
       <Tab.Screen name="设置" component={TabSettingScreen} options={{
         headerShown: false,
         tabBarLabel: '设置',
-        tabBarIcon: ({ color, focusd }) => (
-          <IconAnt
-            name={'setting'}
-            size={32}
-            color={color}
-          />
-        )
+        tabBarIcon: ({ focused, color, size }) => {
+          if (focused) {
+            return <IconAnt
+              name={'setting'}
+              size={32}
+              color={tw.color('blue-500')}
+            />
+          } else {
+            return < IconAnt
+              name={'setting'}
+              size={32}
+              color={color}
+            />
+          }
+        }
       }} />
     </Tab.Navigator>
   )

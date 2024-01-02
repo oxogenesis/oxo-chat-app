@@ -12,7 +12,7 @@ const TabBulletinHeader = (props) => {
         <IconAnt
           name={'addfile'}
           size={24}
-          color={tw.color('blue-500')}
+          color={tw.color('yellow-500')}
           onPress={() => props.navigation.navigate('BulletinPublish')}
         />
       </View>
@@ -30,7 +30,7 @@ const TabBulletinHeader = (props) => {
         <IconAnt
           name={'earth'}
           size={24}
-          color={tw.color('blue-500')}
+          color={tw.color('yellow-500')}
           onPress={() => props.navigation.navigate('BulletinRandom')}
         />
       </View>

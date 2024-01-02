@@ -34,11 +34,14 @@ const SettingBulletinScreen = (props) => {
       backgroundColor: theme.base_view
     }}>
       <WhiteSpace size='lg' />
-
       <BaseList data={[
         { title: '收藏公告', onpress: () => { props.navigation.push('BulletinList', { session: BulletinMarkSession }) } },
         { title: '浏览历史', onpress: () => { props.navigation.push('BulletinList', { session: BulletinHistorySession }) } },
+      ]} />
+      <WhiteSpace size='lg' />
+      <BaseList data={[
         { title: '随便看看', onpress: () => { props.navigation.push('BulletinRandom') } },
+        { title: '活跃用户', onpress: () => { props.navigation.push('BulletinAddressList') } },
       ]} />
       <WhiteSpace size='lg' />
       <BaseList data={[

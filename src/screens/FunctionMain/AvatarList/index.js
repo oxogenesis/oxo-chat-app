@@ -14,8 +14,6 @@ import AvatarImage from '../../../component/AvatarImage'
 import { timestamp_format } from '../../../lib/Util'
 import tw from 'twrnc'
 
-
-
 //账号选择界面
 const AvatarListScreen = props => {
   const { theme } = useContext(ThemeContext)

@@ -39,6 +39,8 @@ function initialState() {
       QuoteWhiteList: [],
       ReplyList: [],
       BulletinCacheSize: DefaultBulletinCacheSize,
+      BulletinAddressList: [],
+      BulletinReplyList: [],
 
       // Chat
       SessionMap: {},
@@ -81,10 +83,14 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('FriendRequests', [])
     .set('Follows', [])
     .set('TabBulletinList', [])
+    // Bulletin
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
     .set('ReplyList', [])
+    .set('BulletinAddressList', [])
+    .set('BulletinReplyList', [])
+    // Chat
     .set('SessionMap', {})
     .set('SessionList', [])
     .set('UnreadMessage', 0,)
@@ -131,6 +137,8 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
     .set('ReplyList', [])
+    .set('BulletinAddressList', [])
+    .set('BulletinReplyList', [])
     // Chat
     .set('SessionMap', {})
     .set('SessionList', [])
@@ -204,12 +212,13 @@ reducer.prototype[actionType.avatar.setMessageGenerator] = (state, action) => {
   return state.set('MessageGenerator', action.message_generator)
 }
 
-//Bulletin
+// Bulletin
 reducer.prototype[actionType.avatar.setBulletinCacheSize] = (state, action) => {
   return state.set('BulletinCacheSize', action.bulletin_cache_size)
 }
 
 reducer.prototype[actionType.avatar.setTabBulletinList] = (state, action) => {
+  console.log(`setTabBulletinList=============================================${action.tab_bulletin_list.length}`)
   return state.set('TabBulletinList', action.tab_bulletin_list)
 }
 
@@ -229,6 +238,15 @@ reducer.prototype[actionType.avatar.setRandomBulletinFlag] = (state, action) => 
   return state.set('RandomBulletinFlag', action.flag)
 }
 
+reducer.prototype[actionType.avatar.setBulletinAddressList] = (state, action) => {
+  return state.set('BulletinAddressList', action.bulletin_address_list)
+}
+
+reducer.prototype[actionType.avatar.setBulletinReplyList] = (state, action) => {
+  return state.set('BulletinReplyList', action.bulletin_reply_list)
+}
+
+// Chat
 reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {
   return state.set('CurrentBBSession', action.current_BB_session)
 }

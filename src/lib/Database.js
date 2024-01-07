@@ -94,6 +94,7 @@ export default class Database {
         main_hash VARCHAR(32) NOT NULL PRIMARY KEY,
         address VARCHAR(35) NOT NULL,
         sequence INTEGER NOT NULL,
+        quote_hash VARCHAR(32) NOT NULL,
         content text NOT NULL,
         signed_at INTEGER NOT NULL
         )`)

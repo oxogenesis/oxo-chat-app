@@ -6,7 +6,6 @@ import { AvatarDerive } from '../../../lib/OXO'
 // import { AvatarDerive, AvatarLoginTimeReset } from '../../../lib/OXO'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { styles } from '../../../theme/style'
 import EmptyView from '../../FunctionBase/EmptyView'
 import { ThemeContext } from '../../../theme/theme-context'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -96,7 +95,8 @@ const AvatarListScreen = props => {
         flagLoading == false ?
           <View style={tw`h-full bg-stone-200 p-5px`}>
             <ScrollView
-              style={styles.scroll_view}
+              style={tw`mb-60px`}
+              // style={styles.scroll_view}
               automaticallyAdjustContentInsets={false}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -132,7 +132,8 @@ const AvatarListScreen = props => {
               <WhiteSpace size='lg' />
             </ScrollView>
 
-            <View style={styles.base_view_a}>
+            <View style={tw`w-full absolute bottom-0 z-99`}>
+            {/* <View style={styles.base_view_a}> */}
               <Button style={tw`rounded-full bg-red-500`} onPress={() => lock()}>
                 <Text style={tw`text-xl text-slate-100`}>安全退出</Text>
               </Button>

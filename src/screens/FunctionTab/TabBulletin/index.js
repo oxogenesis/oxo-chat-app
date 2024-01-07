@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { timestamp_format } from '../../../lib/Util'
-import { Button, Flex } from '@ant-design/react-native'
+import { Flex } from '@ant-design/react-native'
 import EmptyView from '../../FunctionBase/EmptyView'
 import { ThemeContext } from '../../../theme/theme-context'
 import { styles } from '../../../theme/style'
@@ -56,6 +56,13 @@ const TabBulletinScreen = (props) => {
     }
   }
 
+  useEffect(() => {
+    console.log(`TabBulletinScreen===========================${props.avatar.get('TabBulletinList').length}`)
+    // if (props.avatar.get('Database') != null && props.avatar.get('Database') != null) {
+    //   props.navigation.replace('TabHome')
+    // }
+  }, [props.avatar])
+
   const list = props.avatar.get('TabBulletinList')
 
   return (
@@ -79,7 +86,7 @@ const TabBulletinScreen = (props) => {
           backgroundColor: theme.base_body,
           marginBottom: 0
         }}
-        data={list}
+        data={props.avatar.get('TabBulletinList')}
         keyExtractor={item => item.Hash}
         onEndReached={loadMore}
         onEndReachedThreshold={0.05}
@@ -127,7 +134,8 @@ const TabBulletinScreen = (props) => {
                       onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
                     >{item.Content}</Text>
                   </View>
-                  : <View style={styles.content_view}>
+                  :
+                  <View style={styles.content_view}>
                     <Text style={{
                       ...styles.content_text,
                       color: theme.text1

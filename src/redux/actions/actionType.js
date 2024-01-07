@@ -52,6 +52,7 @@ export const actionType = {
     setBulletinCacheSize: 'SET_BULLETIN_CACHE_SIZE',
     changeBulletinCacheSize: 'CHANGE_BULLETIN_CACHE_SIZE',
     clearBulletinCache: 'CLEAR_BULLETIN_CACHE',
+    removeBulletinCache: 'REMOVE_BULLETIN_CACHE',
     LoadTabBulletinList: 'LOAD_TAB_BULLETIN_LIST',
     LoadBulletinList: 'LOAD_BULLETIN_LIST',
     LoadCurrentBulletin: 'LOAD_CURRENT_BULLETIN',
@@ -61,6 +62,8 @@ export const actionType = {
     setCurrentBulletin: 'SET_CURRENT_BULLETIN',
     setRandomBulletin: 'SET_RANDOM_BULLETIN',
     setRandomBulletinFlag: 'SET_RANDOM_BULLETIN_FLAG',
+    setBulletinAddressList: 'SET_BULLETIN_ADDRESS_LIST',
+    setBulletinReplyList: 'SET_BULLETIN_REPLY_LIST',
     setCurrentBBSession: 'SET_CURRENT_BB_SESSION',
 
     HandleBulletinRequest: 'HANDLE_BULLETIN_REQUEST',
@@ -68,6 +71,8 @@ export const actionType = {
     // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
     FetchRandomBulletin: 'FETCH_RANDOM_BULLETIN',
+    FetchBulletinAddressList: 'FETCH_BULLETIN_ADDRESS_LIST',
+    FetchBulletinReplyList: 'FETCH_BULLETIN_REPLY_LIST',
     PublishBulletin: 'PUBLISH_BULLETIN',
     SaveBulletinDraft: 'SAVE_BULLETIN_DRAFT',
 

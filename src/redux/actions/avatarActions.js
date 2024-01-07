@@ -5,7 +5,7 @@ import { eventChannel, END } from 'redux-saga'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { DefaultHost, Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
-import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema } from '../../lib/MessageSchemaVerifier'
+import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
 import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512, AvatarLoginTimeUpdate } from '../../lib/OXO'
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
@@ -123,8 +123,16 @@ export function* Conn(action) {
       // console.log(json)
       // console.log(`======================================================json`)
       console.log(`======================================================yield take(2channel)`)
+
+      if (json.Action == ActionCode.BulletinAddressListResponse && checkBulletinAddressListResponseSchema(json)) {
+        yield put({ type: actionType.avatar.setBulletinAddressList, bulletin_address_list: json.List })
+      }
+      else if (json.Action == ActionCode.BulletinReplyListResponse && checkBulletinReplyListResponseSchema(json)) {
+        yield put({ type: actionType.avatar.setBulletinReplyList, bulletin_reply_list: json.List })
+      }
+
       //save bulletin from server cache
-      if (json.ObjectType == ObjectType.Bulletin && checkBulletinSchema(json)) {
+      else if (json.ObjectType == ObjectType.Bulletin && checkBulletinSchema(json)) {
         let address = DeriveAddress(json.PublicKey)
         yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: json })
       }
@@ -422,8 +430,31 @@ export function* disableAvatar(action) {
   }
 }
 
-export function* changeBulletinCacheSize(action) {
+export function* removeBulletinCache(action) {
   let bulletin_cache_size = action.bulletin_cache_size
+  let db = yield select(state => state.avatar.get('Database'))
+  let follow_list = yield select(state => state.avatar.get('Follows'))
+  let address_list = Array2Str(follow_list)
+  let sql = `SELECT hash FROM BULLETINS WHERE is_mark = "FALSE" ORDER BY created_at DESC OFFSET ${bulletin_cache_size}`
+  if (address_list != "") {
+    sql = `SELECT hash FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list}) ORDER BY created_at DESC OFFSET ${bulletin_cache_size}`
+  }
+  let bulletin_hash_list = yield call([db, db.getAll], sql)
+
+  // delete bulletin
+  sql = `DELETE FROM BULLETINS WHERE hash in (${bulletin_hash_list})`
+  yield call([db, db.runSQL], sql)
+  // delete quote
+  sql = `DELETE FROM QUOTES WHERE quote_hash in (${bulletin_hash_list})`
+  yield call([db, db.runSQL], sql)
+}
+
+export function* changeBulletinCacheSize(action) {
+  let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
+  if (action.bulletin_cache_size != 0 && action.bulletin_cache_size < bulletin_cache_size) {
+    yield put({ type: actionType.avatar.removeBulletinCache, bulletin_cache_size: action.bulletin_cache_size })
+  }
+  bulletin_cache_size = action.bulletin_cache_size
   yield put({ type: actionType.avatar.setBulletinCacheSize, bulletin_cache_size: bulletin_cache_size })
   yield call(setStorageItem, `BulletinCacheSize`, bulletin_cache_size)
 }
@@ -684,7 +715,6 @@ export function* LoadCurrentBulletin(action) {
     //fetch from network
     //action[address, sequence, to]
     yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: null })
-    console.log(action)
     yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: action.sequence, to: action.to })
   }
 }
@@ -696,6 +726,13 @@ export function* clearBulletinCache() {
   let sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE"`
   if (address_list != "") {
     sql = `DELETE FROM BULLETINS WHERE is_mark = "FALSE" AND address NOT IN (${address_list})`
+  }
+  yield call([db, db.runSQL], sql)
+
+  // delete quote
+  sql = `DELETE FROM QUOTES`
+  if (address_list != "") {
+    sql = `DELETE FROM BULLETINS WHERE address NOT IN (${address_list})`
   }
   yield call([db, db.runSQL], sql)
 }
@@ -743,6 +780,7 @@ VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_
   let msg = MessageGenerator.genObjectResponse(bulletin_json, address)
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
+
 export function* SaveBulletinDraft(action) {
   console.log(`=================================================SaveBulletinDraft`)
   let self_address = yield select(state => state.avatar.get('Address'))
@@ -857,9 +895,9 @@ export function* SaveBulletin(action) {
         //bulletin from myself
         sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
         VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
-
         //save bulletin
         yield call([db, db.runSQL], sql)
+
         // save quote
         if (bulletin_json.Quote.length > 0) {
           for (let index = 0; index < bulletin_json.Quote.length; index++) {
@@ -875,12 +913,28 @@ export function* SaveBulletin(action) {
         //bulletin from random
         sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
         VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
-
         //save bulletin
         yield call([db, db.runSQL], sql)
+
+        // save quote
+        if (bulletin_json.Quote.length > 0) {
+          for (let index = 0; index < bulletin_json.Quote.length; index++) {
+            const quote = bulletin_json.Quote[index];
+            sql = `INSERT INTO QUOTES (main_hash, address, sequence, content, signed_at)
+        VALUES ('${quote.Hash}', '${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.Content}', '${bulletin_json.Timestamp}')`
+            yield call([db, db.runSQL], sql)
+          }
+        }
+
         bulletin_json.Hash = hash
         yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
         yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
+      }
+
+      // remove the oldest cache
+      let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
+      if (bulletin_cache_size != 0) {
+        yield put({ type: actionType.avatar.removeBulletinCache, bulletin_cache_size: bulletin_cache_size })
       }
     }
   }
@@ -1054,6 +1108,19 @@ export function* FetchRandomBulletin() {
   // let address = yield select(state => state.avatar.get('Address'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genBulletinRandom()
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* FetchBulletinAddressList(action) {
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genBulletinAddressListRequest(action.page)
+  console.log(msg)
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* FetchBulletinReplyList(action) {
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genBulletinReplyListRequest(action.hash, action.page)
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 

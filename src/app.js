@@ -29,7 +29,7 @@ const App = (props) => {
     <Provider>
       <ThemeProvider defaultTheme={props.avatar.get('Theme')}>
         <NavigationContainer>
-          <AppStack />
+          <AppStack props={props} />
         </NavigationContainer>
       </ThemeProvider>
     </Provider>

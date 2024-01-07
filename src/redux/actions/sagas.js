@@ -46,7 +46,9 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.LoadCurrentBulletin, avatarActions.LoadCurrentBulletin)
   yield takeEvery(actionType.avatar.MarkBulletin, avatarActions.MarkBulletin)
   yield takeEvery(actionType.avatar.UnmarkBulletin, avatarActions.UnmarkBulletin)
-
+  yield takeEvery(actionType.avatar.FetchBulletinAddressList, avatarActions.FetchBulletinAddressList)
+  yield takeEvery(actionType.avatar.FetchBulletinReplyList, avatarActions.FetchBulletinReplyList)
+  
   //Chat
   yield takeEvery(actionType.avatar.LoadCurrentSession, avatarActions.LoadCurrentSession)
   yield takeEvery(actionType.avatar.LoadCurrentMessageList, avatarActions.LoadCurrentMessageList)

@@ -1,6 +1,8 @@
 
 import React, { useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
+import { connect } from 'react-redux'
+
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconFeather from 'react-native-vector-icons/Feather'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
@@ -33,6 +35,8 @@ import BulletinInfoScreen from '../FunctionBulletin/BulletinInfo'
 import BulletinListScreen from '../FunctionBulletin/BulletinList'
 import BulletinPublishScreen from '../FunctionBulletin/BulletinPublish'
 import BulletinCacheScreen from '../FunctionBulletin/BulletinCache'
+import BulletinAddressListScreen from '../FunctionBulletin/BulletinAddressList'
+import BulletinReplyListScreen from '../FunctionBulletin/BulletinReplyList'
 
 import SessionScreen from '../FuncitonChat/Session'
 
@@ -44,6 +48,7 @@ import AddressScanScreen from '../FunctionContact/AddressScan'
 
 import { ThemeContext } from '../../theme/theme-context'
 import tw from 'twrnc'
+import { AddressToName } from '../../lib/Util'
 
 const Stack = createStackNavigator()
 
@@ -168,7 +173,7 @@ const AppStack = (props) => {
                 name={'earth'}
                 size={32}
                 color={theme.text1}
-                onPress={() => navigation.push('BulletinInfo', { hash: route.params.hash })}
+                onPress={() => navigation.push('BulletinReplyList', { hash: route.params.hash })}
               />)
           })
         }
@@ -188,7 +193,7 @@ const AppStack = (props) => {
         component={BulletinListScreen}
         options={
           ({ route, navigation }) => ({
-            title: "公告列表",
+            title: `公告列表:${AddressToName(props.avatar.get('AddressMap'), route.params.address)}`,
             ...headerStyleOption,
             headerRight: () => (
               <IconMaterial
@@ -216,6 +221,26 @@ const AppStack = (props) => {
         options={
           ({ route, navigation }) => ({
             title: '公告信息',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="BulletinAddressList"
+        component={BulletinAddressListScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '活跃用户',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="BulletinReplyList"
+        component={BulletinReplyListScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '网络评论',
             ...headerStyleOption,
           })
         }
@@ -396,5 +421,10 @@ const AppStack = (props) => {
     </Stack.Navigator>
   )
 }
+const ReduxAppStack = connect((state) => {
+  return {
+    avatar: state.avatar
+  }
+})(AppStack)
 
-export default AppStack
+export default ReduxAppStack

@@ -28,7 +28,7 @@ export default class MessageGenerator {
   genQrcode(server) {
     let json = {
       "Relay": server,
-      "Timestamp": new Date().getTime(),
+      "Timestamp": Date.now(),
       "PublicKey": this.PublicKey
     }
     return JSON.stringify(this.signJson(json))
@@ -37,7 +37,7 @@ export default class MessageGenerator {
   genDeclare() {
     let json = {
       "Action": ActionCode.Declare,
-      "Timestamp": new Date().getTime(),
+      "Timestamp": Date.now(),
       "PublicKey": this.PublicKey
     }
     return JSON.stringify(this.signJson(json))
@@ -46,6 +46,27 @@ export default class MessageGenerator {
   genBulletinRandom() {
     let json = {
       "Action": ActionCode.BulletinRandom,
+      "Timestamp": Date.now(),
+      "PublicKey": this.PublicKey
+    }
+    return JSON.stringify(this.signJson(json))
+  }
+
+  genBulletinAddressListRequest(page) {
+    let json = {
+      "Action": ActionCode.BulletinAddressListRequest,
+      "Page": page,
+      "Timestamp": Date.now(),
+      "PublicKey": this.PublicKey
+    }
+    return JSON.stringify(this.signJson(json))
+  }
+
+  genBulletinReplyListRequest(hash, page) {
+    let json = {
+      "Action": ActionCode.BulletinReplyListRequest,
+      "Hash": hash,
+      "Page": page,
       "Timestamp": Date.now(),
       "PublicKey": this.PublicKey
     }

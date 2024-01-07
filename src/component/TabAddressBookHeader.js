@@ -8,8 +8,8 @@ import tw from 'twrnc'
 const TabAddressBookHeader = (props) => {
   // console.log(props)
   return (
-    <View style={tw`flex flex-row justify-between`}>
-      <View style={tw`basis-1/4`}>
+    <View style={tw`w-full flex flex-row justify-between`}>
+      <View style={tw``}>
         <IconAnt
           name={'adduser'}
           size={24}
@@ -17,24 +17,21 @@ const TabAddressBookHeader = (props) => {
           onPress={() => props.navigation.navigate('AddressAdd')}
         />
       </View>
-      <View style={tw`basis-1/2`}>
+      <View style={tw``}>
         <Text style={tw`text-center text-xl`}>
           {props.children}
         </Text>
       </View>
-      <View style={tw`basis-3/16`}>
-        <Text style={tw`text-center`}>
-          { }
-        </Text>
-      </View>
-      <View style={tw`basis-1/16`}>
-        <IconAnt
-          name={'qrcode'}
-          size={24}
-          color={tw.color('indigo-500')}
-          onPress={() => props.navigation.navigate('AddressScan')
-          }
-        />
+      <View style={tw``}>
+        <View style={tw`absolute right-0`}>
+          <IconAnt
+            name={'qrcode'}
+            size={24}
+            color={tw.color('indigo-500')}
+            onPress={() => props.navigation.navigate('AddressScan')
+            }
+          />
+        </View>
       </View>
     </View>
   )

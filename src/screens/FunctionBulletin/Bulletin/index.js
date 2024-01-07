@@ -246,7 +246,7 @@ const BulletinScreen = (props) => {
               <View style={tw`flex flex-row flex-nowrap`}>
                 {
                   props.avatar.get('ReplyList').map((reply, index) => (
-                    <Reply key={index} reply={reply} />
+                    <Reply key={index} address={reply.address} sequence={reply.sequence} hash={reply.quote_hash} content={reply.content} timestamp={reply.signed_at} />
                   ))
                 }
               </View>

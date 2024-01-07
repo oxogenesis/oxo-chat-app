@@ -7,8 +7,8 @@ import tw from 'twrnc'
 
 const TabBulletinHeader = (props) => {
   return (
-    <View style={tw`flex flex-row justify-between`}>
-      <View style={tw`basis-1/4`}>
+    <View style={tw`w-full flex flex-row justify-between`}>
+      <View style={tw``}>
         <IconAnt
           name={'addfile'}
           size={24}
@@ -16,23 +16,20 @@ const TabBulletinHeader = (props) => {
           onPress={() => props.navigation.navigate('BulletinPublish')}
         />
       </View>
-      <View style={tw`basis-1/2`}>
+      <View style={tw``}>
         <Text style={tw`text-center text-xl`}>
           {props.children}
         </Text>
       </View>
-      <View style={tw`basis-3/16`}>
-        <Text style={tw`text-center`}>
-          { }
-        </Text>
-      </View>
-      <View style={tw`basis-1/16`}>
-        <IconAnt
-          name={'earth'}
-          size={24}
-          color={tw.color('yellow-500')}
-          onPress={() => props.navigation.navigate('BulletinRandom')}
-        />
+      <View style={tw``}>
+        <View style={tw`absolute right-0`}>
+          <IconAnt
+            name={'earth'}
+            size={24}
+            color={tw.color('yellow-500')}
+            onPress={() => props.navigation.navigate('BulletinRandom')}
+          />
+        </View>
       </View>
     </View>
   )

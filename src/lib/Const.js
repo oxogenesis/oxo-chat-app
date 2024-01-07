@@ -20,6 +20,10 @@ const ActionCode = {
   "BulletinRandom": 200,
   "BulletinRequest": 201,
   "BulletinFileRequest": 202,
+  "BulletinAddressListRequest": 203,
+  "BulletinAddressListResponse": 204,
+  "BulletinReplyListRequest": 205,
+  "BulletinReplyListResponse": 206,
 
   "ChatDH": 301,
   "ChatMessage": 302,

@@ -13,22 +13,22 @@ const Reply = (props) => {
     <View>
       <Flex justify="start" align="start" style={tw`border-b-4 border-stone-500`}>
         <View style={tw`mt-5px ml-5px`}>
-          <Avatar address={props.reply.address} />
+          <Avatar address={props.address} />
         </View>
         <View style={tw`mt-5px`}>
           <View style={tw`border-b border-stone-500 w-100`}>
             <Text>
-              <LinkBulletin address={props.reply.address} sequence={props.reply.sequence} hash={props.reply.hash} to={props.reply.address} />
+              <LinkBulletin address={props.address} sequence={props.sequence} hash={props.hash} to={props.address} />
             </Text>
 
             <Text style={tw`text-stone-500`}>
-              {timestamp_format(props.reply.signed_at)}
+              {timestamp_format(props.timestamp)}
             </Text>
           </View>
 
           <View style={tw`pr-110px`}>
             <Text style={tw`text-base`}>
-              {props.reply.content}
+              {props.content}
             </Text>
           </View>
         </View>

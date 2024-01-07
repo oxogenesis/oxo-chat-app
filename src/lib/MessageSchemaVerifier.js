@@ -168,6 +168,68 @@ let FileRequestSchema = {
   }
 }
 
+let BulletinAddressListResponseSchema = {
+  "type": "object",
+  "required": ["Action", "Page", "List"],
+  "maxProperties": 3,
+  "properties": {
+    "Action": {
+      "type": "number"
+    },
+    "Page": {
+      "type": "number"
+    },
+    "List": {
+      "type": "array",
+      "minItems": 0,
+      // "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["Address", "Count"],
+        "maxProperties": 2,
+        "properties": {
+          "Address": { "type": "string" },
+          "Count": { "type": "number" }
+        }
+      }
+    }
+  }
+}
+
+let BulletinReplyListResponseSchema = {
+  "type": "object",
+  "required": ["Action", "Hash", "Page", "List"],
+  "maxProperties": 4,
+  "properties": {
+    "Action": {
+      "type": "number"
+    },
+    "Hash": {
+      "type": "string"
+    },
+    "Page": {
+      "type": "number"
+    },
+    "List": {
+      "type": "array",
+      "minItems": 0,
+      // "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["Address", "Sequence", "Hash", "Content", "Timestamp"],
+        "maxProperties": 5,
+        "properties": {
+          "Address": { "type": "string" },
+          "Sequence": { "type": "number" },
+          "Hash": { "type": "string" },
+          "Content": { "type": "string" },
+          "Timestamp": { "type": "number" }
+        }
+      }
+    }
+  }
+}
+
 //>>>chat<<<
 let ChatMessageSchema = {
   "type": "object",
@@ -549,6 +611,33 @@ function checkJsonSchema(json) {
   }
 }
 
+let vBulletinAddressListResponseSchema = ajv.compile(BulletinAddressListResponseSchema)
+function checkBulletinAddressListResponseSchema(json) {
+  try {
+    if (vBulletinAddressListResponseSchema(json)) {
+      return true
+    } else {
+      console.log(`BulletinAddressListResponse Schema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+let vBulletinReplyListResponseSchema = ajv.compile(BulletinReplyListResponseSchema)
+function checkBulletinReplyListResponseSchema(json) {
+  try {
+    if (vBulletinReplyListResponseSchema(json)) {
+      return true
+    } else {
+      console.log(`BulletinReplyListResponse Schema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
 let vBulletinSchema = ajv.compile(BulletinSchema)
 
 function checkBulletinSchema(json) {
@@ -678,5 +767,7 @@ module.exports = {
   checkGroupRequestSchema,
   checkGroupMessageSchema,
   checkFileSchema,
-  checkObjectSchema
+  checkObjectSchema,
+  checkBulletinAddressListResponseSchema,
+  checkBulletinReplyListResponseSchema
 }

@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { AddressToName, ReadDraft } from '../../../lib/Util'
-import { Button, List, WhiteSpace, Toast } from '@ant-design/react-native'
+import { ReadDraft } from '../../../lib/Util'
+import { Button } from '@ant-design/react-native'
 import { styles } from '../../../theme/style'
 import { ThemeContext } from '../../../theme/theme-context'
 import tw from 'twrnc'
@@ -11,7 +11,6 @@ import LinkPublishQuote from '../../../component/LinkPulishQuote'
 import ErrorMsg from '../../../component/ErrorMsg'
 
 //发布公告页面
-const Item = List.Item
 const BulletinPublishScreen = props => {
   const { theme } = useContext(ThemeContext)
   const [draft, setDrfat] = useState('')

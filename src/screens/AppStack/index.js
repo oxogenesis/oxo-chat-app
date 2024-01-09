@@ -173,7 +173,7 @@ const AppStack = (props) => {
                 name={'earth'}
                 size={32}
                 color={theme.text1}
-                onPress={() => navigation.push('BulletinReplyList', { hash: route.params.hash })}
+                onPress={() => navigation.push('BulletinReplyList', { hash: route.params.hash, page: 1 })}
               />)
           })
         }
@@ -232,6 +232,13 @@ const AppStack = (props) => {
           ({ route, navigation }) => ({
             title: '活跃用户',
             ...headerStyleOption,
+            headerRight: () => (
+              <IconEntypo
+                name={'arrow-with-circle-right'}
+                size={32}
+                color={theme.text1}
+                onPress={() => navigation.push('BulletinAddressList', { page: route.params.page + 1 })}
+              />)
           })
         }
       />
@@ -242,6 +249,13 @@ const AppStack = (props) => {
           ({ route, navigation }) => ({
             title: '网络评论',
             ...headerStyleOption,
+            headerRight: () => (
+              <IconEntypo
+                name={'arrow-with-circle-right'}
+                size={32}
+                color={theme.text1}
+                onPress={() => navigation.push('BulletinReplyList', { page: route.params.page + 1 })}
+              />)
           })
         }
       />

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { actionType } from '../../../redux/actions/actionType'
 import { connect } from 'react-redux'
@@ -12,22 +12,26 @@ import tw from 'twrnc'
 
 
 //活跃用户
-const BulletinAddressListScreen = props => {
+const BulletinAddressListScreen = (props) => {
   const { theme } = useContext(ThemeContext)
+  const refPage = useRef(1)
 
   const loadBulletinAddressList = () => {
-    let page = 1
-    if (props.route.params.page > 1) {
-      page = props.route.params.page
-    }
     props.dispatch({
       type: actionType.avatar.FetchBulletinAddressList,
-      page: 1
+      page: refPage.current
     })
   }
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
+      if (props.route.params && props.route.params.page > 1) {
+        refPage.current = props.route.params.page
+      }
+      props.navigation.setOptions({
+        title: `活跃用户#${refPage.current}`,
+      })
+
       loadBulletinAddressList()
     })
   })
@@ -76,7 +80,7 @@ const BulletinAddressListScreen = props => {
                           </View>
                           <TouchableOpacity onPress={() => props.navigation.push('AddressMark', { address: item.Address })}>
                             <View style={tw`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`}>
-                              <Text style={tw`inline-block text-sm text-slate-400`}>{item.Address}</Text>
+                              <Text style={tw`text-sm text-slate-400`}>{item.Address}</Text>
                             </View>
                           </TouchableOpacity>
                         </Flex.Item>

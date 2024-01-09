@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import { View, ScrollView } from 'react-native'
 import { actionType } from '../../../redux/actions/actionType'
 import { connect } from 'react-redux'
@@ -10,21 +10,25 @@ import tw from 'twrnc'
 // 网络评论
 const BulletinReplyListScreen = props => {
   const { theme } = useContext(ThemeContext)
+  const refPage = useRef(1)
 
   const loadBulletinReplyList = () => {
-    let page = 1
-    if (props.route.params.page > 1) {
-      page = props.route.params.page
-    }
     props.dispatch({
       type: actionType.avatar.FetchBulletinReplyList,
       hash: props.route.params.hash,
-      page: 1
+      page: refPage.current
     })
   }
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
+      if (props.route.params && props.route.params.page > 1) {
+        refPage.current = props.route.params.page
+      }
+      props.navigation.setOptions({
+        title: `网络评论#${refPage.current}`,
+      })
+
       loadBulletinReplyList()
     })
   })

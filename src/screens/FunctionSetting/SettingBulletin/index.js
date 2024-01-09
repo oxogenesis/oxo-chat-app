@@ -41,7 +41,7 @@ const SettingBulletinScreen = (props) => {
       <WhiteSpace size='lg' />
       <BaseList data={[
         { title: '随便看看', onpress: () => { props.navigation.push('BulletinRandom') } },
-        { title: '活跃用户', onpress: () => { props.navigation.push('BulletinAddressList') } },
+        { title: '活跃用户', onpress: () => { props.navigation.push('BulletinAddressList', { page: 1 }) } },
       ]} />
       <WhiteSpace size='lg' />
       <BaseList data={[

@@ -95,7 +95,7 @@ const AvatarListScreen = props => {
         flagLoading == false ?
           <View style={tw`h-full bg-stone-200 p-5px`}>
             <ScrollView
-              style={tw`mb-60px`}
+              style={tw`mb-40px`}
               // style={styles.scroll_view}
               automaticallyAdjustContentInsets={false}
               showsHorizontalScrollIndicator={false}

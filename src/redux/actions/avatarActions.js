@@ -258,8 +258,8 @@ export function* Conn(action) {
 }
 
 export function* SendMessage(action) {
-  console.log(`======================================================SendMessage`)
-  console.log(action)
+  // console.log(`======================================================SendMessage`)
+  // console.log(action.message)
   let ws = yield select(state => state.avatar.get('WebSocket'))
   if (ws != null && ws.readyState == WebSocket.OPEN) {
     ws.send(action.message)
@@ -1010,10 +1010,13 @@ export function* LoadBulletinList(action) {
     let sql2 = `SELECT sequence FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC`
     let sequence_list = yield call([db, db.getAll], sql2)
     let length = sequence_list.length
-    if (length == 0 || sequence_list[length - 1] != 1) {
-    } else if (length == sequence_list[0]) {
-      next_sequence = sequence_list[0] + 1
+    if (length == 0 || sequence_list[length - 1]['sequence'] != 1) {
+      // 本地没有缓存 || 缓存最小不是1
+    } else if (length == sequence_list[0]['sequence']) {
+      // 缓存数量 == 最大编号
+      next_sequence = sequence_list[0]['sequence'] + 1
     } else {
+      // 先定位未缓存的最小编号
       let tmp = 0
       while (sequence_list.length > 0) {
         if (tmp + 1 == sequence_list.pop()) {

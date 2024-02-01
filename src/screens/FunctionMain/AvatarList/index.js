@@ -129,7 +129,6 @@ const AvatarListScreen = props => {
                   :
                   <EmptyView pTop={1} />
               }
-              <WhiteSpace size='lg' />
             </ScrollView>
 
             <View style={tw`w-full absolute bottom-0 z-99`}>

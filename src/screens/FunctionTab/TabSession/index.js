@@ -100,7 +100,9 @@ const TabSessionScreen = (props) => {
             </TouchableOpacity>
 
           )
-        }) : <EmptyView />
+        })
+          :
+          <EmptyView />
       }
     </ScrollView>
   )

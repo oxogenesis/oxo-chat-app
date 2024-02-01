@@ -297,8 +297,8 @@ function DHSequence(division, timestamp, address1, address2) {
     tmpStr = address2 + address1
   }
   let tmpInt = parseInt(halfSHA512(tmpStr).substring(0, 5), 16)
-  let cursor = (tmpInt % 86400) * 1000
-  let seq = parseInt((timestamp - (Epoch + cursor)) / (86400000 / division))
+  let cursor = (tmpInt % (24 * 3600)) * 1000
+  let seq = parseInt((timestamp - (Epoch + cursor)) / (24 * 3600 * 1000 / division))
   return seq
 }
 

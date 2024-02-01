@@ -291,7 +291,6 @@ const SessionScreen = (props) => {
               style={{ flex: 0.2, ...styles.btn_high, borderRadius: 0 }}
               type='primary'
               onPress={() => sendMessage()}
-
             >发送</Button>
             :
             <Button

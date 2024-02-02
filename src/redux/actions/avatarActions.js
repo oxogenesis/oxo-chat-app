@@ -4,7 +4,7 @@ import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { DefaultHost, Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultDivision, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
+import { DefaultHost, Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
 import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512, AvatarLoginTimeUpdate } from '../../lib/OXO'
 import Database from '../../lib/Database'
@@ -1147,10 +1147,10 @@ export function* LoadCurrentSession(action) {
   let address = action.address
   let timestamp = Date.now()
   let self_address = yield select(state => state.avatar.get('Address'))
-  let ecdh_sequence = DHSequence(DefaultDivision, timestamp, self_address, address)
+  let ecdh_sequence = DHSequence(DefaultPartition, timestamp, self_address, address)
 
-  //fetch aes-Key according to (address+division+sequence)
-  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${DefaultDivision}" AND sequence = ${ecdh_sequence}`
+  //fetch aes-Key according to (address+partition+sequence)
+  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${DefaultPartition}" AND sequence = ${ecdh_sequence}`
   let ecdh = yield call([db, db.getOne], sql)
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
@@ -1170,15 +1170,15 @@ export function* LoadCurrentSession(action) {
     let ecdh_pk = ecdh.generateKeys('hex')
     let ecdh_sk = ecdh.getPrivateKey('hex')
     let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-    let msg = MessageGenerator.genFriendECDHRequest(DefaultDivision, ecdh_sequence, ecdh_pk, "", address, timestamp)
+    let msg = MessageGenerator.genFriendECDHRequest(DefaultPartition, ecdh_sequence, ecdh_pk, "", address, timestamp)
     // console.log(msg)
 
     //save my-sk-pk, self-not-ready-json
-    let sql = `INSERT INTO ECDHS (address, division, sequence, private_key, self_json)
-VALUES ('${address}', '${DefaultDivision}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
+    let sql = `INSERT INTO ECDHS (address, partition, sequence, private_key, self_json)
+VALUES ('${address}', '${DefaultPartition}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
     let reuslt = yield call([db, db.runSQL], sql)
     // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
-    // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.division, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
+    // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.partition, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
     if (reuslt.code != 0) {
       yield put({ type: actionType.avatar.SendMessage, message: msg })
     }
@@ -1282,7 +1282,7 @@ VALUES ('${address}', ${timestamp})`
   } else {
     //check dh(my-sk-pk pair-pk aes-key)
 
-    let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND division = "${json.Division}" AND sequence = ${json.Sequence}`
+    let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${json.Partition}" AND sequence = ${json.Sequence}`
     let item = yield call([db, db.getOne], sql)
 
     if (item == null) {
@@ -1294,11 +1294,11 @@ VALUES ('${address}', ${timestamp})`
       let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
 
       //gen message with my-pk, indicate self ready
-      let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
+      let msg = MessageGenerator.genFriendECDHRequest(json.Partition, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
 
       //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
-      sql = `INSERT INTO ECDHS (address, division, sequence, private_key, public_key, aes_key, self_json)
-VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
+      sql = `INSERT INTO ECDHS (address, partition, sequence, private_key, public_key, aes_key, self_json)
+VALUES ('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
       let reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
@@ -1312,16 +1312,16 @@ VALUES ('${address}', '${json.Division}', '${json.Sequence}', '${ecdh_sk}', '${j
       let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
 
       //gen self-ready-json
-      let msg = MessageGenerator.genFriendECDHRequest(json.Division, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
+      let msg = MessageGenerator.genFriendECDHRequest(json.Partition, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
 
       if (json.Pair == "") {
         //pair not ready
         //save pair-pk, aes-key, self-ready-json
-        sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+        sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}' WHERE address = "${address}" AND partition = "${json.Partition}" AND sequence = "${json.Sequence}"`
       } else {
         //pair ready
         //save pair-pk, aes-key, self-ready-json, pair-ready-json
-        sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND division = "${json.Division}" AND sequence = "${json.Sequence}"`
+        sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND partition = "${json.Partition}" AND sequence = "${json.Sequence}"`
       }
       let reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
@@ -1381,9 +1381,9 @@ export function* SaveFriendMessage(action) {
   let json = action.json
 
   let self_address = yield select(state => state.avatar.get('Address'))
-  let sequence = DHSequence(DefaultDivision, json.Timestamp, self_address, sour_address)
+  let sequence = DHSequence(DefaultPartition, json.Timestamp, self_address, sour_address)
   //fetch chatkey(aes_key) to decrypt content
-  let sql = `SELECT * FROM ECDHS WHERE address = "${sour_address}" AND division = "${DefaultDivision}" AND sequence = ${sequence}`
+  let sql = `SELECT * FROM ECDHS WHERE address = "${sour_address}" AND partition = "${DefaultPartition}" AND sequence = ${sequence}`
   let item = yield call([db, db.getOne], sql)
   if (item == null && item.aes_key == null) {
     console.log('chatkey not exist...')

@@ -3,7 +3,7 @@ import { Button, Flex, Toast } from '@ant-design/react-native'
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, FlatList, KeyboardAvoidingView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { timestamp_format, AddressToName } from '../../../lib/Util'
-import { DefaultDivision } from '../../../lib/Const'
+import { DefaultPartition } from '../../../lib/Const'
 import { DHSequence } from '../../../lib/OXO'
 import { actionType } from '../../../redux/actions/actionType'
 import { connect } from 'react-redux'
@@ -27,7 +27,7 @@ const SessionScreen = (props) => {
     if (message_input == "") {
       Toast.success('消息不能为空...', 1)
     } else {
-      let ecdh_sequence = DHSequence(DefaultDivision, timestamp, props.avatar.get("Address"), address)
+      let ecdh_sequence = DHSequence(DefaultPartition, timestamp, props.avatar.get("Address"), address)
       let current_session = props.avatar.get("CurrentSession")
       if (ecdh_sequence != current_session.EcdhSequence) {
         Toast.success('握手未完成...', 1)

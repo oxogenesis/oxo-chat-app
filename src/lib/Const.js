@@ -37,7 +37,7 @@ const ActionCode = {
   "GroupFileRequest": 405
 }
 
-const DefaultDivision = 3
+const DefaultPartition = 90 * 24 * 3600
 
 //group
 const GroupRequestActionCode = {
@@ -94,7 +94,7 @@ export {
   GenesisHash,
   MessageInterval,
   ActionCode,
-  DefaultDivision,
+  DefaultPartition,
   GroupRequestActionCode,
   GroupManageActionCode,
   GroupMemberShip,

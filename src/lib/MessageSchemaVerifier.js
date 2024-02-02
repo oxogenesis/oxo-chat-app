@@ -300,13 +300,13 @@ let ChatSyncSchema = {
 //ChatDH
 let ChatDHSchema = {
   "type": "object",
-  "required": ["Action", "Division", "Sequence", "DHPublicKey", "Pair", "To", "Timestamp", "PublicKey", "Signature"],
+  "required": ["Action", "Partition", "Sequence", "DHPublicKey", "Pair", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 9,
   "properties": {
     "Action": {
       "type": "number"
     },
-    "Division": {
+    "Partition": {
       "type": "number"
     },
     "Sequence": {

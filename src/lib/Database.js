@@ -35,14 +35,14 @@ export default class Database {
         )`)
       await this.createTable('ECDHS', `CREATE TABLE IF NOT EXISTS ECDHS(
           address VARCHAR(35) NOT NULL,
-          division INTEGER NOT NULL,
+          partition INTEGER NOT NULL,
           sequence INTEGER NOT NULL,
           aes_key TEXT,
           private_key TEXT,
           public_key TEXT,
           self_json TEXT,
           pair_json TEXT,
-          PRIMARY KEY (address, division, sequence)
+          PRIMARY KEY (address, partition, sequence)
           )`)
 
       //timestamp: time that json is sign

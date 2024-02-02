@@ -289,16 +289,16 @@ function ParseQrcodeSeed(qrcode) {
   }
 }
 
-function DHSequence(division, timestamp, address1, address2) {
+function DHSequence(partition, timestamp, address1, address2) {
   let tmpStr = ''
   if (address1 > address2) {
     tmpStr = address1 + address2
   } else {
     tmpStr = address2 + address1
   }
-  let tmpInt = parseInt(halfSHA512(tmpStr).substring(0, 5), 16)
-  let cursor = (tmpInt % (24 * 3600)) * 1000
-  let seq = parseInt((timestamp - (Epoch + cursor)) / (24 * 3600 * 1000 / division))
+  let tmpInt = parseInt(halfSHA512(tmpStr).substring(0, 6), 16)
+  let cursor = (tmpInt % partition) * 1000
+  let seq = parseInt((timestamp - (Epoch + cursor)) / (partition * 1000))
   return seq
 }
 

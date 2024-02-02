@@ -4,7 +4,7 @@ import {
   Epoch,
   GenesisHash,
   ActionCode,
-  DefaultDivision,
+  DefaultPartition,
   GroupRequestActionCode,
   GroupManageActionCode,
   GroupMemberShip,
@@ -111,10 +111,10 @@ export default class MessageGenerator {
   }
 
   //Chat
-  genFriendECDHRequest(division, sequence, ecdh_pk, pair, address, timestamp) {
+  genFriendECDHRequest(partition, sequence, ecdh_pk, pair, address, timestamp) {
     let json = {
       "Action": ActionCode.ChatDH,
-      "Division": division,
+      "Partition": partition,
       "Sequence": sequence,
       "DHPublicKey": ecdh_pk,
       "Pair": pair,

@@ -48,6 +48,7 @@ function initialState() {
       UnreadMessage: 0,
       UnreadSessionMap: {},
       CurrentSession: {},
+      CurrentSessionAesKey: {},
       CurrentMessageList: [],
       // bulletin from message
       MessageWhiteList: [],
@@ -96,6 +97,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('UnreadMessage', 0,)
     .set('UnreadSessionMap', {})
     .set('CurrentSession', {})
+    .set('CurrentSessionAesKey', {})
     .set('CurrentMessageList', [])
     .set('CountUnreadMessage', null)
     .set('MessageWhiteList', [])
@@ -326,6 +328,16 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
       session.Sequence = action.sequence
       session.Hash = action.hash
     }
+  } else {
+    session = {}
+  }
+  return state.set('CurrentSession', session)
+}
+
+reducer.prototype[actionType.avatar.setCurrentSessionAesKey] = (state, action) => {
+  let session = state.get('CurrentSession')
+  if (action.address != null) {
+    session.Address = action.address
     if (action.aes_key != null) {
       session.AesKey = action.aes_key
       session.EcdhSequence = action.ecdh_sequence
@@ -333,7 +345,7 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
   } else {
     session = {}
   }
-  return state.set('CurrentSession', session)
+  return state.set('CurrentSessionAesKey', session)
 }
 
 reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => {

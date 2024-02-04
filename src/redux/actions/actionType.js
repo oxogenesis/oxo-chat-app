@@ -80,6 +80,7 @@ export const actionType = {
     //Chat
     setSessionMap: 'SET_SESSION_MAP',
     setCurrentSession: 'SET_CURRENT_SESSION',
+    setCurrentSessionAesKey: 'SET_CURRENT_SESSION_AES_KEY',
     setCurrentMessageList: 'SET_CURRENT_MESSAGE_LIST',
     LoadCurrentSession: 'LOAD_CURRENT_SESSION',
     LoadCurrentMessageList: 'LOAD_CURRENT_MESSAGE_LIST',

@@ -1155,7 +1155,7 @@ export function* LoadCurrentSession(action) {
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
       //aes ready
-      yield put({ type: actionType.avatar.setCurrentSession, address: address, ecdh_sequence: ecdh_sequence, aes_key: ecdh.aes_key })
+      yield put({ type: actionType.avatar.setCurrentSessionAesKey, address: address, ecdh_sequence: ecdh_sequence, aes_key: ecdh.aes_key })
       //handsake already done, ready to chat
     } else {
       //my-sk-pk exist, aes not ready
@@ -1328,7 +1328,7 @@ VALUES ('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${
         yield put({ type: actionType.avatar.SendMessage, message: msg })
         let current_session = yield select(state => state.avatar.get('CurrentSession'))
         if (address == current_session.Address) {
-          yield put({ type: actionType.avatar.setCurrentSession, address: address, ecdh_sequence: json.Sequence, aes_key: aes_key })
+          yield put({ type: actionType.avatar.setCurrentSessionAesKey, address: address, ecdh_sequence: json.Sequence, aes_key: aes_key })
         }
       }
     }
@@ -1422,7 +1422,7 @@ export function* SaveFriendMessage(action) {
 
     //save message
     let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1, is_object, object_type)
-VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}', '${is_object}', '${object_type}')`
+      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}', '${is_object}', '${object_type}')`
 
     let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {

@@ -88,6 +88,9 @@ const SessionScreen = (props) => {
       props.dispatch({
         type: actionType.avatar.setCurrentSession
       })
+      props.dispatch({
+        type: actionType.avatar.setCurrentSessionAesKey
+      })
     })
   })
 

@@ -297,6 +297,32 @@ let ChatSyncSchema = {
   }
 }
 
+let ChatSyncFromServerSchema = {
+  "type": "object",
+  "required": ["Action", "PairAddress", "CurrentSequence", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 6,
+  "properties": {
+    "Action": {
+      "type": "number"
+    },
+    "PairAddress": {
+      "type": "string"
+    },
+    "CurrentSequence": {
+      "type": "number"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
 //ChatDH
 let ChatDHSchema = {
   "type": "object",
@@ -596,6 +622,7 @@ let vFileRequestSchema = ajv.compile(FileRequestSchema)
 
 let vChatMessageSchema = ajv.compile(ChatMessageSchema)
 let vChatSyncSchema = ajv.compile(ChatSyncSchema)
+let vChatSyncFromServerSchema = ajv.compile(ChatSyncFromServerSchema)
 let vChatDHSchema = ajv.compile(ChatDHSchema)
 
 let vGroupManageSyncSchema = ajv.compile(GroupManageSyncSchema)
@@ -604,7 +631,7 @@ let vGroupMessageSyncSchema = ajv.compile(GroupMessageSyncSchema)
 let vGroupRequestSchema = ajv.compile(GroupRequestSchema)
 
 function checkJsonSchema(json) {
-  if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vFileRequestSchema(json) || vChatMessageSchema(json) || vChatSyncSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
+  if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vFileRequestSchema(json) || vChatMessageSchema(json) || vChatSyncSchema(json) || vChatSyncFromServerSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
     return true
   } else {
     return false

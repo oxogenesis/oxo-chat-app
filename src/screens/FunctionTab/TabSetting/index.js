@@ -31,7 +31,7 @@ const TabSettingScreen = (props) => {
   }
 
   useEffect(() => {
-    if (props.avatar.get('Database') == null && props.avatar.get('Database') == null) {
+    if (props.avatar.get('Database') == null) {
       props.navigation.replace('AvatarList')
     }
   }, [props.avatar])

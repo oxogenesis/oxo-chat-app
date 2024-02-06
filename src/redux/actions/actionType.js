@@ -87,7 +87,8 @@ export const actionType = {
     HandleFriendECDH: 'HANDLE_FRIEND_ECDH',
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
-    HandleFriendSync: 'HANDLE_FRIEND_SYNC',
+    HandleChatSyncFromFriend: 'HANDLE_CHAT_SYNC_FROM_FRIEND',
+    HandleChatSyncFromServer: 'HANDLE_CHAT_SYNC_FROM_SERVER',
     SendFriendMessage: 'SEND_FRIEND_MESSAGE',
     setMessageWhiteList: 'SET_MESSAGE_WHITE_LIST'
   }

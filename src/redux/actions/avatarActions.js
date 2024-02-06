@@ -140,7 +140,7 @@ export function* Conn(action) {
       //handle message send To me
       else if (checkJsonSchema(json)) {
         //check receiver is me
-        if (json.To != Address) {
+        if (json.To != Address && json.Action != ActionCode.ChatSyncFromServer) {
           console.log('receiver is not me...')
         }
 
@@ -154,7 +154,10 @@ export function* Conn(action) {
               yield put({ type: actionType.avatar.HandleFriendMessage, json: json })
               break
             case ActionCode.ChatSync:
-              yield put({ type: actionType.avatar.HandleFriendSync, json: json })
+              yield put({ type: actionType.avatar.HandleChatSyncFromFriend, json: json })
+              break
+            case ActionCode.ChatSyncFromServer:
+              yield put({ type: actionType.avatar.HandleChatSyncFromServer, json: json })
               break
             case ActionCode.BulletinRequest:
               yield put({ type: actionType.avatar.HandleBulletinRequest, json: json })
@@ -465,7 +468,9 @@ export function* changeTheme(action) {
   yield call(setStorageItem, `Theme`, { 'Theme': theme })
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // AddressBook
+///////////////////////////////////////////////////////////////////////////////
 export function* addAddressMark(action) {
   let timestamp = Date.now()
   let db = yield select(state => state.avatar.get('Database'))
@@ -587,7 +592,9 @@ export function* delFollow(action) {
   yield call([db, db.runSQL], sql)
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Host
+///////////////////////////////////////////////////////////////////////////////
 export function* changeHostList(action) {
   yield put({ type: actionType.avatar.setHostList, host_list: action.host_list })
   yield call(setStorageItem, 'HostList', action.host_list)
@@ -635,7 +642,9 @@ export function* changeCurrentHost(action) {
   yield call(setStorageItem, 'HostList', host_list)
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Bulletin
+///////////////////////////////////////////////////////////////////////////////
 export function* HandleBulletinRequest(action) {
   console.log(`===================================================================HandleBulletinRequest`)
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
@@ -1141,8 +1150,12 @@ export function* UnmarkBulletin(action) {
   yield put({ type: actionType.avatar.LoadCurrentBulletin, hash: action.hash })
 }
 
-//Chat
+///////////////////////////////////////////////////////////////////////////////
+// Chat
+///////////////////////////////////////////////////////////////////////////////
 export function* LoadCurrentSession(action) {
+  console.log("----------------------------------------------------------------LoadCurrentSession")
+
   let db = yield select(state => state.avatar.get('Database'))
   let address = action.address
   let timestamp = Date.now()
@@ -1160,7 +1173,6 @@ export function* LoadCurrentSession(action) {
     } else {
       //my-sk-pk exist, aes not ready
       //send self-not-ready-json
-      // console.log(ecdh.self_json)
       yield put({ type: actionType.avatar.SendMessage, message: ecdh.self_json })
     }
   } else {
@@ -1175,7 +1187,7 @@ export function* LoadCurrentSession(action) {
 
     //save my-sk-pk, self-not-ready-json
     let sql = `INSERT INTO ECDHS (address, partition, sequence, private_key, self_json)
-VALUES ('${address}', '${DefaultPartition}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
+      VALUES ('${address}', '${DefaultPartition}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
     let reuslt = yield call([db, db.runSQL], sql)
     // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
     // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.partition, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
@@ -1271,7 +1283,7 @@ export function* HandleFriendECDH(action) {
       result = yield call([db, db.runSQL], sql)
     } else {
       sql = `INSERT INTO FRIEND_REQUESTS (address, updated_at)
-VALUES ('${address}', ${timestamp})`
+        VALUES ('${address}', ${timestamp})`
       result = yield call([db, db.runSQL], sql)
     }
     if (result && result.code != 0) {
@@ -1298,7 +1310,7 @@ VALUES ('${address}', ${timestamp})`
 
       //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
       sql = `INSERT INTO ECDHS (address, partition, sequence, private_key, public_key, aes_key, self_json)
-VALUES ('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
+        VALUES ('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
       let reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
@@ -1324,10 +1336,11 @@ VALUES ('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${
         sql = `UPDATE ECDHS SET public_key = '${json.DHPublicKey}', aes_key = '${aes_key}', self_json = '${msg}', pair_json = '${JSON.stringify(json)}' WHERE address = "${address}" AND partition = "${json.Partition}" AND sequence = "${json.Sequence}"`
       }
       let reuslt = yield call([db, db.runSQL], sql)
+
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
-        let current_session = yield select(state => state.avatar.get('CurrentSession'))
-        if (address == current_session.Address) {
+        let current_session_aes_key = yield select(state => state.avatar.get('CurrentSessionAesKey'))
+        if (address == current_session_aes_key.Address) {
           yield put({ type: actionType.avatar.setCurrentSessionAesKey, address: address, ecdh_sequence: json.Sequence, aes_key: aes_key })
         }
       }
@@ -1495,10 +1508,32 @@ export function* SaveFriendMessage(action) {
   }
 }
 
-export function* HandleFriendSync(action) {
+export function* HandleChatSyncFromFriend(action) {
   let json = action.json
 
   let sour_address = DeriveAddress(json.PublicKey)
+  //check message from my friend
+  let friend_list = yield select(state => state.avatar.get('Friends'))
+  if (!friend_list.includes(sour_address)) {
+    // console.log('message is not from my friend...')
+    return
+  }
+
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM MESSAGES WHERE dest_address = "${sour_address}" AND confirmed = 'FALSE' AND sequence > ${json.CurrentSequence} ORDER BY sequence ASC`
+  let items = yield call([db, db.getAll], sql)
+  let s = 0
+  for (let i = 0; i < items.length; i++) {
+    yield call(DelayExec, s * 1000)
+    yield put({ type: actionType.avatar.SendMessage, message: items[i].json })
+    s = s + 1
+  }
+}
+
+export function* HandleChatSyncFromServer(action) {
+  let json = action.json
+
+  let sour_address = json.PairAddress
   //check message from my friend
   let friend_list = yield select(state => state.avatar.get('Friends'))
   if (!friend_list.includes(sour_address)) {
@@ -1521,10 +1556,11 @@ export function* SendFriendMessage(action) {
   let dest_address = action.address
   let timestamp = action.timestamp
   let db = yield select(state => state.avatar.get('Database'))
+  let current_session_aes_key = yield select(state => state.avatar.get('CurrentSessionAesKey'))
   let current_session = yield select(state => state.avatar.get('CurrentSession'))
 
   //encrypt content
-  let content = AesEncrypt(action.message, current_session.AesKey)
+  let content = AesEncrypt(action.message, current_session_aes_key.AesKey)
 
   let sequence = current_session.Sequence + 1
 

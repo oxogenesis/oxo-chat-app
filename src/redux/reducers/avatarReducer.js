@@ -152,6 +152,9 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('MessageWhiteList', [])
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Contact
+///////////////////////////////////////////////////////////////////////////////
 reducer.prototype[actionType.avatar.setAddressBook] = (state, action) => {
   let self_address = state.get('Address')
   let address_list = []
@@ -189,6 +192,9 @@ reducer.prototype[actionType.avatar.setFollows] = (state, action) => {
   return state.set('Follows', action.follow_list)
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Host
+///////////////////////////////////////////////////////////////////////////////
 reducer.prototype[actionType.avatar.setHostList] = (state, action) => {
   return state.set('HostList', action.host_list)
 }
@@ -214,7 +220,9 @@ reducer.prototype[actionType.avatar.setMessageGenerator] = (state, action) => {
   return state.set('MessageGenerator', action.message_generator)
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Bulletin
+///////////////////////////////////////////////////////////////////////////////
 reducer.prototype[actionType.avatar.setBulletinCacheSize] = (state, action) => {
   return state.set('BulletinCacheSize', action.bulletin_cache_size)
 }
@@ -296,9 +304,10 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
   return state.set('QuoteList', tmp_quote_list)
 }
 
-//Chat
+///////////////////////////////////////////////////////////////////////////////
+// Chat
+///////////////////////////////////////////////////////////////////////////////
 reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
-  // console.log(action.session_map)
   let session_list = Object.values(action.session_map)
 
   session_list.sort(function (m, n) {
@@ -335,7 +344,7 @@ reducer.prototype[actionType.avatar.setCurrentSession] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setCurrentSessionAesKey] = (state, action) => {
-  let session = state.get('CurrentSession')
+  let session = state.get('CurrentSessionAesKey')
   if (action.address != null) {
     session.Address = action.address
     if (action.aes_key != null) {

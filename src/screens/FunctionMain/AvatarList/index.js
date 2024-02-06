@@ -59,7 +59,7 @@ const AvatarListScreen = props => {
   // }, [props.master])
 
   useEffect(() => {
-    if (props.avatar.get('Database') != null && props.avatar.get('Database') != null) {
+    if (props.avatar.get('Database') != null) {
       props.navigation.replace('TabHome')
     }
   }, [props.avatar])
@@ -117,10 +117,14 @@ const AvatarListScreen = props => {
                                 </Text>
                               </View>
                               <View style={tw`rounded-full px-1`}>
-                                <Text style={tw`text-base text-slate-400`}>{timestamp_format(item.LoginAt)}</Text>
+                                <Text style={tw`text-base text-slate-400`}>
+                                  {timestamp_format(item.LoginAt)}
+                                </Text>
                               </View>
                             </Text>
-                            <Text style={tw`text-sm text-slate-400`}>{item.Address}</Text>
+                            <Text style={tw`text-sm text-slate-400`}>
+                              {item.Address}
+                            </Text>
                           </Flex.Item>
                         </Flex>
                       </View>
@@ -132,7 +136,7 @@ const AvatarListScreen = props => {
             </ScrollView>
 
             <View style={tw`w-full absolute bottom-0 z-99`}>
-            {/* <View style={styles.base_view_a}> */}
+              {/* <View style={styles.base_view_a}> */}
               <Button style={tw`rounded-full bg-red-500`} onPress={() => lock()}>
                 <Text style={tw`text-xl text-slate-100`}>安全退出</Text>
               </Button>

@@ -27,43 +27,43 @@ const TabAddressBookScreen = props => {
                 props.avatar.get('AddressArray').length > 0 ?
                   props.avatar.get('AddressArray').map((item, index) => (
                     <View key={index} style={tw`bg-stone-100`}>
-                      <Flex>
-                        <Flex.Item style={{ flex: 0.15 }}>
-                          <Avatar address={item.Address} />
-                        </Flex.Item>
-                        <Flex.Item >
-                          <View style={tw`flex flex-row`}>
-                            <TouchableOpacity onPress={() => props.navigation.push('AddressMark', { address: item.Address })}>
-                              <View style={tw`bg-indigo-500 rounded-full px-2 border-2 border-gray-300`}>
+                      <TouchableOpacity onPress={() => props.navigation.push('AddressMark', { address: item.Address })}>
+                        <Flex>
+                          <Flex.Item style={{ flex: 0.15 }}>
+                            <Avatar address={item.Address} />
+                          </Flex.Item>
+                          <Flex.Item >
+                            <View style={tw`flex flex-row`}>
+                              <View style={tw`rounded-full px-1 border-2 border-gray-300`}>
                                 <Text style={tw`text-base text-slate-800 text-center`}>
                                   {`${item.Name}`}
                                 </Text>
                               </View>
-                            </TouchableOpacity>
-                            {
-                              props.avatar.get('Follows').includes(item.Address) &&
-                              <TouchableOpacity onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: item.Address })}>
-                                <View style={tw`bg-yellow-500 rounded-full px-2 border-2 border-gray-300`}>
-                                  <Text style={tw`text-base text-slate-800 text-center`}>
-                                    公告
-                                  </Text>
-                                </View>
-                              </TouchableOpacity>
-                            }
-                            {
-                              props.avatar.get('Friends').includes(item.Address) &&
-                              <TouchableOpacity onPress={() => props.navigation.push('Session', { address: item.Address })}>
-                                <View style={tw`bg-green-500 rounded-full px-2 border-2 border-gray-300`}>
-                                  <Text style={tw`text-base text-slate-800 text-center`}>
-                                    聊天
-                                  </Text>
-                                </View>
-                              </TouchableOpacity>
-                            }
-                          </View>
-                          <Text style={tw`text-sm text-slate-400`}>{item.Address}</Text>
-                        </Flex.Item>
-                      </Flex>
+                              {
+                                props.avatar.get('Follows').includes(item.Address) &&
+                                <TouchableOpacity onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: item.Address })}>
+                                  <View style={tw`bg-yellow-500 rounded-full px-2 border-2 border-gray-300`}>
+                                    <Text style={tw`text-base text-slate-800 text-center`}>
+                                      公告
+                                    </Text>
+                                  </View>
+                                </TouchableOpacity>
+                              }
+                              {
+                                props.avatar.get('Friends').includes(item.Address) &&
+                                <TouchableOpacity onPress={() => props.navigation.push('Session', { address: item.Address })}>
+                                  <View style={tw`bg-green-500 rounded-full px-2 border-2 border-gray-300`}>
+                                    <Text style={tw`text-base text-slate-800 text-center`}>
+                                      聊天
+                                    </Text>
+                                  </View>
+                                </TouchableOpacity>
+                              }
+                            </View>
+                            <Text style={tw`text-sm text-slate-400`}>{item.Address}</Text>
+                          </Flex.Item>
+                        </Flex>
+                      </TouchableOpacity>
                     </View>
                   ))
                   :

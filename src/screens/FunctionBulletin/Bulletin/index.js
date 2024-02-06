@@ -60,7 +60,6 @@ const BulletinScreen = (props) => {
     setShow(Math.random())
   }
 
-
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
       props.dispatch({

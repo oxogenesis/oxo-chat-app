@@ -10,7 +10,6 @@ import { BulletinAddressSession } from '../../../lib/Const'
 import StrSequence from '../../../component/StrSequence'
 import tw from 'twrnc'
 
-
 //活跃用户
 const BulletinAddressListScreen = (props) => {
   const { theme } = useContext(ThemeContext)

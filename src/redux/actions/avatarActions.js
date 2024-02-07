@@ -60,9 +60,9 @@ function createWebSocketChannel(ws) {
   return eventChannel(emit => {
     // Pass websocket messages straight though
     ws.onmessage = (event) => {
-      console.log(`======================================================onmessage`)
+      console.log(`======================================================onmessage>>>`)
       console.log(event.data)
-      console.log(`======================================================onmessage`)
+      console.log(`======================================================onmessage<<<`)
       emit(event.data)
     }
 
@@ -115,9 +115,6 @@ export function* Conn(action) {
     while (true) {
       console.log(`======================================================yield take(1channel)`)
       let payload = yield take(channel)
-      // console.log(`======================================================payload`)
-      // console.log(payload)
-      // console.log(`======================================================payload`)
       let json = JSON.parse(payload)
       // console.log(`======================================================json`)
       // console.log(json)
@@ -1154,8 +1151,6 @@ export function* UnmarkBulletin(action) {
 // Chat
 ///////////////////////////////////////////////////////////////////////////////
 export function* LoadCurrentSession(action) {
-  console.log("----------------------------------------------------------------LoadCurrentSession")
-
   let db = yield select(state => state.avatar.get('Database'))
   let address = action.address
   let timestamp = Date.now()

@@ -26,6 +26,18 @@
 # 完整App开发环境
 **[工程文件压缩包](https://github.com/oxogenesis/oxo-chat-app/releases/download/v0.2.01/chat.whole-dev-package.20240214.zip)**  
 
+//to run the code  
+nvm use 14.17.6  
+npm install  
+npm run android  
+
+//to build app  
+cd android  
+.\gradlew assembleRelease  
+
+如果14.17.6装不上，可以[下载](https://github.com/oxogenesis/oxo-chat-app/releases/download/v0.2.01/v14.17.6.zip)  
+解压至C:\Users\admin\AppData\Roaming\nvm\文件夹  
+
 # 代码
 **[app](https://github.com/oxogenesis/oxo-chat-app)**  
 **[客户端](https://github.com/oxogenesis/oxo-chat-client)**  
@@ -33,9 +45,6 @@
 **[服务端](https://github.com/oxogenesis/oxo-chat-server)**  
 
 # apk
-//to run the code  
-nvm use 14.17.6  
-
 **[apk](https://github.com/oxogenesis/oxo-chat-app/releases)**  
 
 # wiki

@@ -23,6 +23,9 @@
 # 使用教程
 **[客户端使用教程(app同理,就不单独写教程了)](https://github.com/oxogenesis/oxo-chat-tutorial)**  
 
+# 完整App开发环境
+**[工程文件压缩包](https://github.com/oxogenesis/oxo-chat-app/releases/download/v0.2.01/chat.whole-dev-package.20240214.zip)**  
+
 # 代码
 **[app](https://github.com/oxogenesis/oxo-chat-app)**  
 **[客户端](https://github.com/oxogenesis/oxo-chat-client)**  

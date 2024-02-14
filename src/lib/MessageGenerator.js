@@ -1,15 +1,7 @@
 import { Sign } from './OXO'
 import {
-  DefaultHost,
-  Epoch,
-  GenesisHash,
   ActionCode,
-  DefaultPartition,
-  GroupRequestActionCode,
-  GroupManageActionCode,
-  GroupMemberShip,
-  ObjectType,
-  SessionType
+  ObjectType
 } from './Const'
 
 export default class MessageGenerator {

@@ -119,7 +119,7 @@ const BulletinRandomScreen = (props) => {
             }
           >
             {/* main bulletin */}
-            <View style={tw`flex flex-row bg-neutral-100 p-5px`}>
+            <View style={tw`flex flex-col bg-neutral-100 p-5px`}>
               <Avatar address={random.Address} />
 
               <View>

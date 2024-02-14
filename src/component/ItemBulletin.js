@@ -11,31 +11,34 @@ import tw from '../lib/tailwind'
 
 const ItemBulletin = (props) => {
   const bulletin = props.item
-  const key = props.index ? props.index : bulletin.hash
+  // const key = props.index ? props.index : bulletin.hash
   return (
-    <View key={key} style={tw`flex flex-row bg-neutral-100 p-5px`}>
-      <Avatar address={bulletin.Address} onPress={() => props.navigation.push('AddressMark', { address: bulletin.Address })} />
+    <View style={tw`flex flex-col bg-neutral-100`}>
+      <View style={tw`flex flex-row mx-5px mt-5px`}>
+        <Avatar address={bulletin.Address} onPress={() => props.navigation.push('AddressMark', { address: bulletin.Address })} />
 
-      <View>
-        <Text>
-          <LinkBulletin address={bulletin.Address} sequence={bulletin.Sequence} hash={bulletin.Hash} to={bulletin.Address} />
-        </Text>
+        <View style={tw`flex flex-col`}>
+          <Text>
+            <LinkBulletin address={bulletin.Address} sequence={bulletin.Sequence} hash={bulletin.Hash} to={bulletin.Address} />
+          </Text>
 
-        <View style={tw`flex flex-row mr-55px`}>
-          <TextTimestamp timestamp={bulletin.Timestamp} textSize={'text-sm'} />
-          {
-            bulletin.QuoteSize != 0 &&
-            <Text style={tw`absolute right-0 text-sm text-gray-400`}>
-              引用：◀{bulletin.QuoteSize}
-            </Text>
-          }
+          <View style={tw`flex flex-row justify-between`}>
+            <TextTimestamp timestamp={bulletin.Timestamp} textSize={'text-xs'} />
+            {
+              bulletin.QuoteSize != 0 &&
+              <Text style={tw`text-sm font-bold text-gray-400`}>
+                引用：◀{bulletin.QuoteSize}
+              </Text>
+            }
+          </View>
         </View>
-        {bulletin.Content.length <= BulletinPreviewSize ?
-          <BulletinContent content={bulletin.Content} onPress={() => props.navigation.push('Bulletin', { hash: bulletin.Hash })} />
-          :
-          <BulletinContent content={bulletin.Content.slice(0, BulletinPreviewSize)} onPress={() => props.navigation.push('Bulletin', { hash: bulletin.Hash })} />
-        }
       </View>
+
+      {bulletin.Content.length <= BulletinPreviewSize ?
+        <BulletinContent content={bulletin.Content} onPress={() => props.navigation.push('Bulletin', { hash: bulletin.Hash })} />
+        :
+        <BulletinContent content={bulletin.Content.slice(0, BulletinPreviewSize)} onPress={() => props.navigation.push('Bulletin', { hash: bulletin.Hash })} />
+      }
     </View>
   )
 }

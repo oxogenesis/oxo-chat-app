@@ -39,7 +39,7 @@ const AvatarNameEditScreen = (props) => {
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <View style={tw`my-auto p-25px`}>
-        <InputPrimary value={address} setValue={setAddress} placeholder={`地址`} editable={false} />
+        <InputPrimary value={address} setValue={setAddress} placeholder={`地址`} editable={false} textSize={'text-sm'} />
         <InputPrimary value={name} setValue={setName} placeholder={`昵称`} />
 
         {

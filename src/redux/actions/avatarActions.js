@@ -43,13 +43,13 @@ function createWebSocket(url) {
   return new Promise((resolve, reject) => {
     let ws = new WebSocket(url)
     ws.onopen = () => {
-      console.log(`======================================================createWebSocket-open`)
+      console.log(`DEBUG======================================================createWebSocket-open`)
       resolve(ws)
     }
     ws.onerror = (error) => {
       //{"isTrusted": false, "message": "Connection reset"}
       //TODO: catch this error
-      console.log(`======================================================createWebSocket-error`)
+      console.log(`DEBUG======================================================createWebSocket-error`)
       console.log(error)
       reject(error)
     }
@@ -60,15 +60,15 @@ function createWebSocketChannel(ws) {
   return eventChannel(emit => {
     // Pass websocket messages straight though
     ws.onmessage = (event) => {
-      console.log(`======================================================onmessage>>>`)
+      // console.log(`DEBUG======================================================onmessage>>>`)
       console.log(event.data)
-      console.log(`======================================================onmessage<<<`)
+      // console.log(`DEBUG======================================================onmessage<<<`)
       emit(event.data)
     }
 
     // Close the channel as appropriate
     ws.onclose = () => {
-      console.log(`======================================================onclose`)
+      console.log(`DEBUG======================================================onclose`)
       emit(END)
     }
 
@@ -113,13 +113,10 @@ export function* Conn(action) {
 
     // Handle messages as they come in
     while (true) {
-      console.log(`======================================================yield take(1channel)`)
+      // console.log(`======================================================yield take(1channel)`)
       let payload = yield take(channel)
       let json = JSON.parse(payload)
-      // console.log(`======================================================json`)
-      // console.log(json)
-      // console.log(`======================================================json`)
-      console.log(`======================================================yield take(2channel)`)
+      // console.log(`======================================================yield take(2channel)`)
 
       if (json.Action == ActionCode.BulletinAddressListResponse && checkBulletinAddressListResponseSchema(json)) {
         yield put({ type: actionType.avatar.setBulletinAddressList, bulletin_address_list: json.List })
@@ -258,7 +255,7 @@ export function* Conn(action) {
 }
 
 export function* SendMessage(action) {
-  // console.log(`======================================================SendMessage`)
+  // console.log(`DEBUG======================================================SendMessage`)
   // console.log(action.message)
   let ws = yield select(state => state.avatar.get('WebSocket'))
   if (ws != null && ws.readyState == WebSocket.OPEN) {
@@ -271,6 +268,7 @@ export function* loadFromDB(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let address = yield select(state => state.avatar.get('Address'))
   let name = yield select(state => state.avatar.get('Name'))
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
 
   // AddressMap
   let sql = `SELECT * FROM ADDRESS_MARKS ORDER BY updated_at DESC`
@@ -291,6 +289,7 @@ export function* loadFromDB(action) {
   })
   yield put({ type: actionType.avatar.setFriends, friend_list: friend_list })
 
+  // Friend Request
   sql = `SELECT * FROM FRIEND_REQUESTS ORDER BY updated_at ASC`
   items = yield call([db, db.getAll], sql)
   let friend_request_list = []
@@ -308,21 +307,13 @@ export function* loadFromDB(action) {
   })
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
 
-  // // Host
-  // sql = `SELECT * FROM HOSTS ORDER BY updated_at DESC`
-  // items = yield call([db, db.getAll], sql)
-  // let hosts = []
-  // items.forEach(item => {
-  //   hosts.push({ Address: item.address, UpdatedAt: item.updated_at })
-  // })
-  // if (hosts.length == 0) {
-  //   hosts.push({ Address: DefaultHost, UpdatedAt: timestamp })
-  // }
-  // yield put({ type: actionType.avatar.setHostList, hosts: hosts })
-
-  // let current_host = hosts[0].Address
-  // yield put({ type: actionType.avatar.setCurrentHost, current_host: current_host, current_host_timestamp: timestamp })
-  // yield put({ type: actionType.avatar.Conn, host: current_host, timestamp: timestamp })
+  // Fetch follow bulletin
+  sql = `SELECT address, sequence FROM BULLETINS WHERE address IN (${Array2Str(follow_list)}) GROUP BY address ORDER BY sequence DESC`
+  items = yield call([db, db.getAll], sql)
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index]
+    yield put({ type: actionType.avatar.FetchBulletin, address: item.address, sequence: item.sequence + 1, to: address })
+  }
 
   // SessionList
   sql = `SELECT * FROM MESSAGES GROUP BY sour_address`
@@ -348,8 +339,8 @@ export function* loadFromDB(action) {
   })
 
   let session_map = {}
-  friend_list.forEach(follow => {
-    session_map[follow] = { Address: follow, Timestamp: Epoch, Content: '', CountUnread: 0 }
+  friend_list.forEach(friend => {
+    session_map[friend] = { Address: friend, Timestamp: Epoch, Content: '', CountUnread: 0 }
   })
   recent_message_receive.forEach(message => {
     if (message && session_map[message.Address]) {
@@ -364,6 +355,21 @@ export function* loadFromDB(action) {
     }
   })
   yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+
+  // Fetch friend message
+  sql = `SELECT sour_address, sequence FROM MESSAGES WHERE sour_address IN (${Array2Str(friend_list)}) GROUP BY sour_address ORDER BY sequence DESC`
+  items = yield call([db, db.getAll], sql)
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index]
+    friend_list = friend_list.filter(friend => friend != item.sour_address)
+    let msg = MessageGenerator.genFriendSync(item.sequence, item.sour_address)
+    yield put({ type: actionType.avatar.SendMessage, message: msg })
+  }
+  for (let index = 0; index < friend_list.length; index++) {
+    const friend = friend_list[index]
+    let msg = MessageGenerator.genFriendSync(0, friend)
+    yield put({ type: actionType.avatar.SendMessage, message: msg })
+  }
 }
 
 export function* enableAvatar(action) {
@@ -1226,14 +1232,16 @@ export function* LoadCurrentSession(action) {
     }
   }
 
-  //fetch pre message
+  // setCurrentSession
   sql = `SELECT * FROM MESSAGES WHERE dest_address = "${address}" ORDER BY sequence DESC`
-  let pre_message = yield call([db, db.getOne], sql)
-  if (pre_message == null) {
-    yield put({ type: actionType.avatar.setCurrentSession, address: address, hash: GenesisHash, sequence: 0 })
-  } else {
-    yield put({ type: actionType.avatar.setCurrentSession, address: address, hash: pre_message.hash, sequence: pre_message.sequence })
+  let last_message = yield call([db, db.getOne], sql)
+  let current_sequence = 0
+  let current_hash = GenesisHash
+  if (last_message != null) {
+    current_sequence = last_message.sequence
+    current_hash = last_message.hash
   }
+  yield put({ type: actionType.avatar.setCurrentSession, address: address, hash: current_hash, sequence: current_sequence })
 }
 
 export function* LoadCurrentMessageList(action) {
@@ -1242,13 +1250,26 @@ export function* LoadCurrentMessageList(action) {
 
   // init_flag?新的列表：延长列表
   if (action.init_flag == true) {
+    // 新的列表
     yield put({ type: actionType.avatar.setCurrentMessageList, message_list: [] })
 
     // 该session未读清零
     let session_map = yield select(state => state.avatar.get('SessionMap'))
     session_map[action.address].CountUnread = 0
     yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
+
+    //fetch more message
+    let sql = `SELECT * FROM MESSAGES WHERE sour_address = "${action.address}" ORDER BY sequence DESC`
+    let last_message = yield call([db, db.getOne], sql)
+    let last_sequence = 0
+    if (last_message != null) {
+      last_sequence = last_message.sequence
+    }
+    let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+    let msg = MessageGenerator.genFriendSync(last_sequence, action.address)
+    yield put({ type: actionType.avatar.SendMessage, message: msg })
   } else {
+    // 延长列表
     message_list = yield select(state => state.avatar.get('CurrentMessageList'))
   }
   let message_list_size = message_list.length
@@ -1257,7 +1278,6 @@ export function* LoadCurrentMessageList(action) {
   let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size}`
   let items = yield call([db, db.getAll], sql)
   let tmp = []
-  // let current_sequence = 0
   items.forEach(item => {
     let confirmed = (item.confirmed == "TRUE")
     let is_object = (item.is_object == "TRUE")
@@ -1279,19 +1299,12 @@ export function* LoadCurrentMessageList(action) {
       "IsObject": is_object,
       "ObjectJson": object_json
     })
-    // if (item.sour_address == action.address && item.sequence > current_sequence) {
-    //   current_sequence = item.sequence
-    // }
   })
   if (tmp.length != 0) {
     message_list = tmp.concat(message_list)
     yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
     yield put({ type: actionType.avatar.setMessageWhiteList, message_white_list: message_white_list })
   }
-
-  // let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  // let msg = MessageGenerator.genFriendSync(current_sequence, action.address)
-  // yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 
 export function* LoadMsgInfo(action) {

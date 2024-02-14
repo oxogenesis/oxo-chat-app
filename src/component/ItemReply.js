@@ -8,25 +8,27 @@ import tw from '../lib/tailwind'
 
 const ItemReply = ({ itemIndex, address, sequence, hash, content, timestamp }) => {
   return (
-    <View key={`reply${itemIndex}`} style={tw`flex flex-row bg-neutral-100 p-5px`}>
-      <Avatar address={address} />
+    <View style={tw`flex flex-col bg-neutral-100`}>
+      <View style={tw`flex flex-row mx-5px mt-5px`}>
+        <Avatar address={address} />
 
-      <View style={tw``}>
-        <Text>
-          <LinkBulletin address={address} sequence={sequence} hash={hash} to={address} />
-          <View style={tw`rounded-full px-1 border-2 border-gray-300`}>
-            <Text style={tw`text-base text-slate-800 text-center`}>
-              {`#${itemIndex + 1}楼`}
-            </Text>
-          </View>
-        </Text>
+        <View style={tw`flex flex-col`}>
+          <Text>
+            <LinkBulletin address={address} sequence={sequence} hash={hash} to={address} />
+            <View style={tw`rounded-full px-1 border-2 border-gray-300`}>
+              <Text style={tw`text-base text-slate-800 text-center`}>
+                {`#${itemIndex + 1}楼`}
+              </Text>
+            </View>
+          </Text>
 
-        <Text>
-          <TextTimestamp timestamp={timestamp} textSize={'text-xs'} />
-        </Text>
-
-        <BulletinContent content={content} />
+          <Text>
+            <TextTimestamp timestamp={timestamp} textSize={'text-xs'} />
+          </Text>
+        </View>
       </View>
+
+      <BulletinContent content={content} />
     </View>
   )
 }

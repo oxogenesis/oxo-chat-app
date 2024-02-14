@@ -230,9 +230,10 @@ export default class Database {
 
   runSQL(sql) {
     if (sql.indexOf('INSERT') != -1) {
-      console.log('#####################INSERT SQL')
+      // console.log(`DEBUG======================================================INSERT SQL OK`)
     } else {
-      console.log(sql)
+      // console.log(`DEBUG======================================================INSERT SQL fail`)
+      // console.log(sql)
     }
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
@@ -247,6 +248,7 @@ export default class Database {
   }
 
   getOne(sql) {
+    // console.log(`DEBUG======================================================getOne SQL`)
     console.log(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
@@ -265,6 +267,7 @@ export default class Database {
   }
 
   getAll(sql) {
+    // console.log(`DEBUG======================================================getOne SQL`)
     console.log(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {

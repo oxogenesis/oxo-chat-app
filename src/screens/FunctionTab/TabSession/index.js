@@ -51,7 +51,7 @@ const TabSessionScreen = (props) => {
                           <TextTimestamp timestamp={item.Timestamp} textSize={'text-xs'} />
                         </Text>
                       </View>
-                      <TextAddress address={item.Address} />
+                      <TextAddress address={item.Content} />
                     </View>
                   </Flex>
                 </TouchableOpacity>

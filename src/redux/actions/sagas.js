@@ -37,6 +37,7 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.UpdateFollowBulletin, avatarActions.UpdateFollowBulletin)
   yield takeEvery(actionType.avatar.LoadBulletinList, avatarActions.LoadBulletinList)
   yield takeEvery(actionType.avatar.HandleBulletinRequest, avatarActions.HandleBulletinRequest)
+  yield takeEvery(actionType.avatar.SaveQuote, avatarActions.SaveQuote)
   yield takeEvery(actionType.avatar.SaveBulletin, avatarActions.SaveBulletin)
   // yield takeEvery(actionType.avatar.SaveContentBulletin, avatarActions.SaveContentBulletin)
   yield takeEvery(actionType.avatar.FetchRandomBulletin, avatarActions.FetchRandomBulletin)
@@ -52,6 +53,7 @@ export default function* rootSaga() {
   //Chat
   yield takeEvery(actionType.avatar.LoadCurrentSession, avatarActions.LoadCurrentSession)
   yield takeEvery(actionType.avatar.LoadCurrentMessageList, avatarActions.LoadCurrentMessageList)
+  yield takeEvery(actionType.avatar.LoadMsgInfo, avatarActions.LoadMsgInfo)
   yield takeEvery(actionType.avatar.HandleFriendECDH, avatarActions.HandleFriendECDH)
   yield takeEvery(actionType.avatar.HandleFriendMessage, avatarActions.HandleFriendMessage)
   yield takeEvery(actionType.avatar.SaveFriendMessage, avatarActions.SaveFriendMessage)

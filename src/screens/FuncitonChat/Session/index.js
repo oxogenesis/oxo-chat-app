@@ -1,22 +1,22 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Button, Flex, Toast } from '@ant-design/react-native'
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, FlatList, KeyboardAvoidingView } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList, KeyboardAvoidingView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { timestamp_format, AddressToName } from '../../../lib/Util'
+import { AddressToName } from '../../../lib/Util'
 import { DefaultPartition } from '../../../lib/Const'
 import { DHSequence } from '../../../lib/OXO'
 import { actionType } from '../../../redux/actions/actionType'
 import { connect } from 'react-redux'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { ThemeContext } from '../../../theme/theme-context'
 import AvatarImage from '../../../component/AvatarImage'
 import LinkBulletin from '../../../component/LinkBulletin'
-import tw from 'twrnc'
+import LinkMsgInfo from '../../../component/LinkMsgInfo'
+import TextTimestamp from '../../../component/TextTimestamp'
+import tw from '../../../lib/tailwind'
 
 //聊天会话界面
 const SessionScreen = (props) => {
   const flatRef = useRef(null)
-  const { theme } = useContext(ThemeContext)
   const [message_input, setMsgInput] = useState('')
   const [refreshFlag, setRefreshFlag] = useState(false)
   const aes_key = props.avatar.get('CurrentSessionAesKey')
@@ -48,10 +48,10 @@ const SessionScreen = (props) => {
     }
   }
 
-  const loadMessageList = (flag) => {
+  const loadMessageList = (init_flag) => {
     props.dispatch({
       type: actionType.avatar.LoadCurrentMessageList,
-      session_flag: flag,
+      init_flag: init_flag,
       address: props.route.params.address
     })
   }
@@ -117,7 +117,7 @@ const SessionScreen = (props) => {
   }
 
   return (
-    <View style={tw`flex flex-col h-full relative`}>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px flex flex-col relative`}>
       <FlatList
         style={tw`mb-55px`}
         ref={flatRef}
@@ -134,32 +134,23 @@ const SessionScreen = (props) => {
                   <AvatarImage address={friend_address} />
                 </View>
 
-                <View style={tw`max-w-64 mt-5px`}>
-                  <Text style={tw`text-left mr-5px`}>
-                    <View style={tw`rounded-full px-1 border border-gray-400`}>
-                      <Text style={tw`text-xs text-gray-400 text-center`}>
-                        {`#${item.Sequence}`}
-                      </Text>
-                    </View>
-
-                    <View style={tw`rounded-full px-1 border border-gray-400`}>
-                      <Text style={tw`text-xs text-gray-400 text-center`}>
-                        {timestamp_format(item.Timestamp)}
-                      </Text>
-                    </View>
+                <View style={tw`max-w-64 mt-5px ml-5px`}>
+                  <Text style={tw`text-left`}>
+                    <LinkMsgInfo hash={item.Hash} sequence={item.Sequence} />
+                    <TextTimestamp timestamp={item.Timestamp} textSize={'text-xs'} />
                   </Text>
 
-                  <View style={tw`mr-5px mt-2px p-2px ${item.Confirmed ? 'bg-green-500' : 'bg-gray-300'} rounded-r-md rounded-bl-md`}>
-                    {
-                      item.IsObject ?
-                        <LinkBulletin address={item.ObjectJson.Address} sequence={item.ObjectJson.Sequence} hash={item.ObjectJson.Hash} to={props.route.params.address} />
-                        :
-                        <TouchableOpacity onPress={() => { copyToClipboard(item.Content) }}>
-                          <Text style={tw`text-sm text-left`}>
+                  <View style={tw`flex flex-row`}>
+                    <Text style={tw`mr-5px mt-2px p-2px ${item.Confirmed ? 'bg-green-500' : 'bg-neutral-100'} rounded-r-md rounded-bl-md`}>
+                      {
+                        item.IsObject ?
+                          <LinkBulletin address={item.ObjectJson.Address} sequence={item.ObjectJson.Sequence} hash={item.ObjectJson.Hash} to={props.route.params.address} />
+                          :
+                          <Text style={tw`text-sm text-left`} onPress={() => { copyToClipboard(item.Content) }}>
                             {item.Content}
                           </Text>
-                        </TouchableOpacity>
-                    }
+                      }
+                    </Text>
                   </View>
                 </View>
               </Flex>
@@ -170,31 +161,23 @@ const SessionScreen = (props) => {
               <Flex justify="end" align="start" key={item.Hash}>
                 <View style={tw`ml-50px max-w-64 mt-5px`}>
                   <Text style={tw`text-right mr-5px`}>
-                    <View style={tw`rounded-full px-1 border border-gray-400`}>
-                      <Text style={tw`text-xs text-gray-400 text-center`}>
-                        {`#${item.Sequence}`}
-                      </Text>
-                    </View>
-
-                    <View style={tw`rounded-full px-1 border border-gray-400`}>
-                      <Text style={tw`text-xs text-gray-400 text-center`}>
-                        {timestamp_format(item.Timestamp)}
-                      </Text>
-                    </View>
+                    <LinkMsgInfo hash={item.Hash} sequence={item.Sequence} />
+                    <TextTimestamp timestamp={item.Timestamp} textSize={'text-xs'} />
                   </Text>
-                  <View style={tw`mr-5px mt-2px p-2px ${item.Confirmed ? 'bg-green-500' : 'bg-gray-300'} rounded-l-md rounded-br-md`}>
-                    {
-                      item.IsObject ?
-                        <View style={tw``}>
-                          <LinkBulletin address={item.ObjectJson.Address} sequence={item.ObjectJson.Sequence} hash={item.ObjectJson.Hash} to={props.route.params.address} />
-                        </View>
-                        :
-                        <TouchableOpacity onPress={() => { copyToClipboard(item.Content) }}>
-                          <Text style={tw`text-sm text-right`}>
+
+                  <View style={tw`flex flex-row-reverse`}>
+                    <Text style={tw`mr-5px mt-2px p-2px ${item.Confirmed ? 'bg-green-500' : 'bg-neutral-100'} rounded-l-md rounded-br-md`}>
+                      {
+                        item.IsObject ?
+                          <View style={tw``}>
+                            <LinkBulletin address={item.ObjectJson.Address} sequence={item.ObjectJson.Sequence} hash={item.ObjectJson.Hash} to={props.route.params.address} />
+                          </View>
+                          :
+                          <Text style={tw`text-sm text-right`} onPress={() => { copyToClipboard(item.Content) }}>
                             {item.Content}
                           </Text>
-                        </TouchableOpacity>
-                    }
+                      }
+                    </Text>
                   </View>
                 </View>
 

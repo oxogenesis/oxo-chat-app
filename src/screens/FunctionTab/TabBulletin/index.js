@@ -1,23 +1,21 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, FlatList } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { timestamp_format } from '../../../lib/Util'
-import { Flex } from '@ant-design/react-native'
-import EmptyView from '../../FunctionBase/EmptyView'
-import { ThemeContext } from '../../../theme/theme-context'
-import { styles } from '../../../theme/style'
+import ViewEmpty from '../../../component/ViewEmpty'
 import { BulletinPreviewSize } from '../../../lib/Const'
 import Avatar from '../../../component/Avatar'
 import LinkBulletin from '../../../component/LinkBulletin'
-import tw from 'twrnc'
+import TextTimestamp from '../../../component/TextTimestamp'
+import tw from '../../../lib/tailwind'
+import BulletinContent from '../../../component/BulletinContent'
+import ItemBulletin from '../../../component/ItemBulletin'
 
 //公告Tab
 const TabBulletinScreen = (props) => {
-  const { theme } = useContext(ThemeContext)
   const [refreshFlag, setRefreshFlag] = useState(false)
-  const [isLoadMore, setIsLoadMore] = useState(false)
+  const [loadmoreFlag, setLoadmoreFlag] = useState(false)
 
   const loadTabBulletinList = (flag) => {
     props.dispatch({
@@ -36,12 +34,16 @@ const TabBulletinScreen = (props) => {
 
   //向上拉到底部，加载更到本地公告
   const loadMore = () => {
-    console.log("上拉加载")
-    setIsLoadMore(true)
-    loadTabBulletinList(false)
-    setTimeout(() => {
-      setIsLoadMore(false)
-    }, 500)
+    if (loadmoreFlag) {
+      console.log("现在正在加载")
+    } else {
+      console.log("上拉加载")
+      setLoadmoreFlag(true)
+      loadTabBulletinList(false)
+      setTimeout(() => {
+        setLoadmoreFlag(false)
+      }, 1000)
+    }
   }
 
   //向下拉，从服务器请求更多公告
@@ -67,12 +69,7 @@ const TabBulletinScreen = (props) => {
   const list = props.avatar.get('TabBulletinList')
 
   return (
-    <View
-      style={{
-        ...styles.base_view_r,
-        backgroundColor: theme.base_view
-      }}
-    >
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 pt-5px px-5px`}>
       {
         !props.avatar.get('ConnStatus') &&
         <View style={tw`bg-red-200 p-4`}>
@@ -81,81 +78,23 @@ const TabBulletinScreen = (props) => {
           </Text>
         </View>
       }
-      <FlatList
-        style={{
-          ...styles.base_color,
-          backgroundColor: theme.base_body,
-          marginBottom: 0
-        }}
-        data={props.avatar.get('TabBulletinList')}
-        keyExtractor={item => item.Hash}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.05}
-        refreshing={refreshFlag}
-        onRefresh={refreshing}
-        ListEmptyComponent={<EmptyView />}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              ...styles.list_border,
-              borderColor: theme.split_line
-            }}>
-            <Flex justify="start" align="start">
-              <Avatar address={item.Address} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} />
-              <View style={tw`ml-2px`}>
-                <Text style={{
-                  marginBottom: 6
-                }}>
-                  <LinkBulletin address={item.Address} sequence={item.Sequence} hash={item.Hash} to={item.Address} />
-                </Text>
-
-                <View style={{
-                  flex: 1,
-                  flexDirection: "row",
-                  paddingRight: 50,
-                }}>
-                  <Text style={{
-                    ...styles.content_view,
-                    color: theme.text2
-                  }}>{timestamp_format(item.Timestamp)}</Text>
-                  {
-                    item.QuoteSize != 0 && <Text style={{
-                      ...styles.form_view,
-                      color: theme.text2
-                    }}>
-                      引用：◀{item.QuoteSize}</Text>
-                  }
-                </View>
-                {item.Content.length <= BulletinPreviewSize ?
-                  <View style={styles.content_view}>
-                    <Text style={{
-                      ...styles.content_text,
-                      color: theme.text1
-                    }}
-                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                    >{item.Content}</Text>
-                  </View>
-                  :
-                  <View style={styles.content_view}>
-                    <Text style={{
-                      ...styles.content_text,
-                      color: theme.text1
-                    }}
-                      onPress={() => props.navigation.push('Bulletin', { hash: item.Hash })}
-                    >{item.Content.slice(0, BulletinPreviewSize)}</Text>
-                  </View>
-                }
-              </View>
-            </Flex>
-          </View>
-        )}
-      />
-
-      {/* <View style={tw`absolute inset-x-0 bottom-0 bg-stone-200 z-50`}>
-        <Button style={tw`rounded-full bg-green-500`} onPress={() => props.navigation.navigate('BulletinPublish')}>
-          <Text style={tw`text-xl text-slate-100`}>发布公告</Text>
-        </Button>
-      </View> */}
+      {
+        props.avatar.get('TabBulletinList').length != 0 ?
+          <FlatList
+            style={tw``}
+            data={props.avatar.get('TabBulletinList')}
+            keyExtractor={item => item.Hash}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.05}
+            refreshing={refreshFlag}
+            onRefresh={refreshing}
+            renderItem={({ item }) => (
+              <ItemBulletin item={item} />
+            )}
+          />
+          :
+          <ViewEmpty msg={`暂无公告...`} />
+      }
     </View>
   )
 }

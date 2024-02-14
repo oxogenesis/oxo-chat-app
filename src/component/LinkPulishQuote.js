@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { actionType } from '../redux/actions/actionType'
 import { Text, View } from 'react-native'
 import LinkBulletin from './LinkBulletin'
-import tw from 'twrnc'
+import tw from '../lib/tailwind'
 
 const LinkPublishQuote = (props) => {
   return (

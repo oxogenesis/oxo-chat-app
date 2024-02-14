@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { connect } from 'react-redux'
 
@@ -6,28 +6,28 @@ import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconFeather from 'react-native-vector-icons/Feather'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
 import IconEntypo from 'react-native-vector-icons/Entypo'
+import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
-import MasterKeyScreen from '../FunctionMain/MasterKey'
-import UnlockScreen from '../FunctionMain/Unlock'
-import AvatarListScreen from '../FunctionMain/AvatarList'
-import AvatarCreateScreen from '../FunctionMain/AvatarCreate'
-import AvatarCreateFromScanSeedQrcodeScreen from '../FunctionMain/AvatarCreateFromScanSeedQrcode'
-import AboutScreen from '../FunctionMain/About'
-import AddressSelectScreen from '../FunctionMain/AddressSelect'
+// Avatar
+import MasterKeyScreen from '../FunctionAvatar/MasterKey'
+import UnlockScreen from '../FunctionAvatar/Unlock'
+import AvatarListScreen from '../FunctionAvatar/AvatarList'
+import AvatarCreateScreen from '../FunctionAvatar/AvatarCreate'
+import AvatarCreateFromScanSeedQrcodeScreen from '../FunctionAvatar/AvatarCreateFromScanSeedQrcode'
+import AvatarNameEditScreen from '../FunctionAvatar/AvatarNameEdit'
+import AvatarSeedScreen from '../FunctionAvatar/AvatarSeed'
+import AvatarSeedQrcodeScreen from '../FunctionAvatar/AvatarSeedQrcode'
+import SettingMeScreen from '../FunctionAvatar/SettingMe'
 
-import AvatarNameEditScreen from '../FunctionSetting/AvatarNameEdit'
-import AvatarSeedScreen from '../FunctionSetting/AvatarSeed'
-import AvatarSeedQrcodeScreen from '../FunctionSetting/AvatarSeedQrcode'
-import SettingMeScreen from '../FunctionSetting/SettingMe'
-import SettingNetworkScreen from '../FunctionSetting/SettingNetwork'
-import SettingBulletinScreen from '../FunctionSetting/SettingBulletin'
-import SettingAddressScreen from '../FunctionSetting/SettingAddress'
-import SettingFriendScreen from '../FunctionSetting/SettingFriend'
-import SettingFollowScreen from '../FunctionSetting/SettingFollow'
-import SettingFriendRequestScreen from '../FunctionSetting/SettingFriendRequest'
+// Contact
+import AddressMarkScreen from '../FunctionContact/AddressMark'
+import AddressAddScreen from '../FunctionContact/AddressAdd'
+import AddressAddFromQrcodeScreen from '../FunctionContact/AddressAddFromQrcode'
+import AddressEditScreen from '../FunctionContact/AddressEdit'
+import AddressScanScreen from '../FunctionContact/AddressScan'
+import SettingAddressScreen from '../FunctionContact/SettingAddress'
 
-import TabHomeScreen from '../FunctionTab/TabHome'
-
+// Bulletin
 import BulletinScreen from '../FunctionBulletin/Bulletin'
 import BulletinRandomScreen from '../FunctionBulletin/BulletinRandom'
 import BulletinInfoScreen from '../FunctionBulletin/BulletinInfo'
@@ -36,32 +36,37 @@ import BulletinPublishScreen from '../FunctionBulletin/BulletinPublish'
 import BulletinCacheScreen from '../FunctionBulletin/BulletinCache'
 import BulletinAddressListScreen from '../FunctionBulletin/BulletinAddressList'
 import BulletinReplyListScreen from '../FunctionBulletin/BulletinReplyList'
+import SettingBulletinScreen from '../FunctionBulletin/SettingBulletin'
+import SettingFollowScreen from '../FunctionBulletin/SettingFollow'
 
+// Chat
 import SessionScreen from '../FuncitonChat/Session'
+import MsgInfoScreen from '../FuncitonChat/MsgInfo'
+import SettingFriendScreen from '../FuncitonChat/SettingFriend'
+import SettingFriendRequestScreen from '../FuncitonChat/SettingFriendRequest'
 
-import AddressMarkScreen from '../FunctionContact/AddressMark'
-import AddressAddScreen from '../FunctionContact/AddressAdd'
-import AddressAddFromQrcodeScreen from '../FunctionContact/AddressAddFromQrcode'
-import AddressEditScreen from '../FunctionContact/AddressEdit'
-import AddressScanScreen from '../FunctionContact/AddressScan'
+//tab network about etc...
+import TabHomeScreen from '../FunctionTab/TabHome'
+import SettingNetworkScreen from '../FunctionTab/SettingNetwork'
+import ServerAddScreen from '../FunctionTab/ServerAdd'
+import AboutScreen from '../FunctionTab/About'
+import AddressSelectScreen from '../FunctionTab/AddressSelect'
+import tw from '../../lib/tailwind'
 
-import { ThemeContext } from '../../theme/theme-context'
-import tw from 'twrnc'
 import { AddressToName } from '../../lib/Util'
 
 const Stack = createStackNavigator()
 
 const AppStack = (props) => {
-  const { theme } = useContext(ThemeContext)
 
   const headerStyleOption = {
     headerStyle: {
-      backgroundColor: theme.tab_view,
+      backgroundColor: tw.color(`neutral-200`),
     },
     headerTitleStyle: {
-      color: theme.tab_text,
+      color: tw.color(`neutral-800`),
     },
-    headerTintColor: theme.tab_text
+    headerTintColor: tw.color(`neutral-800`)
   }
 
   return (
@@ -94,7 +99,7 @@ const AppStack = (props) => {
               <IconAnt
                 name={'adduser'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.navigate('AvatarCreate')
                 }
               />)
@@ -112,7 +117,7 @@ const AppStack = (props) => {
               <IconAnt
                 name={'qrcode'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.replace('AvatarCreateFromScanSeedQrcode')
                 }
               />)
@@ -124,7 +129,7 @@ const AppStack = (props) => {
         component={AvatarCreateFromScanSeedQrcodeScreen}
         options={
           ({ route, navigation }) => ({
-            title: '种子扫描',
+            title: '扫描种子创建账户',
             ...headerStyleOption,
           })
         }
@@ -171,7 +176,7 @@ const AppStack = (props) => {
               <IconAnt
                 name={'earth'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.push('BulletinReplyList', { hash: route.params.hash, page: 1 })}
               />)
           })
@@ -198,7 +203,7 @@ const AppStack = (props) => {
               <IconMaterial
                 name={'post-add'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.navigate('BulletinPublish')}
               />)
           })
@@ -235,7 +240,7 @@ const AppStack = (props) => {
               <IconEntypo
                 name={'arrow-with-circle-right'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.push('BulletinAddressList', { page: route.params.page + 1 })}
               />)
           })
@@ -252,7 +257,7 @@ const AppStack = (props) => {
               <IconEntypo
                 name={'arrow-with-circle-right'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.push('BulletinReplyList', { page: route.params.page + 1 })}
               />)
           })
@@ -270,11 +275,21 @@ const AppStack = (props) => {
               <IconFeather
                 name={'more-horizontal'}
                 size={32}
-                color={theme.text1}
+                color={tw.color(`neutral-800`)}
                 onPress={() => navigation.push('AddressMark', {
                   address: route.params.address
                 })}
               />)
+          })
+        }
+      />
+      <Stack.Screen
+        name="MsgInfo"
+        component={MsgInfoScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: "消息信息",
+            ...headerStyleOption,
           })
         }
       />
@@ -357,6 +372,23 @@ const AppStack = (props) => {
         options={
           ({ route, navigation }) => ({
             title: '网络设置',
+            ...headerStyleOption,
+            headerRight: () => (
+              <IconMaterialIcons
+                name={'playlist-add'}
+                size={32}
+                color={tw.color(`neutral-800`)}
+                onPress={() => navigation.push('ServerAdd')}
+              />)
+          })
+        }
+      />
+      <Stack.Screen
+        name="ServerAdd"
+        component={ServerAddScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '添加服务器',
             ...headerStyleOption,
           })
         }

@@ -1,18 +1,18 @@
-import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, TextInput } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button } from '@ant-design/react-native'
-import { ThemeContext } from '../../../theme/theme-context'
+import ButtonPrimary from '../../../component/ButtonPrimary'
+import InputPrimary from '../../../component/InputPrimary'
 import ErrorMsg from '../../../component/ErrorMsg'
-import tw from 'twrnc'
+import tw from '../../../lib/tailwind'
 
 //添加联系人
 const AddressAddScreen = (props) => {
   const [name, setName] = useState("")
   const [address, setAddress] = useState("")
+  const [flagFromScan, setFlagFromScan] = useState(false)
   const [error_msg, setMsg] = useState('')
-  const { theme } = useContext(ThemeContext)
 
   const addAddressMark = () => {
     let newAddress = address.trim()
@@ -36,35 +36,29 @@ const AddressAddScreen = (props) => {
     return props.navigation.addListener('focus', () => {
       if (props.route.params && props.route.params.address) {
         setAddress(props.route.params.address)
+        setFlagFromScan(true)
       }
     })
   })
 
 
   return (
-    <View style={tw`h-full bg-stone-200`}>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <View style={tw`my-auto`}>
-        <TextInput
-          placeholder="地址"
-          placeholderTextColor={tw.color('stone-500')}
-          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
-          value={address}
-          onChangeText={text => setAddress(text)}
-        />
-        <TextInput
-          placeholder="昵称"
-          placeholderTextColor={tw.color('stone-500')}
-          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
-          value={name}
-          onChangeText={text => setName(text)}
-        />
+        {
+          flagFromScan ?
+            <InputPrimary value={address} editable={false} setValue={setAddress} placeholder={'地址'} textSize={'text-sm'} />
+            :
+            <InputPrimary value={address} setValue={setAddress} placeholder={'地址'} textSize={'text-sm'} />
+        }
+        <InputPrimary value={name} setValue={setName} placeholder={'昵称'} />
+
         {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw`rounded-full bg-green-500`} onPress={addAddressMark}>
-          <Text style={tw`text-xl text-slate-100`}>标记</Text>
-        </Button>
+
+        <ButtonPrimary title={'标记'} onPress={addAddressMark} />
       </View>
     </View>
   )

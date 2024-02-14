@@ -1,34 +1,41 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button, WhiteSpace, Radio } from '@ant-design/react-native'
-import { ThemeContext } from '../../../theme/theme-context'
-import BaseList from '../../FunctionBase/BaseList'
-import tw from 'twrnc'
+import { Button, WhiteSpace } from '@ant-design/react-native'
+import LinkSetting from '../../../component/LinkSetting'
+import SwitchSetting from '../../../component/SwitchSetting'
+import tw from '../../../lib/tailwind'
+import { useAppColorScheme } from 'twrnc'
+import ButtonPrimary from '../../../component/ButtonPrimary'
 
-const RadioItem = Radio.RadioItem
 //设置Tab
-
 const TabSettingScreen = (props) => {
-  const { theme, toggle } = useContext(ThemeContext)
-
-  const setTheme = (type) => {
-    toggle(type)
-
-    props.dispatch({
-      type: actionType.avatar.changeTheme,
-      theme: type
-    })
-  }
+  const [colorScheme, toggleColorScheme, setColorScheme] = useAppColorScheme(tw)
+  const [isDark, setDark] = useState()
 
   const onSwitchChange = (value) => {
+    // toggleColorScheme
     if (value) {
-      setTheme('dark')
+      setColorScheme('dark')
+      setDark(true)
     } else {
-      setTheme('light')
+      setColorScheme('light')
+      setDark(false)
     }
   }
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      console.log(colorScheme)
+      console.log(colorScheme === 'dark')
+      if (colorScheme === 'dark') {
+        setDark(true)
+      } else {
+        setDark(false)
+      }
+    })
+  })
 
   useEffect(() => {
     if (props.avatar.get('Database') == null) {
@@ -37,41 +44,26 @@ const TabSettingScreen = (props) => {
   }, [props.avatar])
 
   return (
-    <View style={tw`rounded-full p-2`}>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <WhiteSpace size='lg' />
-      <BaseList data={[{ title: '账号设置', onpress: () => { props.navigation.navigate('SettingMe') } }]} />
+      <LinkSetting title={'账号设置'} onPress={() => { props.navigation.navigate('SettingMe') }} />
       <WhiteSpace size='lg' />
-      <BaseList data={[
-        { title: '网络设置', onpress: () => { props.navigation.navigate('SettingNetwork') } },
-        { title: '地址管理', onpress: () => { props.navigation.navigate('SettingAddress') } },
-        { title: '公告设置', onpress: () => { props.navigation.navigate('SettingBulletin') } },
-        // { title: '随便看看', onpress: () => { props.navigation.push('BulletinRandom') } },
-      ]} />
+      <LinkSetting title={'网络设置'} onPress={() => { props.navigation.navigate('SettingNetwork') }} />
+      <LinkSetting title={'地址管理'} onPress={() => { props.navigation.navigate('SettingAddress') }} />
+      <LinkSetting title={'公告设置'} onPress={() => { props.navigation.navigate('SettingBulletin') }} />
       <WhiteSpace size='lg' />
 
-      <BaseList data={[
-        {
-          title: '切换主题',
-          type: 'switch',
-          checked: props.avatar.get('Theme') === 'dark',
-          onChange: onSwitchChange,
-        },
-      ]} />
-      <WhiteSpace size='lg' />
-      <Button style={tw`rounded-full bg-red-500`}
-        onPress={() => {
+      <SwitchSetting title={'切换主题'} checked={isDark} onChange={onSwitchChange} />
+
+      <View style={tw`my-5px px-25px`}>
+        <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => {
           props.dispatch({
             type: actionType.avatar.disableAvatar,
             flag_clear_db: false
           })
-        }}>
-        <Text style={tw`text-xl text-slate-100`}>切换账户</Text>
-      </Button>
-
-      <WhiteSpace size='lg' />
-      <Button style={tw`rounded-full bg-green-500`} onPress={() => { props.navigation.navigate('About') }}>
-        <Text style={tw`text-xl text-slate-100`}>关于</Text>
-      </Button>
+        }} />
+        <ButtonPrimary title='关于' onPress={() => { props.navigation.navigate('About') }} />
+      </View >
     </View >
   )
 }

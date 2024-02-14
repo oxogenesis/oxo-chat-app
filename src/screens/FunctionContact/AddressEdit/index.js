@@ -1,20 +1,19 @@
-import React, { useContext, useState } from 'react'
-import { View, Text, TextInput } from 'react-native'
+import React, { useState } from 'react'
+import { View } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button } from '@ant-design/react-native'
-import { ThemeContext } from '../../../theme/theme-context'
+import ButtonPrimary from '../../../component/ButtonPrimary'
+import InputPrimary from '../../../component/InputPrimary'
 import { AddressToName } from '../../../lib/Util'
 import ErrorMsg from '../../../component/ErrorMsg'
-import tw from 'twrnc'
+import tw from '../../../lib/tailwind'
 
 //地址标记
 const AddressEditScreen = (props) => {
   const [address, setAddress] = useState(props.route.params.address)
   const [name, setName] = useState(AddressToName(props.avatar.get('AddressMap'), props.route.params.address))
   const [error_msg, setMsg] = useState('')
-  const { theme } = useContext(ThemeContext)
 
   const saveAddressName = () => {
     let newName = name.trim()
@@ -32,32 +31,17 @@ const AddressEditScreen = (props) => {
   }
 
   return (
-    <View style={tw`h-full bg-stone-200`}>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <View style={tw`my-auto`}>
-        <TextInput
-          placeholderTextColor={tw.color('stone-500')}
-          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
-          placeholder="地址"
-          value={address}
-          editable={false}
-          multiline={false}
-          onChangeText={text => setAddress(text)}
-        />
-        <TextInput
-          placeholderTextColor={tw.color('stone-500')}
-          style={tw`rounded-full border-solid border-2 border-gray-300 text-base text-center`}
-          placeholder="昵称"
-          value={name}
-          multiline={false}
-          onChangeText={text => setName(text)}
-        />
+        <InputPrimary value={address} setValue={setAddress} placeholder={'地址'} editable={false} textSize={'text-sm'} />
+        <InputPrimary value={name} setValue={setName} placeholder={'昵称'} />
+
         {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        <Button style={tw`rounded-full bg-green-500`} onPress={saveAddressName}>
-          <Text style={tw`text-xl text-slate-100`}>保存</Text>
-        </Button>
+
+        <ButtonPrimary title={'保存'} onPress={saveAddressName} />
       </View>
     </View>
   )

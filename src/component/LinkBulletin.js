@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { Text, View } from 'react-native'
 import { AddressToName } from '../lib/Util'
-import tw from 'twrnc'
+import tw from '../lib/tailwind'
 
 const LinkBulletin = (props) => {
   let name = AddressToName(props.avatar.get('AddressMap'), props.address)

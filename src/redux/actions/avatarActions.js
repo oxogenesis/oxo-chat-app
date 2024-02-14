@@ -713,7 +713,6 @@ export function* LoadCurrentBulletin(action) {
     let reply_list = yield call([db, db.getAll], sql)
     if (reply_list.length > 0) {
       yield put({ type: actionType.avatar.setReplyList, reply_list: reply_list })
-      // console.log(reply_list)
     } else {
       yield put({ type: actionType.avatar.setReplyList, reply_list: [] })
     }
@@ -798,6 +797,23 @@ export function* SaveBulletinDraft(action) {
   }
 }
 
+export function* SaveQuote(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let quoter_address = action.quoter_address
+  let quoter_sequence = action.quoter_sequence
+  let quoter_hash = action.quoter_hash
+  let quoter_content = action.quoter_content
+  let quoter_timestamp = action.quoter_timestamp
+  let main_list = action.main_list
+
+  for (let index = 0; index < main_list.length; index++) {
+    const main = main_list[index];
+    sql = `INSERT INTO QUOTES (main_hash, address, sequence, quote_hash, content, signed_at)
+  VALUES ('${main.Hash}', '${quoter_address}', ${quoter_sequence}, '${quoter_hash}', '${quoter_content}', '${quoter_timestamp}')`
+    yield call([db, db.runSQL], sql)
+  }
+}
+
 export function* SaveBulletin(action) {
   let bulletin_json = action.bulletin_json
   let relay_address = action.relay_address
@@ -875,6 +891,19 @@ export function* SaveBulletin(action) {
           yield put({ type: actionType.avatar.setBulletinList, bulletin_list: bulletin_list })
         }
         yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
+
+        // save quote
+        if (bulletin_json.Quote.length > 0) {
+          yield put({
+            type: actionType.avatar.SaveQuote,
+            quoter_address: object_address,
+            quoter_sequence: bulletin_json.Sequence,
+            quoter_hash: hash,
+            quoter_content: bulletin_json.Content,
+            quoter_timestamp: bulletin_json.Timestamp,
+            main_list: bulletin_json.Quote
+          })
+        }
       } else if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
         //bulletin from quote
         sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
@@ -906,12 +935,15 @@ export function* SaveBulletin(action) {
 
         // save quote
         if (bulletin_json.Quote.length > 0) {
-          for (let index = 0; index < bulletin_json.Quote.length; index++) {
-            const quote = bulletin_json.Quote[index];
-            sql = `INSERT INTO QUOTES (main_hash, address, sequence, content, signed_at)
-        VALUES ('${quote.Hash}', '${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.Content}', '${bulletin_json.Timestamp}')`
-            yield call([db, db.runSQL], sql)
-          }
+          yield put({
+            type: actionType.avatar.SaveQuote,
+            quoter_address: object_address,
+            quoter_sequence: bulletin_json.Sequence,
+            quoter_hash: hash,
+            quoter_content: bulletin_json.Content,
+            quoter_timestamp: bulletin_json.Timestamp,
+            main_list: bulletin_json.Quote
+          })
         }
 
         yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
@@ -924,12 +956,15 @@ export function* SaveBulletin(action) {
 
         // save quote
         if (bulletin_json.Quote.length > 0) {
-          for (let index = 0; index < bulletin_json.Quote.length; index++) {
-            const quote = bulletin_json.Quote[index];
-            sql = `INSERT INTO QUOTES (main_hash, address, sequence, content, signed_at)
-        VALUES ('${quote.Hash}', '${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.Content}', '${bulletin_json.Timestamp}')`
-            yield call([db, db.runSQL], sql)
-          }
+          yield put({
+            type: actionType.avatar.SaveQuote,
+            quoter_address: object_address,
+            quoter_sequence: bulletin_json.Sequence,
+            quoter_hash: hash,
+            quoter_content: bulletin_json.Content,
+            quoter_timestamp: bulletin_json.Timestamp,
+            main_list: bulletin_json.Quote
+          })
         }
 
         bulletin_json.Hash = hash
@@ -1205,8 +1240,8 @@ export function* LoadCurrentMessageList(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let message_list = []
 
-  // session_flag?新的列表：延长列表
-  if (action.session_flag == true) {
+  // init_flag?新的列表：延长列表
+  if (action.init_flag == true) {
     yield put({ type: actionType.avatar.setCurrentMessageList, message_list: [] })
 
     // 该session未读清零
@@ -1222,7 +1257,7 @@ export function* LoadCurrentMessageList(action) {
   let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size}`
   let items = yield call([db, db.getAll], sql)
   let tmp = []
-  let current_sequence = 0
+  // let current_sequence = 0
   items.forEach(item => {
     let confirmed = (item.confirmed == "TRUE")
     let is_object = (item.is_object == "TRUE")
@@ -1244,9 +1279,9 @@ export function* LoadCurrentMessageList(action) {
       "IsObject": is_object,
       "ObjectJson": object_json
     })
-    if (item.sour_address == action.address && item.sequence > current_sequence) {
-      current_sequence = item.sequence
-    }
+    // if (item.sour_address == action.address && item.sequence > current_sequence) {
+    //   current_sequence = item.sequence
+    // }
   })
   if (tmp.length != 0) {
     message_list = tmp.concat(message_list)
@@ -1254,9 +1289,32 @@ export function* LoadCurrentMessageList(action) {
     yield put({ type: actionType.avatar.setMessageWhiteList, message_white_list: message_white_list })
   }
 
-  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let msg = MessageGenerator.genFriendSync(current_sequence, action.address)
-  yield put({ type: actionType.avatar.SendMessage, message: msg })
+  // let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  // let msg = MessageGenerator.genFriendSync(current_sequence, action.address)
+  // yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* LoadMsgInfo(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM MESSAGES WHERE hash = "${action.hash}" LIMIT 1`
+  let item = yield call([db, db.getOne], sql)
+  if (item != null) {
+    let json = JSON.parse(item.json)
+    let msg_info = {
+      "SourAddress": item.sour_address,
+      "DestAddress": item.dest_address,
+      "Timestamp": item.timestamp,
+      "CreatedAt": item.created_at,
+      "Sequence": item.sequence,
+
+      "Content": json.Content,
+      "PairHash": json.PairHash
+    }
+
+    yield put({ type: actionType.avatar.setMsgInfo, msg_info: msg_info })
+  } else {
+    // never go here
+  }
 }
 
 export function* HandleFriendECDH(action) {
@@ -1364,17 +1422,17 @@ export function* HandleFriendMessage(action) {
     if (json.Sequence == 1) {
       yield put({ type: actionType.avatar.SaveFriendMessage, sour_address: sour_address, json: json })
     } else {
-      //some message is missing
-      //get last message(biggest sequence)
-      sql = `SELECT * FROM MESSAGES WHERE sour_address = "${sour_address}" ORDER BY sequence DESC`
-      item = yield call([db, db.getOne], sql)
-      //send ChatSync
-      let current_sequence = 0
-      if (item != null) {
-        current_sequence = item.sequence
-      }
-      let msg = MessageGenerator.genFriendSync(current_sequence, sour_address)
-      yield put({ type: actionType.avatar.SendMessage, message: msg })
+      // //some message is missing
+      // //get last message(biggest sequence)
+      // sql = `SELECT * FROM MESSAGES WHERE sour_address = "${sour_address}" ORDER BY sequence DESC`
+      // item = yield call([db, db.getOne], sql)
+      // //send ChatSync
+      // let current_sequence = 0
+      // if (item != null) {
+      //   current_sequence = item.sequence
+      // }
+      // let msg = MessageGenerator.genFriendSync(current_sequence, sour_address)
+      // yield put({ type: actionType.avatar.SendMessage, message: msg })
     }
   } else {
     //pre-message exist

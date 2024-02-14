@@ -1,6 +1,6 @@
 import React from 'react'
 import { Image } from 'react-native'
-import tw from 'twrnc'
+import tw from '../lib/tailwind'
 
 export default function AvatarImage(props) {
   return (

@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { View, ScrollView, RefreshControl, Text, Image, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, ScrollView, RefreshControl, Text, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
@@ -7,22 +7,21 @@ import { Toast } from '@ant-design/react-native'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
-import { timestamp_format, AddressToName } from '../../../lib/Util'
+import { AddressToName } from '../../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Flex } from '@ant-design/react-native'
-import { ThemeContext } from '../../../theme/theme-context'
 import Avatar from '../../../component/Avatar'
 import LinkBulletin from '../../../component/LinkBulletin'
 import LinkName from '../../../component/LinkName'
 import StrSequence from '../../../component/StrSequence'
-import tw from 'twrnc'
+import ViewEmpty from '../../../component/ViewEmpty'
+import TextTimestamp from '../../../component/TextTimestamp'
+import tw from '../../../lib/tailwind'
+import BulletinContent from '../../../component/BulletinContent'
 
 //公告：随便看看
 const BulletinRandomScreen = (props) => {
-  const { theme } = useContext(ThemeContext)
   const random = props.avatar.get('RandomBulletin')
   const [refreshFlag, setRefreshFlag] = useState(false)
-  const [show, setShow] = useState('0')
 
   const markBulletin = (hash) => {
     props.dispatch({
@@ -50,12 +49,10 @@ const BulletinRandomScreen = (props) => {
   const copyToClipboard = () => {
     Clipboard.setString(random.Content)
     Toast.success('拷贝成功！', 1)
-    setShow(Math.random())
   }
 
   const quote = () => {
     Toast.success('引用成功！', 1)
-    setShow(Math.random())
   }
 
   const loadRandomBulletin = () => {
@@ -98,20 +95,18 @@ const BulletinRandomScreen = (props) => {
   const handleCollection = () => {
     markBulletin(random.Hash)
     Toast.success('收藏成功！', 1)
-    setShow(Math.random())
   }
 
   const cancelCollection = () => {
     unmarkBulletin(random.Hash)
     Toast.success('取消收藏！', 1)
-    setShow(Math.random())
   }
 
   return (
-    <View style={tw`h-full bg-stone-200`}>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 pt-5px px-5px`}>
       {
         random == null ?
-          <Text style={{ color: theme.text2 }}>公告不存在，正在获取中，请稍后查看...</Text>
+          <ViewEmpty msg={'获取中...'} />
           :
           <ScrollView
             refreshControl={
@@ -123,10 +118,9 @@ const BulletinRandomScreen = (props) => {
               />
             }
           >
-            <Flex justify="start" align="start" style={tw`mt-5px border-b-4 border-stone-500`}>
-              <View style={tw`ml-5px`}>
-                <Avatar address={random.Address} />
-              </View>
+            {/* main bulletin */}
+            <View style={tw`flex flex-row bg-neutral-100 p-5px`}>
+              <Avatar address={random.Address} />
 
               <View>
                 <View>
@@ -136,9 +130,10 @@ const BulletinRandomScreen = (props) => {
                   </Text>
 
                   {/* 发帖时间 */}
-                  <Text style={tw`mt-5px text-stone-500`}>
-                    {timestamp_format(random.Timestamp)}
-                  </Text>
+                  <View style={tw`flex flex-row`}>
+                    <TextTimestamp timestamp={random.Timestamp} textSize={'text-xs'} />
+                  </View>
+
 
                   {/* 帖子引用 */}
                   {
@@ -158,7 +153,7 @@ const BulletinRandomScreen = (props) => {
                   }
 
                   {/* 快捷操作 */}
-                  <View style={tw`flex flex-row border-b border-stone-500 bg-yellow-100 w-100`}>
+                  <View style={tw`flex flex-row bg-yellow-100 w-100`}>
                     {/* 取消收藏按键 */}
                     {
                       random.IsMark == "TRUE" &&
@@ -188,7 +183,6 @@ const BulletinRandomScreen = (props) => {
                         random.Sequence,
                         random.Hash)
                       props.navigation.push('BulletinPublish')
-                      setShow(Math.random())
                     }
                     }>
                       <IconAnt
@@ -224,7 +218,6 @@ const BulletinRandomScreen = (props) => {
                           Hash: random.Hash
                         }
                       })
-                      setShow(Math.random())
                     }
                     }>
                       <IconFontisto
@@ -258,13 +251,9 @@ const BulletinRandomScreen = (props) => {
                   </View>
                 </View>
 
-                <View style={tw`pr-50px`}>
-                  <Text style={tw`text-base`}>
-                    {random.Content}
-                  </Text>
-                </View>
+                <BulletinContent content={random.Content} />
               </View>
-            </Flex>
+            </View>
           </ScrollView>
       }
     </View>

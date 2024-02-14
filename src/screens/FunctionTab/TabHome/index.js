@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import TabSessionScreen from '../TabSession'
@@ -10,21 +10,19 @@ import { connect } from 'react-redux'
 import TabBulletinHeader from '../../../component/TabBulletinHeader'
 import TabSessionHeader from '../../../component/TabSessionHeader'
 import TabAddressBookHeader from '../../../component/TabAddressBookHeader'
-import { ThemeContext } from '../../../theme/theme-context'
-import tw from 'twrnc'
+import tw from '../../../lib/tailwind'
 
 const Tab = createBottomTabNavigator()
 
 //登录后界面
 const TabHomeScreen = (props) => {
-  const { theme } = useContext(ThemeContext)
   return (
     <Tab.Navigator
       screenOptions={{
-        "tabBarActiveTintColor": theme.tab_text,
-        "tabBarInactiveTintColor": theme.tab_text,
-        "tabBarActiveBackgroundColor": theme.tab_view,
-        "tabBarInactiveBackgroundColor": theme.tab_view,
+        "tabBarActiveTintColor": tw.color(`neutral-500`),
+        "tabBarInactiveTintColor": tw.color(`neutral-500`),
+        "tabBarActiveBackgroundColor": tw.color(`neutral-200`),
+        "tabBarInactiveBackgroundColor": tw.color(`neutral-200`),
         "tabBarStyle": [
           {
             "display": "flex",
@@ -36,10 +34,10 @@ const TabHomeScreen = (props) => {
       <Tab.Screen name="公告" component={TabBulletinScreen} options={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: theme.tab_view,
+          backgroundColor: tw.color(`neutral-200`),
         },
         headerTitleStyle: {
-          color: theme.tab_text,
+          color: tw.color(`neutral-500`),
         },
         headerTitle: (props) => <TabBulletinHeader {...props} />,
         tabBarLabel: '公告',
@@ -54,7 +52,7 @@ const TabHomeScreen = (props) => {
             return < IconAnt
               name={'notification'}
               size={32}
-              color={color}
+              color={tw.color('bg-neutral-800')}
             />
           }
         }
@@ -62,10 +60,10 @@ const TabHomeScreen = (props) => {
       <Tab.Screen name="聊天" component={TabSessionScreen} options={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: theme.tab_view,
+          backgroundColor: tw.color(`neutral-200`),
         },
         headerTitleStyle: {
-          color: theme.tab_text,
+          color: tw.color(`neutral-500`),
         },
         headerTitle: (props) => <TabSessionHeader {...props} />,
         tabBarLabel: '聊天',
@@ -81,17 +79,17 @@ const TabHomeScreen = (props) => {
             return < IconAnt
               name={'message1'}
               size={32}
-              color={color}
+              color={tw.color('bg-neutral-800')}
             />
           }
         }
       }} />
       <Tab.Screen name="地址薄" component={TabAddressBookScreen} options={{
         headerStyle: {
-          backgroundColor: theme.tab_view,
+          backgroundColor: tw.color(`neutral-200`),
         },
         headerTitleStyle: {
-          color: theme.tab_text,
+          color: tw.color(`neutral-500`),
         },
         headerTitle: (props) => <TabAddressBookHeader {...props} />,
         tabBarLabel: '地址薄',
@@ -106,7 +104,7 @@ const TabHomeScreen = (props) => {
             return < IconAnt
               name={'contacts'}
               size={32}
-              color={color}
+              color={tw.color('bg-neutral-800')}
             />
           }
         }
@@ -125,7 +123,7 @@ const TabHomeScreen = (props) => {
             return < IconAnt
               name={'setting'}
               size={32}
-              color={color}
+              color={tw.color('bg-neutral-800')}
             />
           }
         }

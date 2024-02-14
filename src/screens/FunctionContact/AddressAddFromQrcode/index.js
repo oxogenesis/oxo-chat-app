@@ -1,17 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react'
-import { View, Text } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button, WhiteSpace } from '@ant-design/react-native'
-import { styles } from '../../../theme/style'
-import { ThemeContext } from '../../../theme/theme-context'
-import tw from 'twrnc'
+import { WhiteSpace } from '@ant-design/react-native'
+import InputPrimary from '../../../component/InputPrimary'
+import ButtonPrimary from '../../../component/ButtonPrimary'
+import tw from '../../../lib/tailwind'
 
-//登录界面
+// 
 const AddressAddFromQrcodeScreen = (props) => {
   const [address, setAddress] = useState('')
   const [relay, setRelay] = useState('')
-  const { theme } = useContext(ThemeContext)
 
   const markAddress = () => {
     props.navigation.replace('AddressAdd', { address: address })
@@ -42,62 +41,16 @@ const AddressAddFromQrcodeScreen = (props) => {
   })
 
   return (
-    <View style={{
-      ...styles.base_view,
-      backgroundColor: theme.base_view,
-      padding: 0,
-    }}>
-      <View style={{
-        flexDirection: "row",
-        paddingTop: 5,
-        height: 55,
-        borderBottomWidth: 1,
-        borderColor: theme.line,
-        backgroundColor: theme.base_body,
-        paddingLeft: 6,
-        paddingRight: 6
-      }} >
-        <View style={{
-          flex: 0.7,
-        }} >
-          <Text style={{
-            lineHeight: 55,
-            color: theme.text1,
-          }}>
-            {address}
-          </Text>
-        </View>
-      </View>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
+      <View style={tw`my-auto p-25px`}>
+        <InputPrimary value={address} editable={false} placeholder={'账户地址'} />
+        <InputPrimary value={relay} editable={false} placeholder={'服务地址'} />
 
-      <View style={{
-        flexDirection: "row",
-        paddingTop: 5,
-        height: 55,
-        borderBottomWidth: 1,
-        borderColor: theme.line,
-        backgroundColor: theme.base_body,
-        paddingLeft: 6,
-        paddingRight: 6
-      }} >
-        <View style={{
-          flex: 0.7,
-        }} >
-          <Text style={{
-            lineHeight: 55,
-            color: theme.text1,
-          }}>
-            {relay}
-          </Text>
-        </View>
-      </View>
+        <WhiteSpace size='md' />
 
-      <WhiteSpace size='md' />
-      <Button style={tw`rounded-full bg-green-500`} onPress={markAddress}>
-        <Text style={tw`text-xl text-slate-100`}>标记地址</Text>
-      </Button>
-      <Button style={tw`rounded-full bg-green-500`} onPress={addHost}>
-        <Text style={tw`text-xl text-slate-100`}>标记地址 + 保存服务器网址</Text>
-      </Button>
+        <ButtonPrimary title={'标记地址'} onPress={markAddress} />
+        <ButtonPrimary title={'标记地址 + 保存服务器网址'} onPress={addHost} />
+      </View>
     </View>
   )
 }

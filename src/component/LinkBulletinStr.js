@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { Text, View } from 'react-native'
-import tw from 'twrnc'
+import tw from '../lib/tailwind'
 
 const LinkBulletinStr = (props) => {
   return (

@@ -6,32 +6,39 @@
  * @flow strict-local
  */
 
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { Provider } from '@ant-design/react-native'
 
 import { connect } from 'react-redux'
 
+import tw from './lib/tailwind'
+import { useDeviceContext, useAppColorScheme } from 'twrnc'
+
 import AppStack from './screens/AppStack'
 
-import { ThemeProvider, ThemeContext } from './theme/theme-context'
 const Stack = createStackNavigator()
 
 const App = (props) => {
-  const { toggle } = useContext(ThemeContext)
-  // console.log('默认获取的主题',props.avatar.get('Theme'))
-  useEffect(() => {
-    toggle(props.avatar.get('Theme'))
-  }, [props.avatar.get('Theme')])
+  // const { toggle } = useContext(ThemeContext)
+  // // console.log('默认获取的主题',props.avatar.get('Theme'))
+  // useEffect(() => {
+  //   toggle(props.avatar.get('Theme'))
+  // }, [props.avatar.get('Theme')])
+
+  // 1️⃣  opt OUT of listening to DEVICE color scheme events
+  useDeviceContext(tw, { withDeviceColorScheme: false })
+
+  // 2️⃣  use the `useAppColorScheme` hook to get a reference to the current color
+  // scheme, with some functions to modify it (triggering re-renders) when you need to
+  const [colorScheme, toggleColorScheme, setColorScheme] = useAppColorScheme(tw)
 
   return (
     <Provider>
-      <ThemeProvider defaultTheme={props.avatar.get('Theme')}>
-        <NavigationContainer>
-          <AppStack props={props} />
-        </NavigationContainer>
-      </ThemeProvider>
+      <NavigationContainer>
+        <AppStack props={props} />
+      </NavigationContainer>
     </Provider>
   )
 }

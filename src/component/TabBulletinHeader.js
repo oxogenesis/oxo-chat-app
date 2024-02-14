@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import { Text, View } from 'react-native'
-import tw from 'twrnc'
+import tw from '../lib/tailwind'
 
 const TabBulletinHeader = (props) => {
   return (
@@ -17,7 +17,7 @@ const TabBulletinHeader = (props) => {
         />
       </View>
       <View style={tw``}>
-        <Text style={tw`text-center text-xl`}>
+        <Text style={tw`text-center text-2xl`}>
           {props.children}
         </Text>
       </View>

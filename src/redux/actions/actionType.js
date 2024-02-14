@@ -67,6 +67,7 @@ export const actionType = {
     setCurrentBBSession: 'SET_CURRENT_BB_SESSION',
 
     HandleBulletinRequest: 'HANDLE_BULLETIN_REQUEST',
+    SaveQuote: 'SAVE_QUOTE',
     SaveBulletin: 'SAVE_BULLETIN',
     // SaveContentBulletin: 'SAVE_CONTENT_BULLETIN',
     FetchBulletin: 'FETCH_BULLETIN',
@@ -84,6 +85,8 @@ export const actionType = {
     setCurrentMessageList: 'SET_CURRENT_MESSAGE_LIST',
     LoadCurrentSession: 'LOAD_CURRENT_SESSION',
     LoadCurrentMessageList: 'LOAD_CURRENT_MESSAGE_LIST',
+    LoadMsgInfo: 'LOAD_MSG_INFO',
+    setMsgInfo: 'SET_MSG_INFO',
     HandleFriendECDH: 'HANDLE_FRIEND_ECDH',
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',

@@ -45,14 +45,16 @@ const UnlockScreen = (props) => {
           setKey('')
           setMsg('')
 
-          if (props.master.get('Singleton') == undefined || props.master.get('Singleton') == false) {
+          let singleton = props.master.get('Singleton')
+          console.log(singleton)
+          if (singleton == false) {
             props.navigation.replace('AvatarList')
           } else {
             try {
               AsyncStorage.getItem('<#Avatars#>').then(result => {
                 if (result != null) {
                   let avatar_list = JSON.parse(result)
-                  let address = props.master.get('Singleton')
+                  let address = singleton
                   let name = ''
                   for (let i = 0; i < avatar_list.length; i++) {
                     const avatar = avatar_list[i];

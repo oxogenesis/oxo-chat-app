@@ -66,7 +66,7 @@ const MasterKeyScreen = props => {
               type: actionType.master.setDark,
               dark: config.dark
             })
-            
+
             if (config.dark) {
               setColorScheme('dark')
             } else {
@@ -87,7 +87,6 @@ const MasterKeyScreen = props => {
             props.navigation.replace('Unlock')
           }
         })
-
       } catch (e) {
         console.log(e)
       }

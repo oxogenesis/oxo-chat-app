@@ -38,13 +38,15 @@ const TabSettingScreen = (props) => {
   }
 
   const onSwitchSingleton = (singleton) => {
+    // singleton:true false
+    // address:false address
     let address = false
     if (singleton) {
       address = props.avatar.get('Address')
     }
 
     setSingleton(singleton)
-
+    
     MasterConfig({ singleton: address })
       .then(result => {
         if (result) {

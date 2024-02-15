@@ -98,10 +98,10 @@ async function MasterConfig({ singleton, dark }) {
       config = json
     }
 
-    if (singleton) {
+    if (singleton != null) {
       config.singleton = singleton
     }
-    if (dark) {
+    if (dark != null) {
       config.dark = dark
     }
 

@@ -73,6 +73,11 @@ const MasterKeyScreen = props => {
 
         AsyncStorage.getItem('<#MasterKey#>').then(result => {
           if (result != null) {
+            let json = JSON.parse(result)
+            props.dispatch({
+              type: actionType.master.setSingleton,
+              singleton: json.singleton
+            })
             props.navigation.replace('Unlock')
           }
         })
@@ -105,12 +110,12 @@ const MasterKeyScreen = props => {
       <View style={tw`my-auto p-25px`}>
         <InputPrimary value={masterKey} setValue={setMasterKey} placeholder={'口令'} flagSecure={true} />
         <InputPrimary value={confirm} setValue={setConfirm} placeholder={'口令确认'} flagSecure={true} />
-        
+
         {
           error_msg.length > 0 &&
           <ErrorMsg error_msg={error_msg} />
         }
-        
+
         <ButtonPrimary title={'设置'} onPress={saveMasterKey} />
 
         <Text style={tw`text-base text-red-500`}>

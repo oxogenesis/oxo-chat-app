@@ -66,7 +66,7 @@ async function MasterKeySet(masterKey) {
   let iv = crypto.randomBytes(8).toString('hex')
   let info = { "MasterKey": masterKey }
   let crypted = encrypt(key, iv, JSON.stringify(info))
-  let save = { "salt": salt, "iv": iv, "ct": crypted }
+  let save = { "salt": salt, "iv": iv, "ct": crypted, "singleton": false }
   try {
     await AsyncStorage.setItem('<#MasterKey#>', JSON.stringify(save))
     return true
@@ -82,6 +82,19 @@ async function MasterKeyDerive(masterKey) {
     let json = JSON.parse(result)
     let key = halfSHA512(json.salt + masterKey).toString('hex').slice(0, 32)
     let mk = decrypt(key, json.iv, json.ct)
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
+async function AvatarSingleton(address) {
+  try {
+    const result = await AsyncStorage.getItem('<#MasterKey#>')
+    let json = JSON.parse(result)
+    json.singleton = address
+    await AsyncStorage.setItem('<#MasterKey>', JSON.stringify(json))
     return true
   } catch (e) {
     console.log(e)
@@ -361,5 +374,6 @@ export {
   AvatarRemove,
   ParseQrcodeAddress,
   ParseQrcodeSeed,
+  AvatarSingleton,
   DHSequence
 }

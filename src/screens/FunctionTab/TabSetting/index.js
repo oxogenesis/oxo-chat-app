@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button, WhiteSpace } from '@ant-design/react-native'
+import { WhiteSpace } from '@ant-design/react-native'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
-import tw from '../../../lib/tailwind'
-import { useAppColorScheme } from 'twrnc'
 import ButtonPrimary from '../../../component/ButtonPrimary'
+import { useAppColorScheme } from 'twrnc'
+import { AvatarSingleton } from '../../../lib/OXO'
+import tw from '../../../lib/tailwind'
 
 //设置Tab
 const TabSettingScreen = (props) => {
   const [colorScheme, toggleColorScheme, setColorScheme] = useAppColorScheme(tw)
   const [isDark, setDark] = useState()
+  const [isSingleton, setSingleton] = useState()
 
   const onSwitchChange = (value) => {
     // toggleColorScheme
@@ -25,6 +27,26 @@ const TabSettingScreen = (props) => {
     }
   }
 
+  const onSwitchSingleton = (value) => {
+    let address = props.avatar.get('Address')
+    if (value) {
+      setSingleton(true)
+    } else {
+      setSingleton(false)
+      address = false
+    }
+    AvatarSingleton(address)
+      .then(result => {
+        if (result) {
+          props.dispatch({
+            type: actionType.master.setSingleton,
+            singleton: address
+          })
+        } else {
+        }
+      })
+  }
+
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
       console.log(colorScheme)
@@ -34,12 +56,29 @@ const TabSettingScreen = (props) => {
       } else {
         setDark(false)
       }
+
+      let singleton = props.master.get('Singleton')
+      if (singleton == false) {
+        setSingleton(false)
+      } else {
+        setSingleton(true)
+      }
     })
   })
 
   useEffect(() => {
     if (props.avatar.get('Database') == null) {
-      props.navigation.replace('AvatarList')
+      if (props.master.get("Singleton") == false) {
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: 'AvatarList' }],
+        })
+      } else {
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: 'Unlock' }],
+        })
+      }
     }
   }, [props.avatar])
 
@@ -54,14 +93,16 @@ const TabSettingScreen = (props) => {
       <WhiteSpace size='lg' />
 
       <SwitchSetting title={'切换主题'} checked={isDark} onChange={onSwitchChange} />
+      <SwitchSetting title={'切换单账号模式'} checked={isSingleton} onChange={onSwitchSingleton} />
+
 
       <View style={tw`my-5px px-25px`}>
-        <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => {
-          props.dispatch({
-            type: actionType.avatar.disableAvatar,
-            flag_clear_db: false
-          })
-        }} />
+        {
+          isSingleton ?
+            <ButtonPrimary title='安全退出' bg='bg-red-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
+            :
+            <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
+        }
         <ButtonPrimary title='关于' onPress={() => { props.navigation.navigate('About') }} />
       </View >
     </View >
@@ -70,7 +111,8 @@ const TabSettingScreen = (props) => {
 
 const ReduxTabSettingScreen = connect((state) => {
   return {
-    avatar: state.avatar
+    avatar: state.avatar,
+    master: state.master
   }
 })(TabSettingScreen)
 

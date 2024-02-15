@@ -11,9 +11,9 @@ import AvatarImage from '../../../component/AvatarImage'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import LoadingView from '../../../component/LoadingView'
 import TextTimestamp from '../../../component/TextTimestamp'
-import tw from '../../../lib/tailwind'
 import TextName from '../../../component/TextName'
 import TextAddress from '../../../component/TextAddress'
+import tw from '../../../lib/tailwind'
 
 //账号选择界面
 const AvatarListScreen = props => {

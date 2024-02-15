@@ -66,7 +66,7 @@ async function MasterKeySet(masterKey) {
   let iv = crypto.randomBytes(8).toString('hex')
   let info = { "MasterKey": masterKey }
   let crypted = encrypt(key, iv, JSON.stringify(info))
-  let save = { "salt": salt, "iv": iv, "ct": crypted, "singleton": false }
+  let save = { "salt": salt, "iv": iv, "ct": crypted }
   try {
     await AsyncStorage.setItem('<#MasterKey#>', JSON.stringify(save))
     return true
@@ -89,12 +89,23 @@ async function MasterKeyDerive(masterKey) {
   }
 }
 
-async function AvatarSingleton(address) {
+async function MasterConfig({ singleton, dark }) {
   try {
-    const result = await AsyncStorage.getItem('<#MasterKey#>')
-    let json = JSON.parse(result)
-    json.singleton = address
-    await AsyncStorage.setItem('<#MasterKey>', JSON.stringify(json))
+    const result = await AsyncStorage.getItem('<#MasterConfig#>')
+    let config = { singleton: false, dark: false }
+    if (result != null) {
+      let json = JSON.parse(result)
+      config = json
+    }
+
+    if (singleton) {
+      config.singleton = singleton
+    }
+    if (dark) {
+      config.dark = dark
+    }
+
+    await AsyncStorage.setItem('<#MasterConfig#>', JSON.stringify(config))
     return true
   } catch (e) {
     console.log(e)
@@ -215,7 +226,7 @@ async function AvatarNameEdit(name, seed, password) {
 // }
 
 async function AvatarLoginTimeUpdate(address) {
-  console.log(`AvatarLoginTimeUpdate::::address}`)
+  // console.log(`AvatarLoginTimeUpdate::::address}`)
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
     let avatarList = []
@@ -271,7 +282,6 @@ function ParseQrcodeAddress(qrcode) {
 async function AvatarRemove(address) {
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
-    // console.log(result)                                                                                                                             
     let avatar_list = []
     if (result != null) {
       avatar_list = JSON.parse(result)
@@ -365,6 +375,7 @@ export {
   AesDecrypt,
   MasterKeySet,
   MasterKeyDerive,
+  MasterConfig,
   AvatarCreateNew,
   AvatarCreateWithSeed,
   AvatarDerive,
@@ -374,6 +385,5 @@ export {
   AvatarRemove,
   ParseQrcodeAddress,
   ParseQrcodeSeed,
-  AvatarSingleton,
   DHSequence
 }

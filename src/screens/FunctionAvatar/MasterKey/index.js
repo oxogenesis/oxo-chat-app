@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import { actionType } from '../../../redux/actions/actionType'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { MasterKeySet } from '../../../lib/OXO'
-import { DefaultHost, DefaultTheme, DefaultBulletinCacheSize } from '../../../lib/Const'
+import { MasterKeySet, MasterConfig } from '../../../lib/OXO'
+import { DefaultHost, DefaultBulletinCacheSize } from '../../../lib/Const'
 import { connect } from 'react-redux'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import InputPrimary from '../../../component/InputPrimary'
 import ErrorMsg from '../../../component/ErrorMsg'
+import { useAppColorScheme } from 'twrnc'
 import tw from '../../../lib/tailwind'
 
 //口令设置界面
 const MasterKeyScreen = props => {
+  const [colorScheme, toggleColorScheme, setColorScheme] = useAppColorScheme(tw)
   const [masterKey, setMasterKey] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error_msg, setMsg] = useState('')
@@ -45,21 +47,6 @@ const MasterKeyScreen = props => {
           })
         })
 
-        // 设置主题
-        AsyncStorage.getItem('Theme').then(json => {
-          let theme = DefaultTheme
-          if (json != null) {
-            json = JSON.parse(json)
-            if (json.Theme != null && json.Theme == 'dark') {
-              theme = 'dark'
-            }
-          }
-          props.dispatch({
-            type: actionType.avatar.changeTheme,
-            theme: theme
-          })
-        })
-
         // 设置公告缓存大小
         AsyncStorage.getItem('BulletinCacheSize').then(bulletin_cache_size => {
           if (bulletin_cache_size == null || isNaN(bulletin_cache_size) || bulletin_cache_size < 0) {
@@ -71,16 +58,36 @@ const MasterKeyScreen = props => {
           })
         })
 
-        AsyncStorage.getItem('<#MasterKey#>').then(result => {
-          if (result != null) {
-            let json = JSON.parse(result)
+        // 设置
+        AsyncStorage.getItem('<#MasterConfig#>').then(config => {
+          if (config != null) {
+            config = JSON.parse(config)
+            props.dispatch({
+              type: actionType.master.setDark,
+              dark: config.dark
+            })
+            
+            if (config.dark) {
+              setColorScheme('dark')
+            } else {
+              setColorScheme('light')
+            }
+
             props.dispatch({
               type: actionType.master.setSingleton,
-              singleton: json.singleton
+              singleton: config.singleton
             })
+          } else {
+            MasterConfig({ singleton: false, dark: false })
+          }
+        })
+
+        AsyncStorage.getItem('<#MasterKey#>').then(json => {
+          if (json != null) {
             props.navigation.replace('Unlock')
           }
         })
+
       } catch (e) {
         console.log(e)
       }

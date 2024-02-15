@@ -6,8 +6,8 @@ import { WhiteSpace } from '@ant-design/react-native'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
 import ButtonPrimary from '../../../component/ButtonPrimary'
+import { MasterConfig } from '../../../lib/OXO'
 import { useAppColorScheme } from 'twrnc'
-import { AvatarSingleton } from '../../../lib/OXO'
 import tw from '../../../lib/tailwind'
 
 //设置Tab
@@ -16,26 +16,36 @@ const TabSettingScreen = (props) => {
   const [isDark, setDark] = useState()
   const [isSingleton, setSingleton] = useState()
 
-  const onSwitchChange = (value) => {
-    // toggleColorScheme
-    if (value) {
+  const onSwitchChange = (dark) => {
+    if (dark) {
       setColorScheme('dark')
-      setDark(true)
     } else {
       setColorScheme('light')
-      setDark(false)
     }
+
+    setDark(dark)
+
+    MasterConfig({ dark: dark })
+      .then(result => {
+        if (result) {
+          props.dispatch({
+            type: actionType.master.setDark,
+            dark: dark
+          })
+        } else {
+        }
+      })
   }
 
-  const onSwitchSingleton = (value) => {
-    let address = props.avatar.get('Address')
-    if (value) {
-      setSingleton(true)
-    } else {
-      setSingleton(false)
-      address = false
+  const onSwitchSingleton = (singleton) => {
+    let address = false
+    if (singleton) {
+      address = props.avatar.get('Address')
     }
-    AvatarSingleton(address)
+
+    setSingleton(singleton)
+
+    MasterConfig({ singleton: address })
       .then(result => {
         if (result) {
           props.dispatch({
@@ -49,15 +59,16 @@ const TabSettingScreen = (props) => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      console.log(colorScheme)
-      console.log(colorScheme === 'dark')
-      if (colorScheme === 'dark') {
-        setDark(true)
+      let dark = props.master.get('Dark')
+      setDark(dark)
+      if (dark == false) {
+        setColorScheme('light')
       } else {
-        setDark(false)
+        setColorScheme('dark')
       }
 
       let singleton = props.master.get('Singleton')
+      //not setSingleton(singleton)
       if (singleton == false) {
         setSingleton(false)
       } else {
@@ -92,7 +103,7 @@ const TabSettingScreen = (props) => {
       <LinkSetting title={'公告设置'} onPress={() => { props.navigation.navigate('SettingBulletin') }} />
       <WhiteSpace size='lg' />
 
-      <SwitchSetting title={'切换主题'} checked={isDark} onChange={onSwitchChange} />
+      <SwitchSetting title={'切换暗色主题'} checked={isDark} onChange={onSwitchChange} />
       <SwitchSetting title={'切换单账号模式'} checked={isSingleton} onChange={onSwitchSingleton} />
 
 

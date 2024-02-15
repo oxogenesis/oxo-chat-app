@@ -465,12 +465,6 @@ export function* changeBulletinCacheSize(action) {
   yield call(setStorageItem, `BulletinCacheSize`, bulletin_cache_size)
 }
 
-export function* changeTheme(action) {
-  let theme = action.theme
-  yield put({ type: actionType.avatar.setTheme, theme: theme })
-  yield call(setStorageItem, `Theme`, { 'Theme': theme })
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // AddressBook
 ///////////////////////////////////////////////////////////////////////////////

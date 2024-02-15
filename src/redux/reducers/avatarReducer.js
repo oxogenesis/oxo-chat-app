@@ -1,6 +1,6 @@
 import { actionType } from '../actions/actionType'
 import { fromJS, set } from 'immutable'
-import { DefaultTheme, DefaultBulletinCacheSize } from '../../lib/Const'
+import { DefaultBulletinCacheSize } from '../../lib/Const'
 
 function initialState() {
   return fromJS(
@@ -9,7 +9,6 @@ function initialState() {
       Address: null,
       PublicKey: null,
       PrivateKey: null,
-      Theme: DefaultTheme,
 
       Database: null,
 
@@ -50,7 +49,7 @@ function initialState() {
       CurrentSession: {},
       CurrentSessionAesKey: {},
       CurrentMessageList: [],
-      MsgInfo:null,
+      MsgInfo: null,
       // bulletin from message
       MessageWhiteList: [],
       CountUnreadMessage: 0
@@ -103,11 +102,6 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('MsgInfo', null)
     .set('CountUnreadMessage', null)
     .set('MessageWhiteList', [])
-}
-
-
-reducer.prototype[actionType.avatar.setTheme] = (state, action) => {
-  return state.set('Theme', action.theme)
 }
 
 reducer.prototype[actionType.avatar.setAvatarName] = (state, action) => {

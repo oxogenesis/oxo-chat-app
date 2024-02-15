@@ -1,11 +1,10 @@
 export const actionType = {
   master: {
     setMasterKey: 'SET_MASTER_KEY',
+    setDark: 'SET_DARK',
     setSingleton: 'SET_SINGLETON'
   },
   avatar: {
-    setTheme: 'SET_THEME',
-    changeTheme: 'CHANGE_THEME',
     setAvatar: 'SET_AVATAR',
     setAvatarName: 'SET_AVATAR_NAME',
     setDatabase: 'SET_DATABASE',

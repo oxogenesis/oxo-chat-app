@@ -1,5 +1,4 @@
 const DefaultHost = 'wss://ru.oxo-chat-server.com'
-const DefaultTheme = 'light'
 const DefaultBulletinCacheSize = 0
 
 //1000*60*60*24=86400000
@@ -88,7 +87,6 @@ const MessagePageSize = 50
 
 export {
   DefaultHost,
-  DefaultTheme,
   DefaultBulletinCacheSize,
   Epoch,
   GenesisAddress,

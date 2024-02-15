@@ -5,7 +5,8 @@ function initialState() {
   return fromJS(
     {
       MasterKey: null,
-      Singleton: false
+      Singleton: false,
+      Dark: false
     }
   )
 }
@@ -24,4 +25,8 @@ reducer.prototype[actionType.master.setMasterKey] = (state, action) => {
 
 reducer.prototype[actionType.master.setSingleton] = (state, action) => {
   return state.set('Singleton', action.singleton)
+}
+
+reducer.prototype[actionType.master.setDark] = (state, action) => {
+  return state.set('Dark', action.dark)
 }

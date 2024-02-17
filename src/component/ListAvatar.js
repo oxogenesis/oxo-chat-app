@@ -21,7 +21,7 @@ const ListAvatar = ({ data = [] }) => {
               </View>
               <View >
                 <View style={tw`flex flex-row`}>
-                  <View style={tw`rounded-full px-1 border-2 border-gray-300`}>
+                  <View style={tw`rounded-full px-1 border-2 border-gray-300 dark:border-gray-700`}>
                     <Text style={tw`text-base text-slate-800 text-center`}>
                       {`${item.title}`}
                     </Text>

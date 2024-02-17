@@ -60,7 +60,7 @@ const BulletinPublishScreen = props => {
           placeholderTextColor={tw.color('neutral-500')}
           value={draft}
           multiline={true}
-          style={tw`mx-5px rounded-lg border-solid border-2 border-gray-300 text-base text-wrap text-justify h-500px`}
+          style={tw`mx-5px rounded-lg border-solid border-2 border-gray-300 dark:border-gray-700 text-base text-justify h-500px`}
           // TODO align-text-top
           onChangeText={text => setDrfat(text)}
         />

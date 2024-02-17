@@ -7,7 +7,7 @@ import tw from '../lib/tailwind'
 
 const TabBulletinHeader = (props) => {
   return (
-    <View style={tw`w-full flex flex-row justify-between`}>
+    <View style={tw`w-full flex flex-row justify-between bg-neutral-100 dark:bg-neutral-600 `}>
       <View style={tw``}>
         <IconAnt
           name={'addfile'}
@@ -17,7 +17,7 @@ const TabBulletinHeader = (props) => {
         />
       </View>
       <View style={tw``}>
-        <Text style={tw`text-center text-2xl`}>
+        <Text style={tw`text-center text-2xl text-slate-800 dark:text-slate-200`}>
           {props.children}
         </Text>
       </View>

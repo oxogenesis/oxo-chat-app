@@ -17,7 +17,7 @@ const ViewAlert = ({ visible, title, msg, onClose, onPress }) => {
       onClose={onClose}
       visible={visible}
       footer={footerButtons}
-      style={tw`bg-neutral-200 dark:bg-neutral-800`}
+      style={tw`bg-neutral-200 dark:bg-neutral-400`}
     >
       <View style={{ paddingVertical: 20 }}>
         <Text style={tw`text-left text-base text-neutral-900`}>{msg}</Text>

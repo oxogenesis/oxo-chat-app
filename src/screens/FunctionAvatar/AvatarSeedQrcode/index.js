@@ -30,7 +30,7 @@ const AvatarSeedQrcodeScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
-      <View style={tw`items-center bg-neutral-100 dark:bg-neutral-800 m-16px p-16px`}>
+      <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
         <QRCode
           value={qrcode}
           size={350}

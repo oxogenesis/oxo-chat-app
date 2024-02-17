@@ -53,7 +53,7 @@ const AvatarSeedScreen = (props) => {
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <View style={tw`px-25px`}>
         <TouchableOpacity onPress={() => { copySeedAlert() }}>
-          <View style={tw`bg-neutral-100 rounded-lg px-1 border-2 border-gray-300 flex flex-row justify-between py-5px px-15px`}>
+          <View style={tw`bg-neutral-100 dark:bg-neutral-600 rounded-lg px-1 border-2 border-gray-300 dark:border-gray-700 flex flex-row justify-between py-5px px-15px`}>
             <Text style={tw`text-base text-red-500`}>
               {props.avatar.get('Seed')}
             </Text>

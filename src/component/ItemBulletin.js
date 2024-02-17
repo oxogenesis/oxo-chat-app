@@ -13,7 +13,7 @@ const ItemBulletin = (props) => {
   const bulletin = props.item
   // const key = props.index ? props.index : bulletin.hash
   return (
-    <View style={tw`flex flex-col bg-neutral-100`}>
+    <View style={tw`flex flex-col bg-stone-100 dark:bg-stone-500`}>
       <View style={tw`flex flex-row mx-5px mt-5px`}>
         <Avatar address={bulletin.Address} onPress={() => props.navigation.push('AddressMark', { address: bulletin.Address })} />
 
@@ -26,7 +26,7 @@ const ItemBulletin = (props) => {
             <TextTimestamp timestamp={bulletin.Timestamp} textSize={'text-xs'} />
             {
               bulletin.QuoteSize != 0 &&
-              <Text style={tw`text-sm font-bold text-gray-400`}>
+              <Text style={tw`text-sm font-bold text-gray-400 dark:text-gray-200`}>
                 引用：◀{bulletin.QuoteSize}
               </Text>
             }

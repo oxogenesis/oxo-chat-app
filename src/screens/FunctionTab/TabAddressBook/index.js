@@ -23,7 +23,7 @@ const TabAddressBookScreen = props => {
             {
               props.avatar.get('AddressArray').map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} >
-                  <Flex justify="start" align="start" style={tw`bg-stone-100 p-5px mb-1px`}>
+                  <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
                     <View>
                       <Avatar address={item.Address} />
                     </View>
@@ -33,8 +33,8 @@ const TabAddressBookScreen = props => {
                         {
                           props.avatar.get('Follows').includes(item.Address) &&
                           <TouchableOpacity onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: item.Address })}>
-                            <View style={tw`bg-yellow-500 rounded-full px-2 border-2 border-gray-300`}>
-                              <Text style={tw`text-base text-slate-800 text-center`}>
+                            <View style={tw`bg-yellow-500 rounded-full px-2 border-2 border-gray-300 dark:border-gray-700`}>
+                              <Text style={tw`text-base text-slate-800 dark:text-slate-200 text-center`}>
                                 公告
                               </Text>
                             </View>
@@ -43,8 +43,8 @@ const TabAddressBookScreen = props => {
                         {
                           props.avatar.get('Friends').includes(item.Address) &&
                           <TouchableOpacity onPress={() => props.navigation.push('Session', { address: item.Address })}>
-                            <View style={tw`bg-green-500 rounded-full px-2 border-2 border-gray-300`}>
-                              <Text style={tw`text-base text-slate-800 text-center`}>
+                            <View style={tw`bg-green-500 rounded-full px-2 border-2 border-gray-300 dark:border-gray-700`}>
+                              <Text style={tw`text-base text-slate-800 dark:text-slate-200 text-center`}>
                                 聊天
                               </Text>
                             </View>

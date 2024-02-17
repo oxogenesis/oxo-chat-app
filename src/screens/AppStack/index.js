@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { connect } from 'react-redux'
 
@@ -58,16 +58,41 @@ import { AddressToName } from '../../lib/Util'
 const Stack = createStackNavigator()
 
 const AppStack = (props) => {
+  const [headerStyleOption, setHeaderStyleOption] = useState()
+  const [headerIconColor, setHeaderIconColor] = useState()
+  // bg-neutral-100 dark:bg-neutral-500
+  const setStyle = (dark) => {
+    let headerStyle = {
+      headerStyle: {
+        backgroundColor: tw.color(`neutral-100`),
+      },
+      headerTitleStyle: {
+        color: tw.color(`slate-800`),
+      },
+      headerTintColor: tw.color(`slate-800`)
+    }
+    let headerIconColor = tw.color(`slate-800`)
 
-  const headerStyleOption = {
-    headerStyle: {
-      backgroundColor: tw.color(`neutral-200`),
-    },
-    headerTitleStyle: {
-      color: tw.color(`neutral-800`),
-    },
-    headerTintColor: tw.color(`neutral-800`)
+    if (dark == true) {
+      headerStyle = {
+        headerStyle: {
+          backgroundColor: tw.color(`neutral-500`),
+        },
+        headerTitleStyle: {
+          color: tw.color(`slate-200`),
+        },
+        headerTintColor: tw.color(`slate-200`)
+      }
+      headerIconColor = tw.color(`slate-200`)
+    }
+    setHeaderStyleOption(headerStyle)
+    setHeaderIconColor(headerIconColor)
   }
+
+  useEffect(() => {
+    let dark = props.master.get('Dark')
+    setStyle(dark)
+  }, [props.master])
 
   return (
     <Stack.Navigator initialRouteName="MasterKey">
@@ -99,7 +124,7 @@ const AppStack = (props) => {
               <IconAnt
                 name={'adduser'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.navigate('AvatarCreate')
                 }
               />)
@@ -117,7 +142,7 @@ const AppStack = (props) => {
               <IconAnt
                 name={'qrcode'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.replace('AvatarCreateFromScanSeedQrcode')
                 }
               />)
@@ -176,7 +201,7 @@ const AppStack = (props) => {
               <IconAnt
                 name={'earth'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.push('BulletinReplyList', { hash: route.params.hash, page: 1 })}
               />)
           })
@@ -197,13 +222,12 @@ const AppStack = (props) => {
         component={BulletinListScreen}
         options={
           ({ route, navigation }) => ({
-            title: `公告列表:${AddressToName(props.avatar.get('AddressMap'), route.params.address)}`,
             ...headerStyleOption,
             headerRight: () => (
               <IconMaterial
                 name={'post-add'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.navigate('BulletinPublish')}
               />)
           })
@@ -240,7 +264,7 @@ const AppStack = (props) => {
               <IconEntypo
                 name={'arrow-with-circle-right'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.push('BulletinAddressList', { page: route.params.page + 1 })}
               />)
           })
@@ -257,7 +281,7 @@ const AppStack = (props) => {
               <IconEntypo
                 name={'arrow-with-circle-right'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.push('BulletinReplyList', { page: route.params.page + 1 })}
               />)
           })
@@ -275,7 +299,7 @@ const AppStack = (props) => {
               <IconFeather
                 name={'more-horizontal'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.push('AddressMark', {
                   address: route.params.address
                 })}
@@ -377,7 +401,7 @@ const AppStack = (props) => {
               <IconMaterialIcons
                 name={'playlist-add'}
                 size={32}
-                color={tw.color(`neutral-800`)}
+                color={headerIconColor}
                 onPress={() => navigation.push('ServerAdd')}
               />)
           })
@@ -468,7 +492,8 @@ const AppStack = (props) => {
 }
 const ReduxAppStack = connect((state) => {
   return {
-    avatar: state.avatar
+    avatar: state.avatar,
+    master: state.master
   }
 })(AppStack)
 

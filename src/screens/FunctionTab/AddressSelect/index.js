@@ -15,7 +15,7 @@ const AddressSelectScreen = props => {
       {
         props.avatar.get('Friends').length > 0 ?
           <View>
-            <Text style={tw`text-lg text-center text-neutral-900`}>
+            <Text style={tw`text-lg text-center text-slate-800 dark:text-slate-200`}>
               请选择好友
             </Text>
             <WhiteSpace />
@@ -27,19 +27,17 @@ const AddressSelectScreen = props => {
               {
                 props.avatar.get('Friends').map((item, index) => (
                   <TouchableOpacity key={index} onPress={() => props.navigation.push('Session', { address: item, content: props.route.params.content })} >
-                    <Flex justify="start" align="start" style={tw`bg-stone-100 p-5px mb-1px`}>
+                    <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
                       <View>
                         <AvatarImage address={item.Address} />
                       </View>
-                      <View >
-                        <View style={tw`flex flex-row`}>
-                          <View style={tw`rounded-full px-1 border-2 border-gray-300`}>
-                            <Text style={tw`text-base text-slate-800 text-center`}>
-                              {AddressToName(props.avatar.get('AddressMap'), item)}
-                            </Text>
-                          </View>
+                      <View>
+                        <View style={tw`bg-indigo-500 rounded-full px-1 border-2 border-gray-300 dark:border-gray-700`}>
+                          <Text style={tw`text-base text-slate-800 dark:text-slate-200 text-center`}                        >
+                            {AddressToName(props.avatar.get('AddressMap'), item)}
+                          </Text>
                         </View>
-                        <Text style={tw`text-sm text-slate-400`}>{item}</Text>
+                        <Text style={tw`text-sm text-gray-500 dark:text-slate-200 text-left`}>{item}</Text>
                       </View>
                     </Flex>
                   </TouchableOpacity>

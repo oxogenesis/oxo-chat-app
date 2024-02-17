@@ -46,7 +46,7 @@ const UnlockScreen = (props) => {
           setMsg('')
 
           let singleton = props.master.get('Singleton')
-          console.log(singleton)
+
           if (singleton == false) {
             props.navigation.replace('AvatarList')
           } else {

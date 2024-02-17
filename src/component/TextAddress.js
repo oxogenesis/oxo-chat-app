@@ -4,7 +4,7 @@ import tw from '../lib/tailwind'
 
 const TextAddress = ({ address, textSize = 'text-sm' }) => {
   return (
-    <Text style={tw`${textSize} text-gray-500 text-left`}>
+    <Text style={tw`${textSize} text-gray-500 dark:text-slate-200 text-left`}>
       {address}
     </Text>
   )

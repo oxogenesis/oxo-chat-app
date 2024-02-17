@@ -33,7 +33,7 @@ const TabSessionScreen = (props) => {
             {
               props.avatar.get('SessionList').map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => props.navigation.push('Session', { address: item.Address })}>
-                  <Flex justify="start" align="start" style={tw`bg-stone-100 p-5px`}>
+                  <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px`}>
                     <View>
                       {
                         item.CountUnread != null && item.CountUnread != 0 ?

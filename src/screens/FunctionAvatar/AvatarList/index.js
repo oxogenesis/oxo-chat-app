@@ -93,7 +93,7 @@ const AvatarListScreen = props => {
                   {
                     avatarList.map((item, index) => (
                       <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
-                        <View style={tw`bg-neutral-100 mb-1px`}>
+                        <View style={tw`bg-stone-100 dark:bg-stone-500 mb-1px`}>
                           <Flex>
                             <Flex.Item style={{ flex: 0.15 }}>
                               <AvatarImage address={item.Address} />

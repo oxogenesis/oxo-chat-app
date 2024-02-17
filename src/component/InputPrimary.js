@@ -5,7 +5,7 @@ import tw from '../lib/tailwind'
 const InputPrimary = ({ placeholder, value, setValue, editable = true, flagSecure = false, textSize = 'text-base' }) => {
   return (
     <TextInput
-      style={tw`mx-5px rounded-full border-solid border border-neutral-300 ${textSize} text-center`}
+      style={tw`mx-5px rounded-full border-solid border border-neutral-300 ${textSize} text-center text-slate-800 dark:text-slate-200`}
       placeholder={placeholder}
       placeholderTextColor={tw.color('neutral-500')}
       secureTextEntry={flagSecure}

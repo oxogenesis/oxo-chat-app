@@ -36,28 +36,43 @@ const AboutScreen = (props) => {
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <TouchableOpacity onPress={() => { copyChatServer() }}>
-        <Text style={tw`w-full text-base font-bold text-neutral-800`}>
-          {`服务端源码：\nhttps://github.com/oxogenesis/oxo-chat-server`}
+        <Text style={tw`w-full text-base font-bold text-slate-800 dark:text-slate-200`}>
+          {`服务端源码：`}
+        </Text>
+        <Text style={tw`w-full text-base text-slate-800 dark:text-slate-200`}>
+          {`https://github.com/oxogenesis/oxo-chat-server`}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { copyChatApp() }}>
-        <Text style={tw`w-full text-base font-bold text-neutral-800`}>
-          {`App源码：\nhttps://github.com/oxogenesis/oxo-chat-app`}
+        <Text style={tw`w-full text-base font-bold text-slate-800 dark:text-slate-200`}>
+          {`App源码：`}
+        </Text>
+        <Text style={tw`w-full text-base text-slate-800 dark:text-slate-200`}>
+          {`https://github.com/oxogenesis/oxo-chat-app`}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { copyChatClient() }}>
-        <Text style={tw`w-full text-base font-bold text-neutral-800`}>
-          {`客户端源码（停止维护）：\nhttps://github.com/oxogenesis/oxo-chat-client`}
+        <Text style={tw`w-full text-base font-bold text-slate-800 dark:text-slate-200`}>
+          {`客户端源码（停止维护）：`}
+        </Text>
+        <Text style={tw`w-full text-base text-slate-800 dark:text-slate-200`}>
+          {`https://github.com/oxogenesis/oxo-chat-client`}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { copyWiki() }}>
-        <Text style={tw`w-full text-base font-bold text-neutral-800`}>
-          {`wiki：\nhttps://github.com/oxogenesis/oxo-chat-client/wiki`}
+        <Text style={tw`w-full text-base font-bold text-slate-800 dark:text-slate-200`}>
+          {`wiki：`}
+        </Text>
+        <Text style={tw`w-full text-base text-slate-800 dark:text-slate-200`}>
+          {`https://github.com/oxogenesis/oxo-chat-client/wiki`}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { copyWallet() }}>
-        <Text style={tw`w-full text-base font-bold text-neutral-800`}>
-          {`钱包：\nhttps://github.com/oxogenesis/oxo-wallet`}
+        <Text style={tw`w-full text-base font-bold text-slate-800 dark:text-slate-200`}>
+          {`钱包：`}
+        </Text>
+        <Text style={tw`w-full text-base text-slate-800 dark:text-slate-200`}>
+          {`https://github.com/oxogenesis/oxo-wallet`}
         </Text>
       </TouchableOpacity>
     </View>

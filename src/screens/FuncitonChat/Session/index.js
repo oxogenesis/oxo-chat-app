@@ -211,7 +211,7 @@ const SessionScreen = (props) => {
         <View style={tw`w-4/5`}>
           <TextInput
             placeholderTextColor={tw.color('stone-500')}
-            style={tw`border-solid border-t border-gray-300 text-sm`}
+            style={tw`border-solid border-t border-gray-300 dark:border-gray-700 text-sm`}
             placeholder="请输入消息..."
             value={message_input}
             multiline={true}

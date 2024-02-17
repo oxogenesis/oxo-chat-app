@@ -87,7 +87,7 @@ const BulletinScreen = (props) => {
           :
           <ScrollView style={tw``}>
             {/* main bulletin */}
-            <View style={tw`flex flex-col bg-neutral-100`}>
+            <View style={tw`flex flex-col bg-stone-100 dark:bg-stone-500`}>
               <View style={tw`flex flex-row mx-5px mt-5px`}>
                 <Avatar address={current.Address} />
 
@@ -112,7 +112,7 @@ const BulletinScreen = (props) => {
               {/* 帖子引用 */}
               {
                 current.QuoteList != undefined &&
-                <View style={tw`flex flex-row mx-5px flex-wrap rounded-tl-lg bg-yellow-100`}>
+                <View style={tw`flex flex-row mx-5px flex-wrap rounded-t-lg bg-yellow-100 dark:bg-yellow-200`}>
                   {
                     current.QuoteList.length > 0 &&
                     <Text>
@@ -127,7 +127,7 @@ const BulletinScreen = (props) => {
               }
 
               {/* 快捷操作 */}
-              <View style={tw`flex flex-row mx-5px rounded-b-lg bg-yellow-100`}>
+              <View style={tw`flex flex-row mx-5px rounded-b-lg bg-yellow-100 dark:bg-yellow-200`}>
                 {/* 取消收藏按键 */}
                 {
                   current.IsMark == "TRUE" &&

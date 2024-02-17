@@ -119,10 +119,10 @@ const BulletinRandomScreen = (props) => {
             }
           >
             {/* main bulletin */}
-            <View style={tw`flex flex-col bg-neutral-100 p-5px`}>
-              <Avatar address={random.Address} />
+            <View style={tw`flex flex-col bg-stone-100 dark:bg-stone-500 p-5px`}>
 
-              <View>
+              <View style={tw`flex flex-row mx-5px mt-5px`}>
+                <Avatar address={random.Address} />
                 <View>
                   <Text>
                     <LinkName onPress={() => props.navigation.push('AddressMark', { address: random.Address })} name={AddressToName(props.avatar.get('AddressMap'), random.Address)} />
@@ -133,130 +133,130 @@ const BulletinRandomScreen = (props) => {
                   <View style={tw`flex flex-row`}>
                     <TextTimestamp timestamp={random.Timestamp} textSize={'text-xs'} />
                   </View>
-
-
-                  {/* 帖子引用 */}
-                  {
-                    random.QuoteList != undefined &&
-                    <>
-                      {
-                        random.QuoteList.length > 0 &&
-                        <Text style={tw`flex flex-row flex-nowrap`}>
-                          {
-                            random.QuoteList.map((item, index) => (
-                              <LinkBulletin key={index} address={item.Address} sequence={item.Sequence} hash={item.Hash} to={random.Address} />
-                            ))
-                          }
-                        </Text>
-                      }
-                    </>
-                  }
-
-                  {/* 快捷操作 */}
-                  <View style={tw`flex flex-row bg-yellow-100 w-100`}>
-                    {/* 取消收藏按键 */}
-                    {
-                      random.IsMark == "TRUE" &&
-                      <TouchableOpacity onPress={cancelCollection}>
-                        <IconEntypo
-                          name={"star"}
-                          size={32}
-                          color={tw.color('red-500')}
-                        />
-                      </TouchableOpacity>
-                    }
-                    {/* 收藏按键 */}
-                    {
-                      random.IsMark == "FALSE" &&
-                      <TouchableOpacity onPress={handleCollection}>
-                        <IconEntypo
-                          name={"star-outlined"}
-                          size={32}
-                          color={tw.color('blue-500')}
-                        />
-                      </TouchableOpacity>
-                    }
-
-                    {/* 评论按键 */}
-                    <TouchableOpacity onPress={() => {
-                      quoteBulletin(random.Address,
-                        random.Sequence,
-                        random.Hash)
-                      props.navigation.push('BulletinPublish')
-                    }
-                    }>
-                      <IconAnt
-                        name={'addfile'}
-                        size={32}
-                        color={tw.color('blue-500')}
-                      />
-                    </TouchableOpacity>
-
-                    {/* 引用按键 */}
-                    <TouchableOpacity onPress={() => {
-                      quoteBulletin(random.Address,
-                        random.Sequence,
-                        random.Hash)
-                      quote()
-                    }
-                    }
-                    >
-                      <IconFontisto
-                        name='link'
-                        size={32}
-                        color={tw.color('blue-500')}
-                      />
-                    </TouchableOpacity>
-
-                    {/* 分享按键 */}
-                    <TouchableOpacity onPress={() => {
-                      props.navigation.push('AddressSelect', {
-                        content: {
-                          ObjectType: "Bulletin",
-                          Address: random.Address,
-                          Sequence: random.Sequence,
-                          Hash: random.Hash
-                        }
-                      })
-                    }
-                    }>
-                      <IconFontisto
-                        name='share-a'
-                        size={32}
-                        color={tw.color('blue-500')}
-                      />
-                    </TouchableOpacity>
-
-                    {/* 拷贝按键 */}
-                    <TouchableOpacity onPress={() => {
-                      copyToClipboard()
-                    }}>
-                      <IconFontisto
-                        name='copy'
-                        size={32}
-                        color={tw.color('blue-500')}
-                      />
-                    </TouchableOpacity>
-
-                    {/* 原始信息 */}
-                    <TouchableOpacity onPress={() => {
-                      props.navigation.push('BulletinInfo', { hash: random.Hash })
-                    }}>
-                      <IconMaterial
-                        name='info-outline'
-                        size={32}
-                        color={tw.color('blue-500')}
-                      />
-                    </TouchableOpacity>
-                  </View>
                 </View>
-
-                <BulletinContent content={random.Content} />
               </View>
+
+
+              {/* 帖子引用 */}
+              {
+                random.QuoteList != undefined &&
+                <View style={tw`flex flex-row mx-5px flex-wrap rounded-t-lg bg-yellow-100 dark:bg-yellow-200`}>
+                  {
+                    random.QuoteList.length > 0 &&
+                    <Text style={tw`flex flex-row flex-nowrap`}>
+                      {
+                        random.QuoteList.map((item, index) => (
+                          <LinkBulletin key={index} address={item.Address} sequence={item.Sequence} hash={item.Hash} to={random.Address} />
+                        ))
+                      }
+                    </Text>
+                  }
+                </View>
+              }
+
+              {/* 快捷操作 */}
+              <View style={tw`flex flex-row mx-5px rounded-b-lg bg-yellow-100 dark:bg-yellow-200`}>
+                {/* 取消收藏按键 */}
+                {
+                  random.IsMark == "TRUE" &&
+                  <TouchableOpacity onPress={cancelCollection}>
+                    <IconEntypo
+                      name={"star"}
+                      size={32}
+                      color={tw.color('red-500')}
+                    />
+                  </TouchableOpacity>
+                }
+                {/* 收藏按键 */}
+                {
+                  random.IsMark == "FALSE" &&
+                  <TouchableOpacity onPress={handleCollection}>
+                    <IconEntypo
+                      name={"star-outlined"}
+                      size={32}
+                      color={tw.color('blue-500')}
+                    />
+                  </TouchableOpacity>
+                }
+
+                {/* 评论按键 */}
+                <TouchableOpacity onPress={() => {
+                  quoteBulletin(random.Address,
+                    random.Sequence,
+                    random.Hash)
+                  props.navigation.push('BulletinPublish')
+                }
+                }>
+                  <IconAnt
+                    name={'addfile'}
+                    size={32}
+                    color={tw.color('blue-500')}
+                  />
+                </TouchableOpacity>
+
+                {/* 引用按键 */}
+                <TouchableOpacity onPress={() => {
+                  quoteBulletin(random.Address,
+                    random.Sequence,
+                    random.Hash)
+                  quote()
+                }
+                }
+                >
+                  <IconFontisto
+                    name='link'
+                    size={32}
+                    color={tw.color('blue-500')}
+                  />
+                </TouchableOpacity>
+
+                {/* 分享按键 */}
+                <TouchableOpacity onPress={() => {
+                  props.navigation.push('AddressSelect', {
+                    content: {
+                      ObjectType: "Bulletin",
+                      Address: random.Address,
+                      Sequence: random.Sequence,
+                      Hash: random.Hash
+                    }
+                  })
+                }
+                }>
+                  <IconFontisto
+                    name='share-a'
+                    size={32}
+                    color={tw.color('blue-500')}
+                  />
+                </TouchableOpacity>
+
+                {/* 拷贝按键 */}
+                <TouchableOpacity onPress={() => {
+                  copyToClipboard()
+                }}>
+                  <IconFontisto
+                    name='copy'
+                    size={32}
+                    color={tw.color('blue-500')}
+                  />
+                </TouchableOpacity>
+
+                {/* 原始信息 */}
+                <TouchableOpacity onPress={() => {
+                  props.navigation.push('BulletinInfo', { hash: random.Hash })
+                }}>
+                  <IconMaterial
+                    name='info-outline'
+                    size={32}
+                    color={tw.color('blue-500')}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <BulletinContent content={random.Content} />
             </View>
           </ScrollView>
       }
-    </View>
+    </View >
   )
 }
 

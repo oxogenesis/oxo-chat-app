@@ -58,7 +58,7 @@ const SettingNetworkScreen = (props) => {
           renderItem={
             ({ item }) => {
               return (
-                <View style={tw`bg-neutral-100 rounded-lg px-1 border-2 border-gray-300 flex flex-row justify-between py-5px px-15px`}>
+                <View style={tw`bg-neutral-100 dark:bg-neutral-600 rounded-lg px-1 border-2 border-gray-300 dark:border-gray-700 flex flex-row justify-between py-5px px-15px`}>
                   <View style={tw`basis-3/5`} >
                     <Text style={tw`text-left text-base text-neutral-900`}>
                       {item.Address}

@@ -1,20 +1,19 @@
 import React from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
-import IconAnt from 'react-native-vector-icons/AntDesign'
 import { Text, View } from 'react-native'
 import tw from '../lib/tailwind'
 
 const TabSessionHeader = (props) => {
   return (
-    <View style={tw`w-full flex flex-row justify-between`}>
+    <View style={tw`w-full flex flex-row justify-between bg-neutral-100 dark:bg-neutral-600 `}>
       <View style={tw``}>
         <Text style={tw`text-center`}>
           { }
         </Text>
       </View>
       <View style={tw``}>
-        <Text style={tw`text-center text-2xl`}>
+        <Text style={tw`text-center text-2xl text-slate-800 dark:text-slate-200`}>
           {props.children}
         </Text>
       </View>

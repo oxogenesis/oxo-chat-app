@@ -12,9 +12,9 @@ const LinkBulletin = (props) => {
     display = `${name}#${props.sequence}`
   }
   return (
-    <View style={tw`bg-yellow-500 rounded-full px-1 border-2 border-gray-300`}>
+    <View style={tw`bg-yellow-500 rounded-full px-1 border-2 border-gray-300 dark:border-gray-700`}>
       <Text
-        style={tw`text-base text-slate-800 text-center`}
+        style={tw`text-base text-slate-800 dark:text-slate-200 text-center`}
         onPress={() => props.navigation.push('Bulletin', {
           address: props.address,
           sequence: props.sequence,

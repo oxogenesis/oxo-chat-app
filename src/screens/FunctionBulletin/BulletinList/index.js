@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react'
-import { View, Text, ScrollView } from 'react-native'
+import { View, ScrollView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { BulletinAddressSession, BulletinHistorySession, BulletinMarkSession, BulletinPreviewSize } from '../../../lib/Const'
 import { AddressToName } from '../../../lib/Util'
 import ViewEmpty from '../../../component/ViewEmpty'
-import Avatar from '../../../component/Avatar'
-import LinkBulletin from '../../../component/LinkBulletin'
-import TextTimestamp from '../../../component/TextTimestamp'
-import tw from '../../../lib/tailwind'
 import ItemBulletin from '../../../component/ItemBulletin'
+import tw from '../../../lib/tailwind'
 
 //公告列表
 const BulletinListScreen = (props) => {
@@ -24,7 +21,7 @@ const BulletinListScreen = (props) => {
       if (props.route.params.address == props.avatar.get('Address')) {
         props.navigation.setOptions({ title: '我的公告' })
       } else {
-        props.navigation.setOptions({ title: `公告：${AddressToName(props.avatar.get('AddressMap'), props.route.params.address)}` })
+        props.navigation.setOptions({ title: `公告列表：${AddressToName(props.avatar.get('AddressMap'), props.route.params.address)}` })
       }
     }
 

@@ -93,20 +93,18 @@ const AvatarListScreen = props => {
                   {
                     avatarList.map((item, index) => (
                       <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
-                        <View style={tw`bg-stone-100 dark:bg-stone-500 mb-1px`}>
-                          <Flex>
-                            <Flex.Item style={{ flex: 0.15 }}>
-                              <AvatarImage address={item.Address} />
-                            </Flex.Item>
-                            <Flex.Item >
-                              <Text>
-                                <TextName name={item.Name} />
-                                <TextTimestamp timestamp={item.LoginAt} />
-                              </Text>
-                              <TextAddress address={item.Address} />
-                            </Flex.Item>
-                          </Flex>
-                        </View>
+                        <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
+                          <View>
+                            <AvatarImage address={item.Address} />
+                          </View>
+                          <View>
+                            <Text>
+                              <TextName name={item.Name} />
+                              <TextTimestamp timestamp={item.LoginAt} />
+                            </Text>
+                            <TextAddress address={item.Address} />
+                          </View>
+                        </Flex>
                       </TouchableOpacity>
                     ))
                   }
@@ -114,7 +112,7 @@ const AvatarListScreen = props => {
                 :
                 <ViewEmpty msg={`暂无账号...`} />
             }
-            <View style={tw`w-full px-25px absolute bottom-0 z-99 bg-neutral-200 dark:bg-neutral-800`}>
+            <View style={tw`w-full px-25px absolute bottom-0 z-99`}>
               <ButtonPrimary title={'安全退出'} onPress={lock} bg={'bg-red-500'} />
             </View>
           </View>

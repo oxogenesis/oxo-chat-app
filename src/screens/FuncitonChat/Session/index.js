@@ -16,7 +16,7 @@ import tw from '../../../lib/tailwind'
 
 //聊天会话界面
 const SessionScreen = (props) => {
-  const flatRef = useRef(null)
+  const listRef = useRef(null)
   const [message_input, setMsgInput] = useState('')
   const [refreshFlag, setRefreshFlag] = useState(false)
   const aes_key = props.avatar.get('CurrentSessionAesKey')
@@ -42,7 +42,7 @@ const SessionScreen = (props) => {
           message: newMessage_input,
           timestamp: timestamp
         })
-        flatRef.current.scrollToEnd()
+        listRef.current.scrollToEnd()
         setMsgInput('')
       }
     }
@@ -79,7 +79,7 @@ const SessionScreen = (props) => {
 
       loadMessageList(true)
 
-      flatRef.current.scrollToEnd()
+      listRef.current.scrollToEnd()
     })
   })
 
@@ -107,12 +107,12 @@ const SessionScreen = (props) => {
   }
 
   const handleContentSizeChange = () => {
-    flatRef.current.scrollToEnd()
+    listRef.current.scrollToEnd()
   }
 
   const handleFocus = () => {
     setTimeout(() => {
-      flatRef.current.scrollToEnd()
+      listRef.current.scrollToEnd()
     }, 1000)
   }
 
@@ -120,7 +120,7 @@ const SessionScreen = (props) => {
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px flex flex-col relative`}>
       <FlatList
         style={tw`mb-55px`}
-        ref={flatRef}
+        ref={listRef}
         data={data}
         keyExtractor={item => item.Hash}
         refreshing={refreshFlag}
@@ -215,6 +215,7 @@ const SessionScreen = (props) => {
             placeholder="请输入消息..."
             value={message_input}
             multiline={true}
+            keyboardAppearance={keyboardAppearance}
             onFocus={handleFocus}
             onChangeText={text => setMsgInput(text)}
           />

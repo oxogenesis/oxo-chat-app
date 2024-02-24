@@ -53,8 +53,6 @@ import AboutScreen from '../FunctionTab/About'
 import AddressSelectScreen from '../FunctionTab/AddressSelect'
 import tw from '../../lib/tailwind'
 
-import { AddressToName } from '../../lib/Util'
-
 const Stack = createStackNavigator()
 
 const AppStack = (props) => {

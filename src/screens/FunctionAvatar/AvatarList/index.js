@@ -114,7 +114,7 @@ const AvatarListScreen = props => {
                 :
                 <ViewEmpty msg={`暂无账号...`} />
             }
-            <View style={tw`w-full px-25px absolute bottom-0 z-99`}>
+            <View style={tw`w-full px-25px absolute bottom-0 z-99 bg-neutral-200 dark:bg-neutral-800`}>
               <ButtonPrimary title={'安全退出'} onPress={lock} bg={'bg-red-500'} />
             </View>
           </View>

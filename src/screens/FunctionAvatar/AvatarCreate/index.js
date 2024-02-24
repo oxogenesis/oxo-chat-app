@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, TextInput } from 'react-native'
+import { View } from 'react-native'
 import { AvatarCreateNew } from '../../../lib/OXO'
 import { connect } from 'react-redux'
 import ButtonPrimary from '../../../component/ButtonPrimary'

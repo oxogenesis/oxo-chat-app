@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { actionType } from '../../../redux/actions/actionType'
 import { View } from 'react-native'
-import { AvatarCreateNew } from '../../../lib/OXO'
+import { AvatarCreateNew, DeriveKeypair, DeriveAddress } from '../../../lib/OXO'
 import { connect } from 'react-redux'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import InputPrimary from '../../../component/InputPrimary'
@@ -18,14 +19,37 @@ const AvatarCreateScreen = (props) => {
       return
     }
     AvatarCreateNew(name, props.master.get('MasterKey'))
-      .then(result => {
-        if (result) {
+      .then(seed => {
+        if (seed) {
           setMsg('')
-          setName('')
-          props.navigation.goBack()
+          // setName('')
+          let multi = props.master.get("Multi")
+          if (multi == true) {
+            // true not address
+            props.navigation.goBack()
+          } else {
+            // false
+            let keypair = DeriveKeypair(seed)
+            let address = DeriveAddress(keypair.publicKey)
+            props.dispatch({
+              type: actionType.master.setMulti,
+              multi: address
+            })
+            props.dispatch({
+              type: actionType.avatar.enableAvatar,
+              seed: seed,
+              name: name
+            })
+          }
         }
       })
   }
+
+  useEffect(() => {
+    if (props.avatar.get('Database') != null) {
+      props.navigation.replace('TabHome')
+    }
+  }, [props.avatar])
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
@@ -46,6 +70,7 @@ const AvatarCreateScreen = (props) => {
 
 const ReduxAvatarCreateScreen = connect((state) => {
   return {
+    avatar: state.avatar,
     master: state.master
   }
 })(AvatarCreateScreen)

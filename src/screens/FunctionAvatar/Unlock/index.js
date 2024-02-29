@@ -19,6 +19,9 @@ const UnlockScreen = (props) => {
   const enableAvatar = (address, name, avatar_list) => {
     setFlagLoading(true)
     let avatar = avatar_list.filter(item => item.Address == address)[0]
+    console.log(`enableAvatar`)
+    console.log(avatar_list)
+    console.log(address)
     console.log(avatar)
     AvatarDerive(avatar.save, master_key)
       .then(result => {
@@ -45,16 +48,16 @@ const UnlockScreen = (props) => {
           setKey('')
           setMsg('')
 
-          let singleton = props.master.get('Singleton')
+          let multi = props.master.get('Multi')
 
-          if (singleton == false) {
-            props.navigation.replace('AvatarList')
-          } else {
-            try {
-              AsyncStorage.getItem('<#Avatars#>').then(result => {
-                if (result != null) {
+          try {
+            AsyncStorage.getItem('<#Avatars#>').then(result => {
+              if (result != null) {
+                if (multi == true) {
+                  props.navigation.replace('AvatarList')
+                } else {
                   let avatar_list = JSON.parse(result)
-                  let address = singleton
+                  let address = multi
                   let name = ''
                   for (let i = 0; i < avatar_list.length; i++) {
                     const avatar = avatar_list[i];
@@ -64,10 +67,12 @@ const UnlockScreen = (props) => {
                   }
                   enableAvatar(address, name, avatar_list)
                 }
-              })
-            } catch (e) {
-              console.log(e)
-            }
+              } else {
+                props.navigation.replace('AvatarCreate')
+              }
+            })
+          } catch (e) {
+            console.log(e)
           }
         } else {
           setKey('')

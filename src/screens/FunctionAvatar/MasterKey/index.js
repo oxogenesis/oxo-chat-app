@@ -74,11 +74,11 @@ const MasterKeyScreen = props => {
             }
 
             props.dispatch({
-              type: actionType.master.setSingleton,
-              singleton: config.singleton
+              type: actionType.master.setMulti,
+              multi: config.multi
             })
           } else {
-            MasterConfig({ singleton: false, dark: false })
+            MasterConfig({ multi: false, dark: false })
           }
         })
 

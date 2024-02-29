@@ -89,17 +89,17 @@ async function MasterKeyDerive(masterKey) {
   }
 }
 
-async function MasterConfig({ singleton, dark }) {
+async function MasterConfig({ multi, dark }) {
   try {
     const result = await AsyncStorage.getItem('<#MasterConfig#>')
-    let config = { singleton: false, dark: false }
+    let config = { multi: false, dark: false }
     if (result != null) {
       let json = JSON.parse(result)
       config = json
     }
 
-    if (singleton != null) {
-      config.singleton = singleton
+    if (multi != null) {
+      config.multi = multi
     }
     if (dark != null) {
       config.dark = dark
@@ -132,7 +132,7 @@ async function AvatarCreateNew(name, password) {
     }
     avatarList.unshift({ Name: name, Address: address, save: JSON.stringify(save), LoginAt: Date.now() })
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
-    return true
+    return seed
   } catch (e) {
     console.log(e)
     return false

@@ -62,8 +62,10 @@ const AvatarSeedScreen = (props) => {
         <Text style={tw`text-base text-neutral-500`}>
           {`注意：查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。`}
         </Text>
-
-        <ButtonPrimary title='删除账号' bg='bg-red-500' onPress={() => viewRemoveAvatar()} />
+        {
+          props.master.get("Multi") == true &&
+          <ButtonPrimary title='删除账号' bg='bg-red-500' onPress={() => viewRemoveAvatar()} />
+        }
       </View>
 
       <ViewAlert
@@ -86,7 +88,8 @@ const AvatarSeedScreen = (props) => {
 
 const ReduxAvatarSeedScreen = connect((state) => {
   return {
-    avatar: state.avatar
+    avatar: state.avatar,
+    master: state.master
   }
 })(AvatarSeedScreen)
 

@@ -2,7 +2,7 @@ export const actionType = {
   master: {
     setMasterKey: 'SET_MASTER_KEY',
     setDark: 'SET_DARK',
-    setSingleton: 'SET_SINGLETON'
+    setMulti: 'SET_MULTI'
   },
   avatar: {
     setAvatar: 'SET_AVATAR',

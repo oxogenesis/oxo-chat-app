@@ -19,6 +19,8 @@ const SessionScreen = (props) => {
   const listRef = useRef(null)
   const [message_input, setMsgInput] = useState('')
   const [refreshFlag, setRefreshFlag] = useState(false)
+  const [keyboardAppearance, setKeyboardAppearance] = useState()
+
   const aes_key = props.avatar.get('CurrentSessionAesKey')
   const data = props.avatar.get("CurrentMessageList")
   const friend_address = props.route.params.address
@@ -80,6 +82,12 @@ const SessionScreen = (props) => {
       loadMessageList(true)
 
       listRef.current.scrollToEnd()
+
+      if (props.master.get('Dark')) {
+        setKeyboardAppearance('dark')
+      } else {
+        setKeyboardAppearance('light')
+      }
     })
   })
 
@@ -227,7 +235,8 @@ const SessionScreen = (props) => {
 
 const ReduxSessionScreen = connect((state) => {
   return {
-    avatar: state.avatar
+    avatar: state.avatar,
+    master: state.master
   }
 })(SessionScreen)
 

@@ -13,16 +13,12 @@ import tw from '../../../lib/tailwind'
 //解锁界面
 const UnlockScreen = (props) => {
   const [master_key, setKey] = useState('')
-  const [error_msg, setMsg] = useState('')
+  const [error_msg, setErrorMsg] = useState('')
   const [flagLoading, setFlagLoading] = useState(false)
 
   const enableAvatar = (address, name, avatar_list) => {
     setFlagLoading(true)
     let avatar = avatar_list.filter(item => item.Address == address)[0]
-    console.log(`enableAvatar`)
-    console.log(avatar_list)
-    console.log(address)
-    console.log(avatar)
     AvatarDerive(avatar.save, master_key)
       .then(result => {
         if (result) {
@@ -46,7 +42,7 @@ const UnlockScreen = (props) => {
             master_key: master_key
           })
           setKey('')
-          setMsg('')
+          setErrorMsg('')
 
           let multi = props.master.get('Multi')
 
@@ -76,7 +72,7 @@ const UnlockScreen = (props) => {
           }
         } else {
           setKey('')
-          setMsg('无效口令...')
+          setErrorMsg('无效口令...')
         }
       })
   }
@@ -91,7 +87,7 @@ const UnlockScreen = (props) => {
         })
       }
       setKey('')
-      setMsg('')
+      setErrorMsg('')
     })
   })
 

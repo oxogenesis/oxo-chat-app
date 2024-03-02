@@ -1,24 +1,53 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, Text } from 'react-native'
 import { connect } from 'react-redux'
 import QRCodeScanner from 'react-native-qrcode-scanner'
+import { actionType } from '../../../redux/actions/actionType'
 import { RNCamera } from 'react-native-camera'
-import { ParseQrcodeSeed, AvatarCreateWithSeed } from '../../../lib/OXO'
+import { ParseQrcodeSeed, AvatarCreateWithSeed, DeriveKeypair, DeriveAddress, MasterConfig } from '../../../lib/OXO'
 import tw from '../../../lib/tailwind'
 
 const AvatarCreateFromScanSeedQrcode = (props) => {
 
   const onSuccess = (e) => {
-    let result = ParseQrcodeSeed(e.data)
-    if (result != false) {
-      AvatarCreateWithSeed(result.Name, result.Seed, props.master.get('MasterKey'))
+    let json = ParseQrcodeSeed(e.data)
+    if (json != false) {
+      AvatarCreateWithSeed(json.Name, json.Seed, props.master.get('MasterKey'))
         .then(result => {
           if (result) {
-            props.navigation.goBack()
+            let multi = props.master.get("Multi")
+            if (multi == true) {
+              // true not address
+              props.navigation.goBack()
+            } else {
+              // false
+              let keypair = DeriveKeypair(json.Seed)
+              let address = DeriveAddress(keypair.publicKey)
+              MasterConfig({ multi: address })
+                .then(result => {
+                  if (result) {
+                    props.dispatch({
+                      type: actionType.master.setMulti,
+                      multi: address
+                    })
+                  }
+                })
+              props.dispatch({
+                type: actionType.avatar.enableAvatar,
+                seed: json.Seed,
+                name: json.Name
+              })
+            }
           }
         })
     }
   }
+
+  useEffect(() => {
+    if (props.avatar.get('Database') != null) {
+      props.navigation.replace('TabHome')
+    }
+  }, [props.avatar])
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800`}>
@@ -45,6 +74,7 @@ const AvatarCreateFromScanSeedQrcode = (props) => {
 
 const ReduxAvatarCreateFromScanSeedQrcode = connect((state) => {
   return {
+    avatar: state.avatar,
     master: state.master
   }
 })(AvatarCreateFromScanSeedQrcode)

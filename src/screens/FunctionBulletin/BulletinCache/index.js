@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { View, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { WhiteSpace } from '@ant-design/react-native'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import InputPrimary from '../../../component/InputPrimary'
 import ErrorMsg from '../../../component/ErrorMsg'
@@ -45,7 +44,7 @@ const BulletinCacheScreen = (props) => {
         }
 
         <ButtonPrimary title={'设置'} onPress={setBulletinCacheSize} />
-        <WhiteSpace size='lg' />
+        <View style={tw`h-5`}></View>
         <Text style={tw`text-base text-red-500`}>
           {`说明：
 1、关注账户的公告、收藏的公告均不占用缓存公告数量。

@@ -3,8 +3,7 @@ import { View, Text } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import QRCode from 'react-native-qrcode-svg'
-import { WhiteSpace, Button } from '@ant-design/react-native'
-import ViewAlert from '../../../component/ViewAlert'
+import ViewModal from '../../../component/ViewModal'
 import tw from '../../../lib/tailwind'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 
@@ -49,12 +48,15 @@ const AvatarSeedQrcodeScreen = (props) => {
         <ButtonPrimary title='查看种子' bg='bg-indigo-500' onPress={viewSeedAlert} />
       </View>
 
-      <ViewAlert
+      <ViewModal
         visible={visible}
         onClose={onClose}
         msg="查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。
 确定要查看种子吗？"
-        onPress={() => props.navigation.navigate('AvatarSeed')}
+        onConfirm={() => {
+          showModal(false)
+          props.navigation.navigate('AvatarSeed')
+        }}
       />
     </View>
   )

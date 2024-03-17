@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { WhiteSpace } from '@ant-design/react-native'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
 import ButtonPrimary from '../../../component/ButtonPrimary'
@@ -50,14 +49,14 @@ const TabSettingScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
-      <WhiteSpace size='lg' />
       <LinkSetting title={'账号设置'} onPress={() => { props.navigation.navigate('SettingMe') }} />
-      <WhiteSpace size='lg' />
+      <View style={tw`h-5`}></View>
+      
       <LinkSetting title={'网络设置'} onPress={() => { props.navigation.navigate('SettingNetwork') }} />
       <LinkSetting title={'地址管理'} onPress={() => { props.navigation.navigate('SettingAddress') }} />
       <LinkSetting title={'公告设置'} onPress={() => { props.navigation.navigate('SettingBulletin') }} />
-      <WhiteSpace size='lg' />
-
+      <View style={tw`h-5`}></View>
+      
       <SwitchSetting title={'切换暗色主题'} checked={isDark} onChange={onSwitchDark} />
 
       <ButtonPrimary title='关于' onPress={() => { props.navigation.navigate('About') }} />

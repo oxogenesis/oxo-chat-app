@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Button } from '@ant-design/react-native'
-import ViewAlert from '../../../component/ViewAlert'
+import ViewModal from '../../../component/ViewModal'
 import ViewEmpty from '../../../component/ViewEmpty'
 import tw from '../../../lib/tailwind'
 
@@ -73,12 +72,16 @@ const SettingNetworkScreen = (props) => {
                       </View>
                       :
                       <>
-                        <Button style={tw`rounded-full bg-green-500 h-30px`} onPress={() => changeCurrentHost(item.Address)}>
-                          <Text style={tw`text-sm text-slate-100`}>使用</Text>
-                        </Button>
-                        <Button style={tw`rounded-full bg-red-500 h-30px`} onPress={() => delHostAlert(item.Address)}>
-                          <Text style={tw`text-sm text-slate-100`}>删除</Text>
-                        </Button>
+                        <TouchableOpacity style={tw`rounded-full border border-stone-700 dark:border-stone-300 bg-green-500 h-30px`} onPress={() => changeCurrentHost(item.Address)}>
+                          <Text style={tw`px-10px text-sm text-slate-100 text-center align-middle font-bold`}>
+                            使用
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={tw`rounded-full border border-stone-300 bg-red-500 h-30px`} onPress={() => delHostAlert(item.Address)}>
+                          <Text style={tw`px-10px text-sm text-slate-100 text-center align-middle font-bold`}>
+                            删除
+                          </Text>
+                        </TouchableOpacity>
                       </>
                   }
                 </View>
@@ -88,11 +91,14 @@ const SettingNetworkScreen = (props) => {
         >
         </FlatList >
       </View>
-      <ViewAlert
+      <ViewModal
         visible={visible}
         onClose={onClose}
         msg={`你确定要删除${host1}吗?`}
-        onPress={() => delHost(host1)}
+        onConfirm={() => {
+          showModal(false)
+          delHost(host1)
+        }}
       />
     </View >
   )

@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
-import { Icon } from '@ant-design/react-native'
+import IconAnt from 'react-native-vector-icons/AntDesign'
 import tw from '../lib/tailwind'
 
 const LinkSetting = ({ title, textSize, icon, onPress }) => {
@@ -12,7 +12,11 @@ const LinkSetting = ({ title, textSize, icon, onPress }) => {
           {`${title}`}
         </Text>
         <Text style={tw`text-lg text-center`}>
-          <Icon name={icon || 'right'} size="md" />
+          <IconAnt
+            name={icon || 'right'}
+            size={24}
+            color={tw.color('slate-500')}
+          />
         </Text>
       </View>
     </TouchableOpacity>

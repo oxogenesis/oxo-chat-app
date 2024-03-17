@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { WhiteSpace } from '@ant-design/react-native'
 import InputPrimary from '../../../component/InputPrimary'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import tw from '../../../lib/tailwind'
@@ -46,7 +45,7 @@ const AddressAddFromQrcodeScreen = (props) => {
         <InputPrimary value={address} editable={false} placeholder={'账户地址'} />
         <InputPrimary value={relay} editable={false} placeholder={'服务地址'} />
 
-        <WhiteSpace size='md' />
+        <View style={tw`h-5`}></View>
 
         <ButtonPrimary title={'标记地址'} onPress={markAddress} />
         <ButtonPrimary title={'标记地址 + 保存服务器网址'} onPress={addHost} />

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text } from 'react-native'
+import { View, ToastAndroid } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { BulletinAddressSession } from '../../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Button, Toast } from '@ant-design/react-native'
-import ViewAlert from '../../../component/ViewAlert'
+import ViewModal from '../../../component/ViewModal'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
+import ButtonPrimary from '../../../component/ButtonPrimary'
 import { AddressToName } from '../../../lib/Util'
 import tw from '../../../lib/tailwind'
 
@@ -47,6 +47,7 @@ const AddressMarkScreen = (props) => {
 
   const delFriend = () => {
     setFriend(false)
+    show_visible_del_friend(false)
     props.dispatch({
       type: actionType.avatar.delFriend,
       address: props.avatar.get('CurrentAddressMark').Address
@@ -62,6 +63,7 @@ const AddressMarkScreen = (props) => {
 
   const delFollow = () => {
     setFollow(false)
+    show_visible_del_follow(false)
     props.dispatch({
       type: actionType.avatar.delFollow,
       address: props.avatar.get('CurrentAddressMark').Address
@@ -77,7 +79,9 @@ const AddressMarkScreen = (props) => {
 
   const copyToClipboard = () => {
     Clipboard.setString(props.avatar.get('CurrentAddressMark').Address)
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
   }
 
   useEffect(() => {
@@ -124,51 +128,43 @@ const AddressMarkScreen = (props) => {
           <LinkSetting title={AddressToName(props.avatar.get('AddressMap'), Address)} icon={'edit'} onPress={() => {
             props.navigation.navigate('AddressEdit', { address: Address })
           }} />
-          <LinkSetting title={Address} textSize={'text-sm'} icon={'block'} onPress={copyToClipboard} />
+          <LinkSetting title={Address} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
           <SwitchSetting title={'关注公告'} checked={currentFollow} onChange={onSwitchChangeFollow} />
           <SwitchSetting title={'添加好友'} checked={currentFriend} onChange={onSwitchChangeFriend} />
 
           <View style={tw`my-5px px-25px`}>
             {
               currentFollow &&
-              <Button style={tw`rounded-full bg-green-500`} onPress={() =>
-                props.navigation.push('BulletinList', { session: BulletinAddressSession, address: Address })}>
-                <Text style={tw`text-lg text-slate-100`}>查看公告</Text>
-              </Button>
+              <ButtonPrimary title='查看公告' bg='bg-green-500' onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: Address })} />
             }
 
             {
               currentFriend &&
-              <Button style={tw`rounded-full bg-green-500`} onPress={() =>
-                props.navigation.push('Session', { address: Address })}>
-                <Text style={tw`text-lg text-slate-100`}>开始聊天</Text>
-              </Button>
+              <ButtonPrimary title='开始聊天' bg='bg-green-500' onPress={() => props.navigation.push('Session', { address: Address })} />
             }
 
-            <Button style={tw`rounded-full bg-red-500`} onPress={delAddressMark}>
-              <Text style={tw`text-lg text-slate-100`}>删除</Text>
-            </Button>
+            <ButtonPrimary title='删除' bg='bg-red-500' onPress={delAddressMark} />
           </View>
         </>
       }
-      <ViewAlert
-        visible={visible_delete}
-        onPress={onClose}
-        onClose={onClose}
-        title='错误'
-        msg='删除账户标记前，请先解除好友并取消关注，谢谢。'
-      />
-      <ViewAlert
+      <ViewModal
         visible={visible_del_follow}
         onClose={onClose}
         msg="取消关注账户后，该账户的公告都将会被设置为缓存。"
-        onPress={delFollow}
+        onConfirm={delFollow}
       />
-      <ViewAlert
+      <ViewModal
         visible={visible_del_friend}
         onClose={onClose}
         msg='解除好友关系后，历史聊天记录将会被删除，并拒绝接收该账户的消息。'
-        onPress={delFriend}
+        onConfirm={delFriend}
+      />
+      <ViewModal
+        visible={visible_delete}
+        title={'错误'}
+        msg={'删除账户标记前，请先解除好友并取消关注，谢谢。'}
+        onClose={onClose}
+        onConfirm={onClose}
       />
     </View>
   )

@@ -4,13 +4,8 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import ViewEmpty from '../../../component/ViewEmpty'
-import { BulletinPreviewSize } from '../../../lib/Const'
-import Avatar from '../../../component/Avatar'
-import LinkBulletin from '../../../component/LinkBulletin'
-import TextTimestamp from '../../../component/TextTimestamp'
-import tw from '../../../lib/tailwind'
-import BulletinContent from '../../../component/BulletinContent'
 import ItemBulletin from '../../../component/ItemBulletin'
+import tw from '../../../lib/tailwind'
 
 //公告Tab
 const TabBulletinScreen = (props) => {

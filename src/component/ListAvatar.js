@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, ScrollView, TouchableOpacity } from 'react-native'
-import { Flex } from '@ant-design/react-native'
 import AvatarImage from './AvatarImage'
 import TextName from './TextName'
 import TextTimestamp from './TextTimestamp'
@@ -16,7 +15,7 @@ const ListAvatar = ({ data = [] }) => {
       {
         data.map((item, index) => (
           <TouchableOpacity key={index} onPress={item.onPress} >
-            <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
+            <View style={tw`flex flex-row bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
               <View>
                 <AvatarImage address={item.address} />
               </View>
@@ -29,7 +28,7 @@ const ListAvatar = ({ data = [] }) => {
                   <TextTimestamp timestamp={item.timestamp} textSize='text-base' />
                 }
               </View>
-            </Flex>
+            </View>
           </TouchableOpacity>
         ))
       }

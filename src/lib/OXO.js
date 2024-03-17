@@ -1,5 +1,4 @@
-import '../../shim.js'
-import crypto from 'crypto'
+import crypto from 'react-native-quick-crypto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { set } from 'immutable'
 import { Epoch } from './Const'

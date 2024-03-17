@@ -3,9 +3,8 @@ import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { BulletinHistorySession, BulletinMarkSession } from '../../../lib/Const'
 import { actionType } from '../../../redux/actions/actionType'
-import { WhiteSpace } from '@ant-design/react-native'
 import LinkSetting from '../../../component/LinkSetting'
-import ViewAlert from '../../../component/ViewAlert'
+import ViewModal from '../../../component/ViewModal'
 import tw from '../../../lib/tailwind'
 
 //设置公告
@@ -17,6 +16,7 @@ const SettingBulletinScreen = (props) => {
   }
 
   const clearBulletinCache = () => {
+    showModal(false)
     props.dispatch({
       type: actionType.avatar.clearBulletinCache
     })
@@ -28,7 +28,7 @@ const SettingBulletinScreen = (props) => {
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
-      <WhiteSpace size='lg' />
+      <View style={tw`h-5`}></View>
       <LinkSetting title={'收藏公告'} onPress={() => {
         props.navigation.push('BulletinList', { session: BulletinMarkSession })
       }} />
@@ -36,7 +36,7 @@ const SettingBulletinScreen = (props) => {
         props.navigation.push('BulletinList', { session: BulletinHistorySession })
       }} />
 
-      <WhiteSpace size='lg' />
+      <View style={tw`h-5`}></View>
       <LinkSetting title={'随便看看'} onPress={() => {
         props.navigation.push('BulletinRandom')
       }} />
@@ -44,17 +44,17 @@ const SettingBulletinScreen = (props) => {
         props.navigation.push('BulletinAddressList', { page: 1 })
       }} />
 
-      <WhiteSpace size='lg' />
+      <View style={tw`h-5`}></View>
       <LinkSetting title={'设置缓存'} onPress={() => {
         props.navigation.push('BulletinCache')
       }} />
       <LinkSetting title={'清空缓存'} icon={'delete'} onPress={clearBulletinCacheAlert} />
 
-      <ViewAlert
+      <ViewModal
         visible={visible}
         onClose={onClose}
         msg='确定要清除所有缓存公告吗？'
-        onPress={clearBulletinCache}
+        onConfirm={clearBulletinCache}
       />
     </View >
   )

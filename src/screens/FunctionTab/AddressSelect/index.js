@@ -1,8 +1,6 @@
 import React from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import { WhiteSpace } from '@ant-design/react-native'
 import { connect } from 'react-redux'
-import { Flex } from '@ant-design/react-native'
 import { AddressToName } from '../../../lib/Util'
 import ViewEmpty from '../../../component/ViewEmpty'
 import AvatarImage from '../../../component/AvatarImage'
@@ -18,7 +16,7 @@ const AddressSelectScreen = props => {
             <Text style={tw`text-lg text-center text-slate-800 dark:text-slate-200`}>
               请选择好友
             </Text>
-            <WhiteSpace />
+            <View style={tw`h-5`}></View>
             <ScrollView
               style={tw`h-full p-5px mb-0`}
               automaticallyAdjustContentInsets={false}
@@ -27,7 +25,7 @@ const AddressSelectScreen = props => {
               {
                 props.avatar.get('Friends').map((item, index) => (
                   <TouchableOpacity key={index} onPress={() => props.navigation.push('Session', { address: item, content: props.route.params.content })} >
-                    <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
+                    <View style={tw`flex flex-row bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
                       <View>
                         <AvatarImage address={item.Address} />
                       </View>
@@ -39,7 +37,7 @@ const AddressSelectScreen = props => {
                         </View>
                         <Text style={tw`text-sm text-gray-500 dark:text-slate-200 text-left`}>{item}</Text>
                       </View>
-                    </Flex>
+                    </View>
                   </TouchableOpacity>
                 ))
               }

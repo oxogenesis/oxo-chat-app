@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Flex } from '@ant-design/react-native'
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AvatarDerive } from '../../../lib/OXO'
@@ -93,7 +92,7 @@ const AvatarListScreen = props => {
                   {
                     avatarList.map((item, index) => (
                       <TouchableOpacity key={index} onPress={() => enableAvatar(item.Address, item.Name)}>
-                        <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
+                        <View style={tw`flex flex-row bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
                           <View>
                             <AvatarImage address={item.Address} />
                           </View>
@@ -104,7 +103,7 @@ const AvatarListScreen = props => {
                             </Text>
                             <TextAddress address={item.Address} />
                           </View>
-                        </Flex>
+                        </View>
                       </TouchableOpacity>
                     ))
                   }

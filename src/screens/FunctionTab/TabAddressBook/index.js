@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import { Flex } from '@ant-design/react-native'
 import ViewEmpty from '../../../component/ViewEmpty'
 import Avatar from '../../../component/Avatar'
 import { BulletinAddressSession } from '../../../lib/Const'
@@ -23,7 +22,7 @@ const TabAddressBookScreen = props => {
             {
               props.avatar.get('AddressArray').map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => props.navigation.push('AddressMark', { address: item.Address })} >
-                  <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
+                  <View style={tw`flex flex-row bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
                     <View>
                       <Avatar address={item.Address} />
                     </View>
@@ -53,7 +52,7 @@ const TabAddressBookScreen = props => {
                       </View>
                       <TextAddress address={item.Address} />
                     </View>
-                  </Flex>
+                  </View>
                 </TouchableOpacity>
               ))
             }

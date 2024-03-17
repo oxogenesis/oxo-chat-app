@@ -9,7 +9,6 @@
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import { Provider } from '@ant-design/react-native'
 
 import { connect } from 'react-redux'
 
@@ -28,18 +27,16 @@ const App = (props) => {
   // }, [props.avatar.get('Theme')])
 
   // 1️⃣  opt OUT of listening to DEVICE color scheme events
-  useDeviceContext(tw, { withDeviceColorScheme: false })
+  useDeviceContext(tw, { observeDeviceColorSchemeChanges: false })
 
   // 2️⃣  use the `useAppColorScheme` hook to get a reference to the current color
   // scheme, with some functions to modify it (triggering re-renders) when you need to
   const [colorScheme, toggleColorScheme, setColorScheme] = useAppColorScheme(tw)
 
   return (
-    <Provider>
-      <NavigationContainer>
-        <AppStack props={props} />
-      </NavigationContainer>
-    </Provider>
+    <NavigationContainer>
+      <AppStack props={props} />
+    </NavigationContainer>
   )
 }
 

@@ -2,7 +2,6 @@ import React from 'react'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { AddressToName } from '../../../lib/Util'
-import { WhiteSpace } from '@ant-design/react-native'
 import ViewEmpty from '../../../component/ViewEmpty'
 import ListAvatar from '../../../component/ListAvatar'
 import tw from '../../../lib/tailwind'
@@ -20,7 +19,7 @@ const SettingFriendRequestScreen = props => {
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
-      <WhiteSpace size='lg' />
+      <View style={tw`h-5`}></View>
       {
         data.length > 0 ?
           <ListAvatar data={lists} />

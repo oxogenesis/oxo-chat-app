@@ -1,7 +1,6 @@
 import React from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, ToastAndroid, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import { Toast } from '@ant-design/react-native'
 import Clipboard from '@react-native-clipboard/clipboard'
 import tw from '../../../lib/tailwind'
 
@@ -9,27 +8,37 @@ import tw from '../../../lib/tailwind'
 const AboutScreen = (props) => {
 
   const copyChatClient = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-client')
   }
 
   const copyChatApp = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-app')
   }
 
   const copyChatServer = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-server')
   }
 
   const copyWiki = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-client/wiki')
   }
 
   const copyWallet = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString('https://github.com/oxogenesis/oxo-chat-wallet')
   }
 

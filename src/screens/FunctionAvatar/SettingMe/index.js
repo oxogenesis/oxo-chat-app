@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { View } from 'react-native'
+import { View, ToastAndroid } from 'react-native'
 import { BulletinAddressSession } from '../../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Toast, WhiteSpace } from '@ant-design/react-native'
 import { MasterConfig } from '../../../lib/OXO'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
-import ViewAlert from '../../../component/ViewAlert'
+import ViewModal from '../../../component/ViewModal'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import QRCode from 'react-native-qrcode-svg'
 import tw from '../../../lib/tailwind'
@@ -26,7 +25,9 @@ const SettingMeScreen = (props) => {
   const [qrcode, setQrcode] = useState(JSON.stringify(json))
 
   const copyToClipboard = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString(props.avatar.get('Address'))
   }
 
@@ -101,14 +102,14 @@ const SettingMeScreen = (props) => {
           logoBackgroundColor='grey'
         />
       </View>
-      <WhiteSpace size='lg' />
+      <View style={tw`h-5`}></View>
       <LinkSetting title={'我的公告'} onPress={() => {
         props.navigation.push('BulletinList', { session: BulletinAddressSession, address: props.avatar.get('Address') })
       }} />
       <LinkSetting title={props.avatar.get('Name')} icon={'edit'} onPress={() => {
         props.navigation.navigate('AvatarNameEdit')
       }} />
-      <LinkSetting title={props.avatar.get('Address')} textSize={'text-sm'} icon={'block'} onPress={copyToClipboard} />
+      <LinkSetting title={props.avatar.get('Address')} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
       <SwitchSetting title={'切换多账号模式'} checked={isMulti} onChange={onSwitchMulti} />
       <LinkSetting title={'查看种子二维码'} onPress={viewSeedQrcodeAlert} />
 
@@ -121,12 +122,15 @@ const SettingMeScreen = (props) => {
         }
       </View >
 
-      <ViewAlert
+      <ViewModal
         visible={visible}
         onClose={onClose}
         msg='确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
         确定要查看种子二维码？'
-        onPress={() => props.navigation.navigate('AvatarSeedQrcode')}
+        onConfirm={() => {
+          showModal(false)
+          props.navigation.navigate('AvatarSeedQrcode')
+        }}
       />
     </View >
   )

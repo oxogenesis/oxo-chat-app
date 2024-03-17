@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'react-native-quick-crypto'
 import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'

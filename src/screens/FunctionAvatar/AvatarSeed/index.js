@@ -1,23 +1,25 @@
 import React, { useState } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, ToastAndroid, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { AvatarRemove } from '../../../lib/OXO'
-import { Toast } from '@ant-design/react-native'
 import Clipboard from '@react-native-clipboard/clipboard'
-import ViewAlert from '../../../component/ViewAlert'
+import ViewModal from '../../../component/ViewModal'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import tw from '../../../lib/tailwind'
 
-//地址标记
+// 查看种子
 const AvatarSeedScreen = (props) => {
   const seed = props.avatar.get('Seed')
-  const [visible, showCopySeed] = useState(false)
+  const [visible_copy_seed, showCopySeed] = useState(false)
   const [visible_remove_account, showRemoveAvatar] = useState(false)
 
   const copyToClipboard = () => {
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
     Clipboard.setString(seed)
+    showCopySeed(false)
   }
 
   const copySeedAlert = () => {
@@ -46,6 +48,7 @@ const AvatarSeedScreen = (props) => {
             routes: [{ name: 'AvatarList' }],
           })
         }
+        showRemoveAvatar(false)
       })
   }
 
@@ -68,13 +71,13 @@ const AvatarSeedScreen = (props) => {
         }
       </View>
 
-      <ViewAlert
-        visible={visible}
+      <ViewModal
+        visible={visible_copy_seed}
+        msg={'确定要复制种子吗？'}
         onClose={onClose}
-        msg='确定要复制种子吗？'
-        onPress={copyToClipboard}
+        onConfirm={copyToClipboard}
       />
-      <ViewAlert
+      <ViewModal
         visible={visible_remove_account}
         onClose={onClose}
         msg={`！！！种子是账号的唯一凭证，只存储在本地，服务器不提供找回功能！！！

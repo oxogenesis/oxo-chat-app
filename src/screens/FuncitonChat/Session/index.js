@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Button, Flex, Toast } from '@ant-design/react-native'
-import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList, KeyboardAvoidingView } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid, FlatList, KeyboardAvoidingView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { AddressToName } from '../../../lib/Util'
 import { DefaultPartition } from '../../../lib/Const'
@@ -21,7 +20,6 @@ const SessionScreen = (props) => {
   const [refreshFlag, setRefreshFlag] = useState(false)
   const [keyboardAppearance, setKeyboardAppearance] = useState()
 
-  const aes_key = props.avatar.get('CurrentSessionAesKey')
   const data = props.avatar.get("CurrentMessageList")
   const friend_address = props.route.params.address
   const friend_name = AddressToName(props.avatar.get('AddressMap'), props.route.params.address)
@@ -31,12 +29,16 @@ const SessionScreen = (props) => {
     let timestamp = Date.now()
     let newMessage_input = message_input.trim()
     if (message_input == "") {
-      Toast.success('消息不能为空...', 1)
+      ToastAndroid.show('消息不能为空...',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER)
     } else {
       let ecdh_sequence = DHSequence(DefaultPartition, timestamp, self_address, friend_address)
       let current_session_aes_key = props.avatar.get("CurrentSessionAesKey")
-      if (ecdh_sequence != current_session_aes_key.EcdhSequence) {
-        Toast.success('握手未完成...', 1)
+      if (current_session_aes_key == {} || !current_session_aes_key.AesKey || ecdh_sequence != current_session_aes_key.EcdhSequence) {
+        ToastAndroid.show('会话密钥协商中，无法加密消息...',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER)
       } else {
         props.dispatch({
           type: actionType.avatar.SendFriendMessage,
@@ -60,7 +62,9 @@ const SessionScreen = (props) => {
 
   const copyToClipboard = (content) => {
     Clipboard.setString(content)
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
   }
 
   useEffect(() => {
@@ -125,9 +129,9 @@ const SessionScreen = (props) => {
   }
 
   return (
-    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px flex flex-col relative`}>
+    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 flex flex-col relative`}>
       <FlatList
-        style={tw`mb-55px`}
+        style={tw`mb-55px p-5px`}
         ref={listRef}
         data={data}
         keyExtractor={item => item.Hash}
@@ -137,7 +141,7 @@ const SessionScreen = (props) => {
         renderItem={({ item }) => {
           if (item.SourAddress == friend_address) {
             return (
-              <Flex justify="start" align="start" key={item.Hash}>
+              <View style={tw`flex flex-row`} key={item.Hash}>
                 <View style={tw``}>
                   <AvatarImage address={friend_address} />
                 </View>
@@ -161,12 +165,12 @@ const SessionScreen = (props) => {
                     </Text>
                   </View>
                 </View>
-              </Flex>
+              </View>
             )
           }
           else {
             return (
-              <Flex justify="end" align="start" key={item.Hash}>
+              <View style={tw`flex flex-row-reverse`} key={item.Hash}>
                 <View style={tw`ml-50px max-w-64 mt-5px`}>
                   <Text style={tw`text-right mr-5px`}>
                     <LinkMsgInfo hash={item.Hash} sequence={item.Sequence} />
@@ -192,7 +196,7 @@ const SessionScreen = (props) => {
                 <View>
                   <AvatarImage address={self_address} />
                 </View>
-              </Flex>
+              </View>
             )
           }
         }}
@@ -200,21 +204,11 @@ const SessionScreen = (props) => {
 
       <View style={tw`w-full flex flex-row-reverse absolute bottom-0`}>
         <View style={tw`w-1/5`}>
-          {
-            aes_key != {} && aes_key.AesKey ?
-              <Button
-                style={tw`h-full rounded-none bg-green-500`}
-                type='primary'
-                onPress={() => sendMessage()}>
-                发送
-              </Button>
-              :
-              <Button
-                style={tw`h-full rounded-none`}
-                disabled={true}>
-                发送
-              </Button>
-          }
+          <TouchableOpacity style={tw`h-full rounded-none bg-green-500`} onPress={() => sendMessage()}>
+            <Text style={tw`h-full align-middle text-lg text-center font-bold text-slate-200`}>
+              发送
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={tw`w-4/5`}>
           <TextInput

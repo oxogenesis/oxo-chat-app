@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native'
+import { View, ScrollView, Text, ToastAndroid, TouchableOpacity } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { Toast } from '@ant-design/react-native'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
 import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconAnt from 'react-native-vector-icons/AntDesign'
@@ -50,11 +49,15 @@ const BulletinScreen = (props) => {
 
   const copyToClipboard = () => {
     Clipboard.setString(current.Content)
-    Toast.success('拷贝成功！', 1)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
   }
 
   const quote = () => {
-    Toast.success('引用成功，请去发布公告！', 1)
+    ToastAndroid.show('引用成功，请去发布公告！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
   }
 
   useEffect(() => {
@@ -71,12 +74,16 @@ const BulletinScreen = (props) => {
 
   const handleCollection = () => {
     markBulletin(current.Hash)
-    Toast.success('收藏成功！', 1)
+    ToastAndroid.show('收藏成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
   }
 
   const cancelCollection = () => {
     unmarkBulletin(current.Hash)
-    Toast.success('取消收藏！', 1)
+    ToastAndroid.show('取消收藏！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
   }
 
   return (

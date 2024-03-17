@@ -1,7 +1,6 @@
 import React from 'react'
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import { Flex, Badge } from '@ant-design/react-native'
 import { AddressToName } from '../../../lib/Util'
 import ViewEmpty from '../../../component/ViewEmpty'
 import AvatarImage from '../../../component/AvatarImage'
@@ -33,13 +32,11 @@ const TabSessionScreen = (props) => {
             {
               props.avatar.get('SessionList').map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => props.navigation.push('Session', { address: item.Address })}>
-                  <Flex justify="start" align="start" style={tw`bg-stone-100 dark:bg-stone-500 p-5px`}>
+                  <View style={tw`flex flex-row bg-stone-100 dark:bg-stone-500 p-5px`}>
                     <View>
                       {
                         item.CountUnread != null && item.CountUnread != 0 ?
-                          <Badge text={item.CountUnread} overflowCount={99} size="small">
-                            <AvatarImage address={item.Address} />
-                          </Badge>
+                          <AvatarImage address={item.Address} count={item.CountUnread} />
                           :
                           <AvatarImage address={item.Address} />
                       }
@@ -53,7 +50,7 @@ const TabSessionScreen = (props) => {
                       </View>
                       <TextAddress address={item.Content} />
                     </View>
-                  </Flex>
+                  </View>
                 </TouchableOpacity>
               ))
             }

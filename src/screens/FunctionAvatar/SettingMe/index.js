@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { View, ToastAndroid } from 'react-native'
+import { View, ToastAndroid, ScrollView } from 'react-native'
 import { BulletinAddressSession } from '../../../lib/Const'
+import ImagePicker from 'react-native-image-crop-picker'
+import { Dirs, FileSystem } from 'react-native-file-access'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { MasterConfig } from '../../../lib/OXO'
 import LinkSetting from '../../../component/LinkSetting'
@@ -15,6 +17,7 @@ import tw from '../../../lib/tailwind'
 //设置
 const SettingMeScreen = (props) => {
 
+  const [avatarImg, setAvatarImg] = useState(null)
   const [visible, showModal] = useState(false)
   const [isMulti, setMulti] = useState()
 
@@ -61,6 +64,45 @@ const SettingMeScreen = (props) => {
       })
   }
 
+  const picker = async () => {
+    let address = props.avatar.get('Address')
+    let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
+    let avatar_img_path = `${avatar_img_dir}/${address}`
+    let image = await ImagePicker.openPicker({
+      width: 50,
+      height: 50,
+      cropping: true,
+      includeBase64: true
+    })
+    if (image) {
+      if (image.mime != 'image/png') {
+      }
+      let result = await FileSystem.exists(avatar_img_dir)
+      if (!result) {
+        result = await FileSystem.mkdir(avatar_img_dir)
+      }
+      result = await FileSystem.exists(avatar_img_path)
+      if (result) {
+        await FileSystem.unlink(avatar_img_path)
+      }
+      // await FileSystem.mv(image_file_path, avatar_img_path)
+      let content = `data:${image.mime};base64,${image.data}`
+      setAvatarImg(content)
+      await FileSystem.writeFile(avatar_img_path, content, 'utf8')
+    }
+  }
+
+  const loadAvatar = async () => {
+    let address = props.avatar.get('Address')
+    let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
+    let avatar_img_path = `${avatar_img_dir}/${address}`
+    let result = await FileSystem.exists(avatar_img_path)
+    if (result) {
+      result = await FileSystem.readFile(avatar_img_path, 'utf8')
+      setAvatarImg(result)
+    }
+  }
+
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
       let multi = props.master.get("Multi")
@@ -70,6 +112,7 @@ const SettingMeScreen = (props) => {
       } else {
         setMulti(false)
       }
+      loadAvatar()
     })
   })
 
@@ -90,49 +133,65 @@ const SettingMeScreen = (props) => {
   }, [props.avatar])
 
   return (
-    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
-      <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
-        <QRCode
-          value={qrcode}
-          size={350}
-          logo={require('../../../assets/app.png')}
-          logoSize={50}
-          backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
-          color={tw.color(`neutral-800 dark:neutral-200`)}
-          logoBackgroundColor='grey'
-        />
-      </View>
-      <View style={tw`h-5`}></View>
-      <LinkSetting title={'我的公告'} onPress={() => {
-        props.navigation.push('BulletinList', { session: BulletinAddressSession, address: props.avatar.get('Address') })
-      }} />
-      <LinkSetting title={props.avatar.get('Name')} icon={'edit'} onPress={() => {
-        props.navigation.navigate('AvatarNameEdit')
-      }} />
-      <LinkSetting title={props.avatar.get('Address')} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
-      <SwitchSetting title={'切换多账号模式'} checked={isMulti} onChange={onSwitchMulti} />
-      <LinkSetting title={'查看种子二维码'} onPress={viewSeedQrcodeAlert} />
+    <ScrollView>
+      <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
+        <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
+          {
+            avatarImg != null ?
+              <QRCode
+                value={qrcode}
+                size={350}
+                logo={avatarImg}
+                logoSize={50}
+                backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+                color={tw.color(`neutral-800 dark:neutral-200`)}
+                logoBackgroundColor='grey'
+              />
+              :
+              <QRCode
+                value={qrcode}
+                size={350}
+                logo={require('../../../assets/app.png')}
+                logoSize={50}
+                backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+                color={tw.color(`neutral-800 dark:neutral-200`)}
+                logoBackgroundColor='grey'
+              />
+          }
+        </View>
+        <View style={tw`h-5`}></View>
+        <LinkSetting title={'我的公告'} onPress={() => {
+          props.navigation.push('BulletinList', { session: BulletinAddressSession, address: props.avatar.get('Address') })
+        }} />
+        <LinkSetting title={'我的头像'} icon={'edit'} onPress={picker} />
+        <LinkSetting title={props.avatar.get('Name')} icon={'edit'} onPress={() => {
+          props.navigation.navigate('AvatarNameEdit')
+        }} />
+        <LinkSetting title={props.avatar.get('Address')} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
+        <SwitchSetting title={'切换多账号模式'} checked={isMulti} onChange={onSwitchMulti} />
+        <LinkSetting title={'查看种子二维码'} onPress={viewSeedQrcodeAlert} />
 
-      <View style={tw`my-5px px-25px`}>
-        {
-          isMulti ?
-            <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
-            :
-            <ButtonPrimary title='安全退出' bg='bg-red-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
-        }
-      </View >
+        <View style={tw`my-5px px-25px`}>
+          {
+            isMulti ?
+              <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
+              :
+              <ButtonPrimary title='安全退出' bg='bg-red-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
+          }
+        </View >
 
-      <ViewModal
-        visible={visible}
-        onClose={onClose}
-        msg='确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
+        <ViewModal
+          visible={visible}
+          onClose={onClose}
+          msg='确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
         确定要查看种子二维码？'
-        onConfirm={() => {
-          showModal(false)
-          props.navigation.navigate('AvatarSeedQrcode')
-        }}
-      />
-    </View >
+          onConfirm={() => {
+            showModal(false)
+            props.navigation.navigate('AvatarSeedQrcode')
+          }}
+        />
+      </View >
+    </ScrollView>
   )
 }
 

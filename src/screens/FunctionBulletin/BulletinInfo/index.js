@@ -40,7 +40,10 @@ const BulletinInfoScreen = (props) => {
                 {`时间：${props.avatar.get('CurrentBulletin').Timestamp}`}
               </Text>
               <Text style={tw`text-base text-slate-800`}>
-                {`引用：${props.avatar.get('CurrentBulletin').QuoteSize}`}
+                {`引用：${props.avatar.get('CurrentBulletin').QuoteCount}`}
+              </Text>
+              <Text style={tw`text-base text-slate-800`}>
+                {`附件：${props.avatar.get('CurrentBulletin').FileCount}`}
               </Text>
               {
                 <View>

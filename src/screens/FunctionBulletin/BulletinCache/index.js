@@ -18,7 +18,7 @@ const BulletinCacheScreen = (props) => {
       setMsg('公告缓存数量不能小于0...')
     } else {
       props.dispatch({
-        type: actionType.avatar.changeBulletinCacheSize,
+        type: actionType.avatar.ChangeBulletinCacheSize,
         bulletin_cache_size: bulletin_cache_size
       })
       setSize('')

@@ -81,6 +81,7 @@ async function MasterKeyDerive(masterKey) {
     let json = JSON.parse(result)
     let key = halfSHA512(json.salt + masterKey).toString('hex').slice(0, 32)
     let mk = decrypt(key, json.iv, json.ct)
+    mk = JSON.parse(mk)
     return true
   } catch (e) {
     console.log(e)

@@ -67,7 +67,7 @@ export default class Database {
         object_type TEXT,
         is_file BOOLEAN DEFAULT FALSE,
         file_saved BOOLEAN DEFAULT FALSE,
-        file_sha1 VARCHAR(40)
+        file_hash VARCHAR(40)
         )`)
 
       // bulletin
@@ -76,14 +76,12 @@ export default class Database {
         address VARCHAR(35) NOT NULL,
         sequence INTEGER,
         pre_hash VARCHAR(32) NOT NULL,
-        quote_size INTEGER,
+        quote_count INTEGER,
+        file_count INTEGER,
         content TEXT,
         timestamp INTEGER,
         created_at INTEGER,
         json TEXT,
-        is_file BOOLEAN DEFAULT FALSE,
-        file_saved BOOLEAN DEFAULT FALSE,
-        file_sha1 VARCHAR(40),
         relay_address VARCHAR(35),
         view_at INTEGER,
         mark_at INTEGER,
@@ -99,6 +97,16 @@ export default class Database {
         quote_hash VARCHAR(32) NOT NULL,
         content text NOT NULL,
         signed_at INTEGER NOT NULL
+        )`)
+
+      // bulletin file
+      await this.createTable('BULLETIN_FILES', `CREATE TABLE IF NOT EXISTS BULLETIN_FILES(
+        hash VARCHAR(32) NOT NULL PRIMARY KEY,
+        name text NOT NULL,
+        ext VARCHAR(5) NOT NULL,
+        size INTEGER NOT NULL,
+        chunk_length INTEGER NOT NULL,
+        chunk_cursor INTEGER NOT NULL
         )`)
 
       //group
@@ -158,11 +166,11 @@ export default class Database {
         readed BOOLEAN DEFAULT FALSE,
         is_file BOOLEAN DEFAULT FALSE,
         file_saved BOOLEAN DEFAULT FALSE,
-        file_sha1 VARCHAR(40)
+        file_hash VARCHAR(40)
         )`)
 
       await this.createTable('FILES', `CREATE TABLE IF NOT EXISTS FILES(
-        sha1 VARCHAR(40) PRIMARY KEY,
+        hash VARCHAR(40) PRIMARY KEY,
         name TEXT NOT NULL,
         ext TEXT NOT NULL,
         size INTEGER NOT NULL,

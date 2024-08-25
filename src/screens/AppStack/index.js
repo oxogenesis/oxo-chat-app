@@ -38,6 +38,7 @@ import BulletinAddressListScreen from '../FunctionBulletin/BulletinAddressList'
 import BulletinReplyListScreen from '../FunctionBulletin/BulletinReplyList'
 import SettingBulletinScreen from '../FunctionBulletin/SettingBulletin'
 import SettingFollowScreen from '../FunctionBulletin/SettingFollow'
+import BulletinFileSelectScreen from '../FunctionBulletin/BulletinFileSelect'
 
 // Chat
 import SessionScreen from '../FuncitonChat/Session'
@@ -51,6 +52,11 @@ import SettingNetworkScreen from '../FunctionTab/SettingNetwork'
 import ServerAddScreen from '../FunctionTab/ServerAdd'
 import AboutScreen from '../FunctionTab/About'
 import AddressSelectScreen from '../FunctionTab/AddressSelect'
+import FileViewScreen from '../FunctionTab/FileView'
+import FileExplorerScreen from '../FunctionTab/FileExplorer'
+import FileSelectScreen from '../FunctionTab/FileSelect'
+
+import { Dirs } from 'react-native-file-access'
 import tw from '../../lib/tailwind'
 
 const Stack = createStackNavigator()
@@ -200,7 +206,10 @@ const AppStack = (props) => {
                 name={'earth'}
                 size={32}
                 color={headerIconColor}
-                onPress={() => navigation.push('BulletinReplyList', { hash: route.params.hash, page: 1 })}
+                onPress={() => navigation.push('BulletinReplyList', {
+                  hash: route.params.hash,
+                  page: 1
+                })}
               />)
           })
         }
@@ -238,6 +247,14 @@ const AppStack = (props) => {
           ({ route, navigation }) => ({
             title: "发布公告",
             ...headerStyleOption,
+            headerRight: () => (
+              <IconMaterial
+                name={'post-add'}
+                size={32}
+                color={headerIconColor}
+                onPress={() => navigation.push('BulletinFileSelect',
+                  { dir: Dirs.SDCardDir })}
+              />)
           })
         }
       />
@@ -263,7 +280,9 @@ const AppStack = (props) => {
                 name={'arrow-with-circle-right'}
                 size={32}
                 color={headerIconColor}
-                onPress={() => navigation.push('BulletinAddressList', { page: route.params.page + 1 })}
+                onPress={() => navigation.push('BulletinAddressList', {
+                  page: route.params.page + 1
+                })}
               />)
           })
         }
@@ -280,8 +299,20 @@ const AppStack = (props) => {
                 name={'arrow-with-circle-right'}
                 size={32}
                 color={headerIconColor}
-                onPress={() => navigation.push('BulletinReplyList', { page: route.params.page + 1 })}
+                onPress={() => navigation.push('BulletinReplyList', {
+                  page: route.params.page + 1
+                })}
               />)
+          })
+        }
+      />
+      <Stack.Screen
+        name="BulletinFileSelect"
+        component={BulletinFileSelectScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '文件浏览',
+            ...headerStyleOption,
           })
         }
       />
@@ -362,6 +393,36 @@ const AppStack = (props) => {
         options={
           ({ route, navigation }) => ({
             title: '选择好友',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="FileView"
+        component={FileViewScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '文件预览',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="FileExplorer"
+        component={FileExplorerScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '文件浏览',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="FileSelect"
+        component={FileSelectScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '文件浏览',
             ...headerStyleOption,
           })
         }

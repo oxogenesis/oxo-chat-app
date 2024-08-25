@@ -3,12 +3,14 @@ import { actionType } from './actionType'
 import { call, put, select, take, cancelled, fork } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { FileSystem, Dirs } from 'react-native-file-access'
 
-import { DefaultHost, Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession } from '../../lib/Const'
+import { Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession, FileChunkSize } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
 import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512, AvatarLoginTimeUpdate } from '../../lib/OXO'
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
+import { GBOB } from '../../lib/Util'
 
 function DelayExec(ms) {
   return new Promise(resolve => {
@@ -34,6 +36,51 @@ function setStorageItem(key, json) {
   } catch (e) {
     console.log(e)
     // return false
+  }
+}
+
+async function readFile(path, cursor, size) {
+  let chunk_size = FileChunkSize
+  let begin = (cursor - 1) * FileChunkSize
+  let file_left = size - begin
+  if (file_left < FileChunkSize) {
+    chunk_size = file_left
+  }
+  let result = await FileSystem.readFileChunk(path, begin, chunk_size, "base64")
+  return result
+}
+
+async function appendFile(path, cursor, content) {
+  console.log(path)
+  console.log(cursor)
+  // console.log(content)
+  console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[--------]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+  if (cursor == 1) {
+    console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[exists]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+    let is_exist = await FileSystem.exists(path)
+    console.log(is_exist)
+    if (is_exist) {
+      console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[unlink]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+      await FileSystem.unlink(path)
+    }
+    console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[writeFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+    await FileSystem.writeFile(path, content, "base64")
+  } else {
+    console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[appendFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+    await FileSystem.appendFile(path, content, "base64")
+  }
+  console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[++++++++]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+}
+
+async function verfifyFile(path, hash) {
+  let file_hash = await FileSystem.hash(path, 'SHA-1')
+  file_hash = file_hash.toUpperCase()
+  console.log("HASH", hash, file_hash)
+  if (hash == file_hash) {
+    return true
+  } else {
+    await FileSystem.unlink(path)
+    return false
   }
 }
 
@@ -138,7 +185,27 @@ export function* Conn(action) {
           console.log('receiver is not me...')
         }
 
-        //verify signature
+        // verfiy object signature
+        else if (json.Action == ActionCode.ObjectResponse) {
+          let address = DeriveAddress(json.PublicKey)
+          let objectJson = json.Object
+          if (objectJson.ObjectType == ObjectType.Bulletin && checkBulletinSchema(objectJson)) {
+            yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
+          } else if (objectJson.ObjectType == ObjectType.BulletinFileChunk && checkFileChunkSchema(objectJson)) {
+            yield put({ type: actionType.avatar.SaveBulletinFileChunk, file_chunk_json: objectJson })
+          }
+          // else if (objectJson.ObjectType == ObjectType.PrivateFile && checkFileChunkSchema(objectJson)) {
+          //   console.log('SavePrivateFile(address, objectJson)')
+          // } else if (objectJson.ObjectType == ObjectType.GroupFile && checkFileChunkSchema(objectJson)) {
+          //   console.log('SaveGroupFile(address, objectJson)')
+          // } else if (objectJson.ObjectType == ObjectType.GroupManage && checkGroupManageSchema(objectJson)) {
+          //   console.log('SaveGroupManage(address, objectJson)')
+          // } else if (objectJson.ObjectType == ObjectType.GroupMessage) {
+          //   console.log('SaveGroupMessage(address, objectJson)')
+          // }
+        }
+
+        //verify message signature
         else if (VerifyJsonSignature(json) == true) {
           switch (json.Action) {
             case ActionCode.ChatDH:
@@ -156,33 +223,15 @@ export function* Conn(action) {
             case ActionCode.BulletinRequest:
               yield put({ type: actionType.avatar.HandleBulletinRequest, json: json })
               break
-            // case ActionCode.BulletinFileRequest:
-            //   console.log('HandleBulletinFileRequest(json)')
-            //   break
+            case ActionCode.BulletinFileChunkRequest:
+              yield put({ type: actionType.avatar.HandleBulletinFileChunkRequest, json: json })
+              break
             // case ActionCode.PrivateFileRequest:
             //   console.log('HandlePrivateFileRequest(json)')
             //   break
             // case ActionCode.GroupFileRequest:
             //   console.log('HandleGroupFileRequest(json)')
             //   break
-            case ActionCode.ObjectResponse:
-              let address = DeriveAddress(json.PublicKey)
-              let objectJson = json.Object
-              if (objectJson.ObjectType == ObjectType.Bulletin && checkBulletinSchema(objectJson)) {
-                yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
-              }
-              // else if (objectJson.ObjectType == ObjectType.BulletinFile && checkFileChunkSchema(objectJson)) {
-              //   console.log('SaveBulletinFile(address, objectJson)')
-              // } else if (objectJson.ObjectType == ObjectType.PrivateFile && checkFileChunkSchema(objectJson)) {
-              //   console.log('SavePrivateFile(address, objectJson)')
-              // } else if (objectJson.ObjectType == ObjectType.GroupFile && checkFileChunkSchema(objectJson)) {
-              //   console.log('SaveGroupFile(address, objectJson)')
-              // } else if (objectJson.ObjectType == ObjectType.GroupManage && checkGroupManageSchema(objectJson)) {
-              //   console.log('SaveGroupManage(address, objectJson)')
-              // } else if (objectJson.ObjectType == ObjectType.GroupMessage) {
-              //   console.log('SaveGroupMessage(address, objectJson)')
-              // }
-              break
             // case ActionCode.GroupRequest:
             //   console.log('HandleGroupRequest(json)')
             //   break
@@ -308,10 +357,12 @@ export function* loadFromDB(action) {
   yield put({ type: actionType.avatar.setFollows, follow_list: follow_list })
 
   // Fetch follow bulletin
-  sql = `SELECT address, sequence FROM BULLETINS WHERE address IN (${Array2Str(follow_list)}) GROUP BY address ORDER BY sequence DESC`
+  // sql = `SELECT address, sequence FROM BULLETINS WHERE address IN (${Array2Str(follow_list)}) GROUP BY address ORDER BY sequence DESC`
+  sql = `SELECT address, sequence FROM BULLETINS WHERE address IN (${Array2Str(follow_list)})`
   items = yield call([db, db.getAll], sql)
-  for (let index = 0; index < items.length; index++) {
-    const item = items[index]
+  items = GBOB(items, 'address', 'sequence')
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
     yield put({ type: actionType.avatar.FetchBulletin, address: item.address, sequence: item.sequence + 1, to: address })
   }
 
@@ -369,6 +420,25 @@ export function* loadFromDB(action) {
     const friend = friend_list[index]
     let msg = MessageGenerator.genFriendSync(0, friend)
     yield put({ type: actionType.avatar.SendMessage, message: msg })
+  }
+
+  // set next bulletin sequence
+  sql = `SELECT * FROM BULLETINS WHERE address = "${address}" ORDER BY sequence DESC LIMIT 1`
+  let last_bulletin = yield call([db, db.getOne], sql)
+  let next_sequence = 1
+  if (last_bulletin != null) {
+    pre_hash = last_bulletin.hash
+    next_sequence = last_bulletin.sequence + 1
+  }
+  yield put({ type: actionType.avatar.setNextBulletinSequence, sequence: next_sequence })
+
+  // Fetch bulletin file
+  sql = `SELECT * FROM BULLETIN_FILES WHERE chunk_cursor != chunk_length`
+  items = yield call([db, db.getAll], sql)
+  for (let index = 0; index < items.length; index++) {
+    const file = items[index]
+    file.address = ""
+    yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
   }
 }
 
@@ -455,7 +525,7 @@ export function* removeBulletinCache(action) {
   yield call([db, db.runSQL], sql)
 }
 
-export function* changeBulletinCacheSize(action) {
+export function* ChangeBulletinCacheSize(action) {
   let bulletin_cache_size = yield select(state => state.avatar.get('BulletinCacheSize'))
   if (action.bulletin_cache_size != 0 && action.bulletin_cache_size < bulletin_cache_size) {
     yield put({ type: actionType.avatar.removeBulletinCache, bulletin_cache_size: action.bulletin_cache_size })
@@ -682,17 +752,23 @@ export function* LoadCurrentBulletin(action) {
       "Sequence": item.sequence,
       "Content": item.content,
       "Hash": item.hash,
-      "QuoteSize": item.quote_size,
+      "QuoteCount": item.quote_count,
+      "FileCount": item.file_count,
       "ViewAt": item.view_at,
       "IsCache": item.is_cache,
       "IsMark": item.is_mark,
 
       "PreHash": item.pre_hash,
-      "QuoteList": []
+      "QuoteList": [],
+      "FileList": []
     }
-    if (bulletin.QuoteSize != 0) {
+    if (bulletin.QuoteCount != 0) {
       let json = JSON.parse(item.json)
       bulletin.QuoteList = json.Quote
+    }
+    if (bulletin.FileCount != 0) {
+      let json = JSON.parse(item.json)
+      bulletin.FileList = json.File
     }
 
     yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin })
@@ -724,7 +800,7 @@ export function* LoadCurrentBulletin(action) {
   }
 }
 
-export function* clearBulletinCache() {
+export function* ClearBulletinCache() {
   let db = yield select(state => state.avatar.get('Database'))
   let follow_list = yield select(state => state.avatar.get('Follows'))
   let address_list = Array2Str(follow_list)
@@ -742,6 +818,91 @@ export function* clearBulletinCache() {
   yield call([db, db.runSQL], sql)
 }
 
+export function* CacheLocalBulletinFile(action) {
+  let file_json = action.file_json
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${file_json.Hash}" LIMIT 1`
+  let file = yield call([db, db.getOne], sql)
+  if (file == null) {
+    let chunk_length = Math.ceil(file_json.Size / FileChunkSize)
+    sql = `INSERT INTO BULLETIN_FILES (hash, name, ext, size, chunk_length, chunk_cursor)
+      VALUES ('${file_json.Hash}', '${file_json.Name}', '${file_json.Ext}', ${file_json.Size}, ${chunk_length}, ${chunk_length})`
+    yield call([db, db.runSQL], sql)
+  }
+
+  yield put({ type: actionType.avatar.addFileList, file_json: file_json })
+}
+
+export function* FetchBulletinFileChunk(action) {
+  let file_json = action.file_json
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genBulletinFileChunkRequest(file_json.hash, file_json.chunk_cursor + 1, file_json.address)
+  console.log(msg)
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* SaveBulletinFileChunk(action) {
+  console.log(`===================================================================SaveBulletinFileChunk`)
+  let json = action.file_chunk_json
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${json.Hash}" LIMIT 1`
+  let file = yield call([db, db.getOne], sql)
+  if (file && file.chunk_cursor + 1 == json.Cursor) {
+    let address = yield select(state => state.avatar.get('Address'))
+    let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}/${json.Hash}`
+    yield call(appendFile, file_path, json.Cursor, json.Content)
+    sql = `UPDATE BULLETIN_FILES SET chunk_cursor = ${json.Cursor} WHERE hash = "${json.Hash}"`
+    yield call([db, db.runSQL], sql)
+    if (file.chunk_length == json.Cursor) {
+      let result = yield call(verfifyFile, file_path, json.Hash)
+      if (!result) {
+        sql = `UPDATE BULLETIN_FILES SET chunk_cursor = 0 WHERE hash = "${json.Hash}"`
+        yield call([db, db.runSQL], sql)
+        file.chunk_cursor = 0
+        file.address = ""
+        yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
+      }
+    } else {
+      file.chunk_cursor = json.Cursor
+      file.address = ""
+      yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
+    }
+  }
+}
+
+export function* LoadCurrentBulletinFile(action) {
+  let hash = action.hash
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${hash}" LIMIT 1`
+  let file = yield call([db, db.getOne], sql)
+  if (file && file.chunk_cursor < file.chunk_length) {
+    file.address = action.address
+    yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
+  }
+  yield put({ type: actionType.avatar.setCurrentBulletinFile, file: file })
+}
+
+export function* HandleBulletinFileChunkRequest(action) {
+  console.log(`===================================================================HandleBulletinFileChunkRequest`)
+  let address = yield select(state => state.avatar.get('Address'))
+  let json = action.json
+  console.log(json)
+  let request_address = DeriveAddress(json.PublicKey)
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+
+  let db = yield select(state => state.avatar.get('Database'))
+  let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${json.Hash}" AND chunk_length = chunk_cursor LIMIT 1`
+  let item = yield call([db, db.getOne], sql)
+  console.log(item)
+  if (item != null && json.Cursor <= item.chunk_length) {
+    let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}/${json.Hash}`
+    let content = yield call(readFile, file_path, json.Cursor, item.size)
+    let chunk_object = MessageGenerator.genBulletinFileChunkJson(json.Hash, json.Cursor, content)
+    let msg = MessageGenerator.genObjectResponse(chunk_object, request_address)
+    yield put({ type: actionType.avatar.SendMessage, message: msg })
+  }
+}
+
 export function* PublishBulletin(action) {
   console.log(`=================================================PublishBulletin`)
   let address = yield select(state => state.avatar.get('Address'))
@@ -754,16 +915,19 @@ export function* PublishBulletin(action) {
     pre_hash = last_bulletin.hash
     next_sequence = last_bulletin.sequence + 1
   }
+  yield put({ type: actionType.avatar.setNextBulletinSequence, sequence: next_sequence })
   let quote_list = yield select(state => state.avatar.get('QuoteList'))
+  let file_list = yield select(state => state.avatar.get('FileList'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let timestamp = Date.now()
-  let bulletin_json = MessageGenerator.genBulletinJson(next_sequence, pre_hash, quote_list, action.content, timestamp)
+  let bulletin_json = MessageGenerator.genBulletinJson(next_sequence, pre_hash, quote_list, file_list, action.content, timestamp)
   let str_bulletin = JSON.stringify(bulletin_json)
   let hash = quarterSHA512(str_bulletin)
-  let is_file = false
-  let file_saved = false
-  sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${address}', 'FALSE')`
+  // INSERT ' into sqlite
+  let content = bulletin_json.Content.replace(/'/, "''")
+  str_bulletin = str_bulletin.replace(/'/, "''")
+  sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
+    VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, ${bulletin_json.File.length}, '${address}', 'FALSE')`
   yield call([db, db.runSQL], sql)
   let bulletin = {
     "Address": address,
@@ -772,9 +936,11 @@ VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${bulletin_
     'Sequence': bulletin_json.Sequence,
     "Content": bulletin_json.Content,
     "Hash": hash,
-    "QuoteSize": bulletin_json.Quote.length,
+    "QuoteCount": bulletin_json.Quote.length,
+    "FileCount": bulletin_json.File.length,
     "IsMark": false
   }
+  yield put({ type: actionType.avatar.setNextBulletinSequence, sequence: next_sequence + 1 })
   //刷新TabBulletin页
   let tab_bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
   tab_bulletin_list.unshift(bulletin)
@@ -808,9 +974,27 @@ export function* SaveQuote(action) {
 
   for (let index = 0; index < main_list.length; index++) {
     const main = main_list[index];
-    sql = `INSERT INTO QUOTES (main_hash, address, sequence, quote_hash, content, signed_at)
-  VALUES ('${main.Hash}', '${quoter_address}', ${quoter_sequence}, '${quoter_hash}', '${quoter_content}', '${quoter_timestamp}')`
+    let sql = `INSERT INTO QUOTES (main_hash, address, sequence, quote_hash, content, signed_at)
+      VALUES ('${main.Hash}', '${quoter_address}', ${quoter_sequence}, '${quoter_hash}', '${quoter_content}', '${quoter_timestamp}')`
     yield call([db, db.runSQL], sql)
+  }
+}
+
+export function* SaveBulletinFile(action) {
+  let db = yield select(state => state.avatar.get('Database'))
+  let file_list = action.file_list
+  console.log(file_list)
+  for (let index = 0; index < file_list.length; index++) {
+    const file = file_list[index]
+    let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${file.Hash}" LIMIT 1`
+    let tmp_file = yield call([db, db.getOne], sql)
+    console.log(tmp_file)
+    if (!tmp_file) {
+      let chunk_length = Math.ceil(file.Size / FileChunkSize)
+      sql = `INSERT INTO BULLETIN_FILES (hash, name, ext, size, chunk_length, chunk_cursor)
+        VALUES ('${file.Hash}', '${file.Name}', '${file.Ext}', ${file.Size}, ${chunk_length}, 0)`
+      yield call([db, db.runSQL], sql)
+    }
   }
 }
 
@@ -835,12 +1019,6 @@ export function* SaveBulletin(action) {
 
     // console.log(quote_white_list)
 
-    //check is_file?
-    let is_file = false
-    let file_saved = false
-    let fileJson = null
-    let fileSHA1 = null
-
     //WTF:is_file = 'false', not is_file = false
 
     let sql = `SELECT * FROM BULLETINS WHERE address = "${object_address}" AND sequence = ${bulletin_json.Sequence} LIMIT 1`
@@ -863,11 +1041,20 @@ export function* SaveBulletin(action) {
     } else {
       if (follow_list.includes(object_address)) {
         //bulletin from follow
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'FALSE')`
+        let quote_count = 0
+        let file_count = 0
+        if (bulletin_json.Quote) {
+          quote_count = bulletin_json.Quote.length
+        }
+        if (bulletin_json.File) {
+          file_count = bulletin_json.File.length
+        }
 
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${relay_address}', 'FALSE')`
         //save bulletin
         yield call([db, db.runSQL], sql)
+
         let bulletin = {
           "Address": object_address,
           "Timestamp": bulletin_json.Timestamp,
@@ -875,7 +1062,8 @@ export function* SaveBulletin(action) {
           'Sequence': bulletin_json.Sequence,
           "Content": bulletin_json.Content,
           "Hash": hash,
-          "QuoteSize": bulletin_json.Quote.length,
+          "QuoteCount": quote_count,
+          "FileCount": file_count,
           "IsMark": false
         }
         //刷新TabBulletin页
@@ -893,7 +1081,7 @@ export function* SaveBulletin(action) {
         yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
 
         // save quote
-        if (bulletin_json.Quote.length > 0) {
+        if (quote_count > 0) {
           yield put({
             type: actionType.avatar.SaveQuote,
             quoter_address: object_address,
@@ -904,10 +1092,18 @@ export function* SaveBulletin(action) {
             main_list: bulletin_json.Quote
           })
         }
+
+        // save file
+        if (file_count > 0) {
+          yield put({
+            type: actionType.avatar.SaveBulletinFile,
+            file_list: bulletin_json.File
+          })
+        }
       } else if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
         //bulletin from quote
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
 
         //save bulletin
         yield call([db, db.runSQL], sql)
@@ -917,8 +1113,8 @@ export function* SaveBulletin(action) {
         }
         // } else if (message_white_list.includes(hash)) {
         //   //bulletin from message
-        //   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-        // VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+        //   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
+        // VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
 
         //   //save bulletin
         //   yield call([db, db.runSQL], sql)
@@ -928,10 +1124,11 @@ export function* SaveBulletin(action) {
         //   }
       } else if (self_address == object_address) {
         //bulletin from myself
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
         //save bulletin
         yield call([db, db.runSQL], sql)
+        yield put({ type: actionType.avatar.setNextBulletinSequence, sequence: bulletin_json.Sequence + 1 })
 
         // save quote
         if (bulletin_json.Quote.length > 0) {
@@ -949,8 +1146,8 @@ export function* SaveBulletin(action) {
         yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
       } else if (random_bulletin_flag) {
         //bulletin from random
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_size, is_file, file_saved, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${is_file}', '${file_saved}', '${relay_address}', 'TRUE')`
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
+        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
         //save bulletin
         yield call([db, db.runSQL], sql)
 
@@ -1014,7 +1211,8 @@ export function* LoadTabBulletinList(action) {
       "Sequence": bulletin.sequence,
       "Content": bulletin.content,
       "Hash": bulletin.hash,
-      "QuoteSize": bulletin.quote_size,
+      "QuoteCount": bulletin.quote_count,
+      "FileCount": bulletin.file_count,
       "IsMark": bulletin.is_mark
     })
   })
@@ -1089,7 +1287,8 @@ export function* LoadBulletinList(action) {
       "Sequence": bulletin.sequence,
       "Content": bulletin.content,
       "Hash": bulletin.hash,
-      "QuoteSize": bulletin.quote_size,
+      "QuoteCount": bulletin.quote_count,
+      "FileCount": bulletin.file_count,
       "IsMark": bulletin.is_mark
     })
   })
@@ -1158,7 +1357,7 @@ export function* FetchRandomBulletin() {
 export function* FetchBulletinAddressList(action) {
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genBulletinAddressListRequest(action.page)
-  console.log(msg)
+  // console.log(msg)
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 
@@ -1478,7 +1677,7 @@ export function* SaveFriendMessage(action) {
     let is_file = 'FALSE'
     let file_saved = 'FALSE'
     let fileJson = null
-    let fileSHA1 = null
+    let file_hash = null
 
     // Parse Object Json
     let is_object = 'FALSE'
@@ -1494,8 +1693,8 @@ export function* SaveFriendMessage(action) {
     }
 
     //save message
-    let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1, is_object, object_type)
-      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${fileSHA1}', '${is_object}', '${object_type}')`
+    let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
+      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
 
     let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
@@ -1547,8 +1746,8 @@ export function* SaveFriendMessage(action) {
     //   if (checkFileSchema(fileJson)) {
     //     //is a file json
     //     is_file = true
-    //     fileSHA1 = fileJson["SHA1"]
-    //     let filesql = `SELECT * FROM FILES WHERE sha1 = "${fileJson.SHA1}" AND saved = true`
+    //     file_hash = fileJson["Hash"]
+    //     let filesql = `SELECT * FROM FILES WHERE hash = "${fileJson.Hash}" AND saved = true`
     //     state.DB.get(filesql, (err, item) => {
     //       if (err) {
     //         console.log(err)
@@ -1557,8 +1756,8 @@ export function* SaveFriendMessage(action) {
     //           file_saved = true
     //         }
     //         //update sql
-    //         sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1)
-    //           VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', ${readed}, ${is_file}, ${file_saved}, '${fileSHA1}')`
+    //         sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash)
+    //           VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', ${readed}, ${is_file}, ${file_saved}, '${file_hash}')`
     //       }
     //     })
     //   }
@@ -1638,7 +1837,7 @@ export function* SendFriendMessage(action) {
   let hash = quarterSHA512(msg)
   let is_file = 'FALSE'
   let file_saved = 'FALSE'
-  let fileSHA1 = null
+  let file_hash = null
 
   // Forward Bulletin
   let is_object = 'FALSE'
@@ -1653,8 +1852,8 @@ export function* SendFriendMessage(action) {
   } catch (e) {
   }
 
-  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_sha1, is_object, object_type)
-VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${fileSHA1}', '${is_object}', '${object_type}')`
+  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
+VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
   reuslt = yield call([db, db.runSQL], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })

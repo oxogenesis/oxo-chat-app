@@ -43,10 +43,18 @@ const AvatarSeedScreen = (props) => {
             type: actionType.avatar.disableAvatar,
             flag_clear_db: true
           })
-          props.navigation.reset({
-            index: 0,
-            routes: [{ name: 'AvatarList' }],
-          })
+          if (props.master.get("Multi") == true) {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: 'AvatarList' }],
+            })
+          } else {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: 'Unlock' }],
+            })
+          }
+
         }
         showRemoveAvatar(false)
       })
@@ -66,7 +74,6 @@ const AvatarSeedScreen = (props) => {
           {`注意：查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。`}
         </Text>
         {
-          props.master.get("Multi") == true &&
           <ButtonPrimary title='删除账号' bg='bg-red-500' onPress={() => viewRemoveAvatar()} />
         }
       </View>
@@ -83,7 +90,7 @@ const AvatarSeedScreen = (props) => {
         msg={`！！！种子是账号的唯一凭证，只存储在本地，服务器不提供找回功能！！！
 ！！！移除账号前，请务必备份种子！！！
 确定要移除账号吗？`}
-        onPress={() => removeAvatar()}
+        onConfirm={() => removeAvatar()}
       />
     </View>
   )

@@ -53,7 +53,7 @@ const MasterKeyScreen = props => {
             bulletin_cache_size = DefaultBulletinCacheSize
           }
           props.dispatch({
-            type: actionType.avatar.changeBulletinCacheSize,
+            type: actionType.avatar.ChangeBulletinCacheSize,
             bulletin_cache_size: bulletin_cache_size
           })
         })

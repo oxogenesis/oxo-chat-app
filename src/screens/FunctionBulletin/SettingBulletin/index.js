@@ -18,7 +18,7 @@ const SettingBulletinScreen = (props) => {
   const clearBulletinCache = () => {
     showModal(false)
     props.dispatch({
-      type: actionType.avatar.clearBulletinCache
+      type: actionType.avatar.ClearBulletinCache
     })
   }
 

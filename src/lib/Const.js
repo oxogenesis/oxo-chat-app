@@ -18,7 +18,7 @@ const ActionCode = {
 
   BulletinRandom: 200,
   BulletinRequest: 201,
-  BulletinFileRequest: 202,
+  BulletinFileChunkRequest: 202,
   BulletinAddressListRequest: 203,
   BulletinAddressListResponse: 204,
   BulletinReplyListRequest: 205,
@@ -39,6 +39,9 @@ const ActionCode = {
 
 const DefaultPartition = 90 * 24 * 3600
 
+const FileMaxSize = 16 * 1024 * 1024
+const FileChunkSize = 64 * 1024
+const BulletinFileExtRegex = /jpg|png|jpeg|txt|md/i
 //group
 const GroupRequestActionCode = {
   Join: 1,
@@ -60,13 +63,13 @@ const GroupMemberShip = {
 
 const ObjectType = {
   Bulletin: 101,
-  BulletinFile: 102,
+  BulletinFileChunk: 102,
 
-  PrivateFile: 201,
+  PrivateFileChunk: 201,
 
   GroupManage: 301,
   GroupMessage: 302,
-  GroupFile: 303
+  GroupFileChunk: 303
 }
 
 const SessionType = {
@@ -94,6 +97,9 @@ export {
   MessageInterval,
   ActionCode,
   DefaultPartition,
+  FileMaxSize,
+  FileChunkSize,
+  BulletinFileExtRegex,
   GroupRequestActionCode,
   GroupManageActionCode,
   GroupMemberShip,

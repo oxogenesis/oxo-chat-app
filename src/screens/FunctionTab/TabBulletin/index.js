@@ -54,7 +54,7 @@ const TabBulletinScreen = (props) => {
   }
 
   useEffect(() => {
-    // TODO
+    // TODO:refresh
     // console.log(`TabBulletinScreen===========================${props.avatar.get('TabBulletinList').length}`)
     // if (props.avatar.get('Database') != null && props.avatar.get('Database') != null) {
     //   props.navigation.replace('TabHome')

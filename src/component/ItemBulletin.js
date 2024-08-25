@@ -25,9 +25,15 @@ const ItemBulletin = (props) => {
           <View style={tw`flex flex-row justify-between`}>
             <TextTimestamp timestamp={bulletin.Timestamp} textSize={'text-xs'} />
             {
-              bulletin.QuoteSize != 0 &&
+              bulletin.QuoteCount != 0 &&
               <Text style={tw`text-sm font-bold text-gray-400 dark:text-gray-200`}>
-                引用：◀{bulletin.QuoteSize}
+                引用：◀{bulletin.QuoteCount}
+              </Text>
+            }
+            {
+              bulletin.FileCount != 0 &&
+              <Text style={tw`text-sm font-bold text-gray-400 dark:text-gray-200`}>
+                附件：◀{bulletin.FileCount}
               </Text>
             }
           </View>

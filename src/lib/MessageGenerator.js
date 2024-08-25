@@ -1,4 +1,4 @@
-import { Sign } from './OXO'
+import { Sign, halfSHA512 } from './OXO'
 import {
   ActionCode,
   ObjectType
@@ -77,29 +77,70 @@ export default class MessageGenerator {
     return JSON.stringify(this.signJson(json))
   }
 
+  genBulletinFileChunkRequest(hash, cursor, to) {
+    let json = {
+      "Action": ActionCode.BulletinFileChunkRequest,
+      "Hash": hash,
+      "Cursor": cursor,
+      "To": to,
+      "Timestamp": Date.now(),
+      "PublicKey": this.PublicKey
+    }
+    return JSON.stringify(this.signJson(json))
+  }
+
   genObjectResponse(object, to) {
+    let object_string = JSON.stringify(object)
+    let object_hash = halfSHA512(object_string)
+    let tmp_json = {
+      "Action": ActionCode.ObjectResponse,
+      "ObjectHash": object_hash,
+      "To": to,
+      "Timestamp": Date.now(),
+      "PublicKey": this.PublicKey
+    }
+    tmp_json = this.signJson(tmp_json)
     let json = {
       "Action": ActionCode.ObjectResponse,
       "Object": object,
       "To": to,
       "Timestamp": Date.now(),
       "PublicKey": this.PublicKey,
+      "Signature": tmp_json.Signature
     }
-    return JSON.stringify(this.signJson(json))
+    return JSON.stringify(json)
   }
 
-  // not a message
-  genBulletinJson(sequence, pre_hash, quote, content, timestamp) {
+  // not a message, a bulletin string
+  genBulletinJson(sequence, pre_hash, quote, file, content, timestamp) {
     let json = {
       "ObjectType": ObjectType.Bulletin,
       "Sequence": sequence,
       "PreHash": pre_hash,
       "Quote": quote,
+      "File": file,
       "Content": content,
       "Timestamp": timestamp,
       "PublicKey": this.PublicKey
     }
+    if (quote == []) {
+      delete json["Quote"]
+    }
+    if (file == []) {
+      delete json["File"]
+    }
     return this.signJson(json)
+  }
+
+  // not a message
+  genBulletinFileChunkJson(hash, cursor, content) {
+    let json = {
+      "ObjectType": ObjectType.BulletinFileChunk,
+      "Hash": hash,
+      "Cursor": cursor,
+      "Content": content
+    }
+    return json
   }
 
   //Chat

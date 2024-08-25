@@ -14,7 +14,7 @@ const LinkPublishQuote = (props) => {
         <Text
           style={tw`text-base text-red-500 text-center`}
           onPress={() => props.dispatch({
-            type: actionType.avatar.delQuote,
+            type: actionType.avatar.delQuoteList,
             hash: props.hash
           })}>
           X

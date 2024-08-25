@@ -24,7 +24,7 @@ const AddressSelectScreen = props => {
               showsVerticalScrollIndicator={false}>
               {
                 props.avatar.get('Friends').map((item, index) => (
-                  <TouchableOpacity key={index} onPress={() => props.navigation.push('Session', { address: item, content: props.route.params.content })} >
+                  <TouchableOpacity key={index} onPress={() => props.navigation.replace('Session', { address: item, content: props.route.params.content })} >
                     <View style={tw`flex flex-row bg-stone-100 dark:bg-stone-500 p-5px mb-1px`}>
                       <View>
                         <AvatarImage address={item.Address} />

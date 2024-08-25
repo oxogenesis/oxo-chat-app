@@ -49,8 +49,8 @@ let ObjectResponseSchema = {
 //>>>bulletin<<<
 let BulletinSchema = {
   "type": "object",
-  "required": ["ObjectType", "Sequence", "PreHash", "Quote", "Content", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 8,
+  "required": ["ObjectType", "Sequence", "PreHash", "Content", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 9,
   "properties": {
     "ObjectType": {
       "type": "number"
@@ -59,6 +59,9 @@ let BulletinSchema = {
       "type": "number"
     },
     "PreHash": {
+      "type": "string"
+    },
+    "Content": {
       "type": "string"
     },
     "Quote": {
@@ -75,8 +78,20 @@ let BulletinSchema = {
         }
       }
     },
-    "Content": {
-      "type": "string"
+    "File": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["Name", "Ext", "Size", "Hash"],
+        "properties": {
+          "Name": { "type": "string" },
+          "Ext": { "type": "string" },
+          "Size": { "type": "number" },
+          "Hash": { "type": "string" }
+        }
+      }
     },
     "Timestamp": {
       "type": "number"
@@ -121,16 +136,16 @@ let BulletinRequestSchema = {
 
 let FileChunkSchema = {
   "type": "object",
-  "required": ["ObjectType", "SHA1", "Chunk", "Content"],
+  "required": ["ObjectType", "Hash", "Cursor", "Content"],
   "maxProperties": 4,
   "properties": {
     "ObjectType": {
       "type": "number"
     },
-    "SHA1": {
+    "Hash": {
       "type": "string"
     },
-    "Chunk": {
+    "Cursor": {
       "type": "number"
     },
     "Content": {
@@ -139,18 +154,18 @@ let FileChunkSchema = {
   }
 }
 
-let FileRequestSchema = {
+let BulletinFileChunkRequest = {
   "type": "object",
-  "required": ["Action", "SHA1", "CurrentChunk", "To", "Timestamp", "PublicKey", "Signature"],
+  "required": ["Action", "Hash", "Cursor", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "Action": {
       "type": "number"
     },
-    "SHA1": {
+    "Hash": {
       "type": "string"
     },
-    "CurrentChunk": {
+    "Cursor": {
       "type": "number"
     },
     "To": {
@@ -566,7 +581,7 @@ let GroupMessageSyncSchema = {
 
 let FileSchema = {
   "type": "object",
-  "required": ["Name", "Ext", "Size", "Chunk", "SHA1"],
+  "required": ["Name", "Ext", "Size", "Chunk", "Hash"],
   "maxProperties": 5,
   "properties": {
     "Name": {
@@ -581,7 +596,7 @@ let FileSchema = {
     "Chunk": {
       "type": "number"
     },
-    "SHA1": {
+    "Hash": {
       "type": "string"
     }
   }
@@ -618,7 +633,8 @@ let vDeclare = ajv.compile(DeclareSchema)
 let vObjectResponseSchema = ajv.compile(ObjectResponseSchema)
 
 let vBulletinRequestSchema = ajv.compile(BulletinRequestSchema)
-let vFileRequestSchema = ajv.compile(FileRequestSchema)
+
+let vBulletinFileChunkRequest = ajv.compile(BulletinFileChunkRequest)
 
 let vChatMessageSchema = ajv.compile(ChatMessageSchema)
 let vChatSyncSchema = ajv.compile(ChatSyncSchema)
@@ -631,7 +647,7 @@ let vGroupMessageSyncSchema = ajv.compile(GroupMessageSyncSchema)
 let vGroupRequestSchema = ajv.compile(GroupRequestSchema)
 
 function checkJsonSchema(json) {
-  if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vFileRequestSchema(json) || vChatMessageSchema(json) || vChatSyncSchema(json) || vChatSyncFromServerSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
+  if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vBulletinFileChunkRequest(json) || vChatMessageSchema(json) || vChatSyncSchema(json) || vChatSyncFromServerSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
     return true
   } else {
     return false

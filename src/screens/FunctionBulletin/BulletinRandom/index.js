@@ -38,7 +38,7 @@ const BulletinRandomScreen = (props) => {
 
   const quoteBulletin = (address, sequence, hash) => {
     props.dispatch({
-      type: actionType.avatar.addQuote,
+      type: actionType.avatar.addQuoteList,
       address: address,
       sequence: sequence,
       hash: hash
@@ -176,7 +176,7 @@ const BulletinRandomScreen = (props) => {
                 }
                 {/* 收藏按键 */}
                 {
-                  random.IsMark == "FALSE" &&
+                  (current.IsMark == 0 || current.IsMark == "FALSE") &&
                   <TouchableOpacity onPress={handleCollection}>
                     <IconEntypo
                       name={"star-outlined"}

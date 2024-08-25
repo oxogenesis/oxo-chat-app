@@ -13,6 +13,7 @@ import TextTimestamp from '../../../component/TextTimestamp'
 import TextName from '../../../component/TextName'
 import TextAddress from '../../../component/TextAddress'
 import tw from '../../../lib/tailwind'
+import { Dirs, FileSystem } from 'react-native-file-access'
 
 //账号选择界面
 const AvatarListScreen = props => {
@@ -52,7 +53,22 @@ const AvatarListScreen = props => {
     }
   }, [props.avatar])
 
+  const mkdir_for_avatar = async (address) => {
+    let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}`
+    result = await FileSystem.exists(file_path)
+    if (!result) {
+      result = await FileSystem.mkdir(file_path)
+    }
+
+    file_path = `${Dirs.DocumentDir}/ChatFile/${address}`
+    result = await FileSystem.exists(file_path)
+    if (!result) {
+      result = await FileSystem.mkdir(file_path)
+    }
+  }
+
   const enableAvatar = (address, name) => {
+    mkdir_for_avatar(address)
     setFlagLoading(true)
     let avatar = avatarList.filter(item => item.Address == address)[0]
     AvatarDerive(avatar.save, props.master.get('MasterKey'))

@@ -1,10 +1,11 @@
 import React from 'react'
-import { useNavigation, useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute, useEffect } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { TouchableOpacity, View } from 'react-native'
 import AvatarImage from './AvatarImage'
 
 const Avatar = (props) => {
+
   return (
     <View>
       <TouchableOpacity onPress={() => props.navigation.push('AddressMark', { address: props.address })}>

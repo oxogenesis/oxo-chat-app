@@ -29,19 +29,28 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.SendMessage, avatarActions.SendMessage)
 
   //Bulletin
-  yield takeEvery(actionType.avatar.changeBulletinCacheSize, avatarActions.changeBulletinCacheSize)
-  yield takeEvery(actionType.avatar.clearBulletinCache, avatarActions.clearBulletinCache)
+  yield takeEvery(actionType.avatar.ChangeBulletinCacheSize, avatarActions.ChangeBulletinCacheSize)
+  yield takeEvery(actionType.avatar.ClearBulletinCache, avatarActions.ClearBulletinCache)
 
   yield takeEvery(actionType.avatar.LoadTabBulletinList, avatarActions.LoadTabBulletinList)
   yield takeEvery(actionType.avatar.UpdateFollowBulletin, avatarActions.UpdateFollowBulletin)
   yield takeEvery(actionType.avatar.LoadBulletinList, avatarActions.LoadBulletinList)
   yield takeEvery(actionType.avatar.HandleBulletinRequest, avatarActions.HandleBulletinRequest)
   yield takeEvery(actionType.avatar.SaveQuote, avatarActions.SaveQuote)
+  yield takeEvery(actionType.avatar.SaveBulletinFile, avatarActions.SaveBulletinFile)
   yield takeEvery(actionType.avatar.SaveBulletin, avatarActions.SaveBulletin)
   // yield takeEvery(actionType.avatar.SaveContentBulletin, avatarActions.SaveContentBulletin)
   yield takeEvery(actionType.avatar.FetchRandomBulletin, avatarActions.FetchRandomBulletin)
   yield takeEvery(actionType.avatar.FetchBulletin, avatarActions.FetchBulletin)
   yield takeEvery(actionType.avatar.PublishBulletin, avatarActions.PublishBulletin)
+
+  // BulletinFile
+  yield takeEvery(actionType.avatar.CacheLocalBulletinFile, avatarActions.CacheLocalBulletinFile)
+  yield takeEvery(actionType.avatar.LoadCurrentBulletinFile, avatarActions.LoadCurrentBulletinFile)
+  yield takeEvery(actionType.avatar.HandleBulletinFileChunkRequest, avatarActions.HandleBulletinFileChunkRequest)
+  yield takeEvery(actionType.avatar.FetchBulletinFileChunk, avatarActions.FetchBulletinFileChunk)
+  yield takeEvery(actionType.avatar.SaveBulletinFileChunk, avatarActions.SaveBulletinFileChunk)
+
   yield takeEvery(actionType.avatar.SaveBulletinDraft, avatarActions.SaveBulletinDraft)
   yield takeEvery(actionType.avatar.LoadCurrentBulletin, avatarActions.LoadCurrentBulletin)
   yield takeEvery(actionType.avatar.MarkBulletin, avatarActions.MarkBulletin)

@@ -5,6 +5,7 @@ import { actionType } from '../../../redux/actions/actionType'
 import { ReadDraft } from '../../../lib/Util'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import LinkPublishQuote from '../../../component/LinkPulishQuote'
+import LinkPublishFile from '../../../component/LinkPublishFile'
 import ErrorMsg from '../../../component/ErrorMsg'
 import tw from '../../../lib/tailwind'
 
@@ -39,7 +40,8 @@ const BulletinPublishScreen = props => {
             setDrfat('')
           }
         })
-
+      props.navigation.setOptions({ title: `发布第${props.avatar.get('NextBulletinSequence')}号公告` })
+      // TODO:goBack refresh filelist
       if (props.master.get('Dark')) {
         setKeyboardAppearance('dark')
       } else {
@@ -69,7 +71,7 @@ const BulletinPublishScreen = props => {
           multiline={true}
           keyboardAppearance={keyboardAppearance}
           style={tw`mx-5px rounded-lg border-solid border-2 border-gray-300 dark:border-gray-700 text-slate-800 dark:text-slate-200 text-base text-justify`}
-          // TODO align-text-top
+          // TODO:align-text-top
           onChangeText={text => setDrfat(text)}
         />
         {
@@ -88,8 +90,20 @@ const BulletinPublishScreen = props => {
             }
           </View>
         }
+        {
+          props.avatar.get('FileList').length > 0 &&
+          <View style={tw`flex flex-row flex-wrap`}>
+            {
+              props.avatar.get('FileList').map((item, index) => (
+                <View key={index} style={tw`border rounded-lg mr-5px`}>
+                  <LinkPublishFile name={item.Name} ext={item.Ext} hash={item.Hash} size={item.Size} />
+                </View>
+              ))
+            }
+          </View>
+        }
         <Text style={tw`text-base text-red-500`}>
-          {`注意：发布内容将以字符串类型进行签名，所以请不要使用英文单引号（'），建议使用英文双引号（"）或者中文单引号（‘’）或者中文双引号（“”）替代，谢谢`}
+          {``}
         </Text>
       </ScrollView>
     </View >

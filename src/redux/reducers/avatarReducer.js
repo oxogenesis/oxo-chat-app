@@ -32,10 +32,13 @@ function initialState() {
       BulletinList: [],
       CurrentBBSession: null,
       CurrentBulletin: null,
+      setNextBulletinSequence: null,
+      CurrentBulletinFile: null,
       RandomBulletin: null,
       RandomBulletinFlag: false,
       QuoteList: [],
       QuoteWhiteList: [],
+      FileList: [],
       ReplyList: [],
       BulletinCacheSize: DefaultBulletinCacheSize,
       BulletinAddressList: [],
@@ -75,6 +78,8 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('CurrentHost', null)
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
+    .set('NextBulletinSequence', null)
+    .set('CurrentBulletinFile', null)
     .set('RandomBulletin', null)
     .set('RandomBulletinFlag', false)
     .set('AddressMap', {})
@@ -88,6 +93,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('FileList', [])
     .set('ReplyList', [])
     .set('BulletinAddressList', [])
     .set('BulletinReplyList', [])
@@ -122,6 +128,8 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     // Bulletin
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
+    .set('NextBulletinSequence', null)
+    .set('CurrentBulletinFile', null)
     .set('RandomBulletin', null)
     .set('RandomBulletinFlag', false)
     .set('AddressMap', {})
@@ -134,6 +142,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('BulletinList', [])
     .set('QuoteList', [])
     .set('QuoteWhiteList', [])
+    .set('FielList', [])
     .set('ReplyList', [])
     .set('BulletinAddressList', [])
     .set('BulletinReplyList', [])
@@ -225,6 +234,7 @@ reducer.prototype[actionType.avatar.setBulletinCacheSize] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setTabBulletinList] = (state, action) => {
+  // TODO
   console.log(`setTabBulletinList=============================================${action.tab_bulletin_list.length}`)
   return state.set('TabBulletinList', action.tab_bulletin_list)
 }
@@ -235,6 +245,10 @@ reducer.prototype[actionType.avatar.setBulletinList] = (state, action) => {
 
 reducer.prototype[actionType.avatar.setCurrentBulletin] = (state, action) => {
   return state.set('CurrentBulletin', action.bulletin)
+}
+
+reducer.prototype[actionType.avatar.setNextBulletinSequence] = (state, action) => {
+  return state.set('NextBulletinSequence', action.sequence)
 }
 
 reducer.prototype[actionType.avatar.setRandomBulletin] = (state, action) => {
@@ -253,11 +267,6 @@ reducer.prototype[actionType.avatar.setBulletinReplyList] = (state, action) => {
   return state.set('BulletinReplyList', action.bulletin_reply_list)
 }
 
-// Chat
-reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {
-  return state.set('CurrentBBSession', action.current_BB_session)
-}
-
 reducer.prototype[actionType.avatar.setQuoteList] = (state, action) => {
   return state.set('QuoteList', action.quote_list)
 }
@@ -270,7 +279,7 @@ reducer.prototype[actionType.avatar.setReplyList] = (state, action) => {
   return state.set('ReplyList', action.reply_list)
 }
 
-reducer.prototype[actionType.avatar.addQuote] = (state, action) => {
+reducer.prototype[actionType.avatar.addQuoteList] = (state, action) => {
   let quote_list = state.get('QuoteList')
 
   if (quote_list.length >= 8) {
@@ -290,7 +299,7 @@ reducer.prototype[actionType.avatar.addQuote] = (state, action) => {
   return state.set('QuoteList', quote_list)
 }
 
-reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
+reducer.prototype[actionType.avatar.delQuoteList] = (state, action) => {
   let quote_list = state.get('QuoteList')
   let tmp_quote_list = []
   for (const quote of quote_list) {
@@ -299,6 +308,52 @@ reducer.prototype[actionType.avatar.delQuote] = (state, action) => {
     }
   }
   return state.set('QuoteList', tmp_quote_list)
+}
+
+reducer.prototype[actionType.avatar.setFileList] = (state, action) => {
+  return state.set('FileList', action.file_list)
+}
+
+reducer.prototype[actionType.avatar.addFileList] = (state, action) => {
+  // console.log(`addFileList-----------------------------------------------------------`)
+  let file_json = action.file_json
+  let file_list = state.get('FileList')
+
+  if (file_list.length >= 8) {
+    return state.set('FileList', file_list)
+  }
+  for (const file of file_list) {
+    if (file.Hash == file_json.Hash) {
+      return state.set('FileList', file_list)
+    }
+  }
+
+  file_list.push(file_json)
+  // console.log(file_list)
+  return state.set('FileList', file_list)
+}
+
+reducer.prototype[actionType.avatar.delFileList] = (state, action) => {
+  // console.log(`delFileList-----------------------------------------------------------`)
+  let file_list = state.get('FileList')
+  let tmp_file_list = []
+  for (const file of file_list) {
+    if (file.Hash != action.Hash) {
+      tmp_file_list.push(file)
+    }
+  }
+  // console.log(tmp_file_list)
+  return state.set('FileList', tmp_file_list)
+}
+
+
+reducer.prototype[actionType.avatar.setCurrentBulletinFile] = (state, action) => {
+  return state.set('CurrentBulletinFile', action.file)
+}
+
+// Chat
+reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {
+  return state.set('CurrentBBSession', action.current_BB_session)
 }
 
 ///////////////////////////////////////////////////////////////////////////////

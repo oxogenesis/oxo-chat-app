@@ -3,9 +3,12 @@ import { View, ToastAndroid } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
+import ImagePicker from 'react-native-image-crop-picker'
+import { Dirs, FileSystem } from 'react-native-file-access'
 import { BulletinAddressSession } from '../../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
 import ViewModal from '../../../component/ViewModal'
+import AvatarImage from '../../../component/AvatarImage'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
 import ButtonPrimary from '../../../component/ButtonPrimary'
@@ -19,6 +22,34 @@ const AddressMarkScreen = (props) => {
   const [visible_delete, show_visible_delete] = useState(false)
   const [visible_del_friend, show_visible_del_friend] = useState(false)
   const [visible_del_follow, show_visible_del_follow] = useState(false)
+
+  const current = props.avatar.get('CurrentAddressMark')
+  const { Address, IsFriend, IsFollow } = current || {}
+  const currentFriend = isFriend === undefined ? IsFriend : isFriend
+  const currentFollow = isFollow === undefined ? IsFollow : isFollow
+
+  const picker = async () => {
+    let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
+    let avatar_img_path = `${avatar_img_dir}/${Address}`
+    let image = await ImagePicker.openPicker({
+      width: 50,
+      height: 50,
+      cropping: true,
+      includeBase64: true
+    })
+    if (image) {
+      let result = await FileSystem.exists(avatar_img_dir)
+      if (!result) {
+        result = await FileSystem.mkdir(avatar_img_dir)
+      }
+      result = await FileSystem.exists(avatar_img_path)
+      if (result) {
+        await FileSystem.unlink(avatar_img_path)
+      }
+      // await FileSystem.mv(image_file_path, avatar_img_path)
+      await FileSystem.writeFile(avatar_img_path, `data:${image.mime};base64,${image.data}`, 'utf8')
+    }
+  }
 
   const delAddressMark = () => {
     if (props.avatar.get('CurrentAddressMark').IsFollow || props.avatar.get('CurrentAddressMark').IsFriend) {
@@ -115,20 +146,19 @@ const AddressMarkScreen = (props) => {
     }
   }
 
-  const current = props.avatar.get('CurrentAddressMark')
-  const { Address, IsFriend, IsFollow } = current || {}
-  const currentFriend = isFriend === undefined ? IsFriend : isFriend
-  const currentFollow = isFollow === undefined ? IsFollow : isFollow
-
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       {
         current &&
         <>
+          <View style={tw`mx-auto`}>
+            <AvatarImage address={Address} />
+          </View>
           <LinkSetting title={AddressToName(props.avatar.get('AddressMap'), Address)} icon={'edit'} onPress={() => {
             props.navigation.navigate('AddressEdit', { address: Address })
           }} />
           <LinkSetting title={Address} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
+          <LinkSetting title={'编辑头像'} icon={'edit'} onPress={picker} />
           <SwitchSetting title={'关注公告'} checked={currentFollow} onChange={onSwitchChangeFollow} />
           <SwitchSetting title={'添加好友'} checked={currentFriend} onChange={onSwitchChangeFriend} />
 

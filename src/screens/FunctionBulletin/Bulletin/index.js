@@ -19,6 +19,7 @@ import ItemReply from '../../../component/ItemReply'
 import TextTimestamp from '../../../component/TextTimestamp'
 import tw from '../../../lib/tailwind'
 import BulletinContent from '../../../component/BulletinContent'
+import LinkBulletinFile from '../../../component/LinkBulletinFile'
 
 //公告详情
 const BulletinScreen = (props) => {
@@ -40,7 +41,7 @@ const BulletinScreen = (props) => {
 
   const quoteBulletin = (address, sequence, hash) => {
     props.dispatch({
-      type: actionType.avatar.addQuote,
+      type: actionType.avatar.addQuoteList,
       address: address,
       sequence: sequence,
       hash: hash
@@ -101,7 +102,7 @@ const BulletinScreen = (props) => {
                 <View style={tw`flex flex-col`}>
                   <View style={tw`flex flex-row`}>
                     <LinkName onPress={() => props.navigation.push('AddressMark', { address: current.Address })} name={AddressToName(props.avatar.get('AddressMap'), current.Address)} />
-                    <StrSequence sequence={current.Sequence} />
+                    <StrSequence sequence={`${current.Sequence}`} />
                     {
                       current.PreHash != GenesisHash && (props.avatar.get('Follows').includes(current.Address) || props.avatar.get('Address') == current.Address) &&
                       <LinkBulletin address={current.Address} sequence={current.Sequence - 1} hash={current.PreHash} to={current.Address} display={`上一篇`} />
@@ -133,6 +134,20 @@ const BulletinScreen = (props) => {
                 </View>
               }
 
+              {/* 帖子附件文件 */}
+              {
+                current.FileList != undefined && current.FileList.length > 0 &&
+                <View style={tw`flex flex-row mx-5px flex-wrap rounded-t-lg bg-yellow-100 dark:bg-yellow-200`}>
+                  <Text>
+                    {
+                      current.FileList.map((item, index) => (
+                        <LinkBulletinFile key={index} name={item.Name} ext={item.Ext} hash={item.Hash} size={item.Size} address={current.Address} />
+                      ))
+                    }
+                  </Text>
+                </View>
+              }
+
               {/* 快捷操作 */}
               <View style={tw`flex flex-row mx-5px rounded-b-lg bg-yellow-100 dark:bg-yellow-200`}>
                 {/* 取消收藏按键 */}
@@ -148,7 +163,7 @@ const BulletinScreen = (props) => {
                 }
                 {/* 收藏按键 */}
                 {
-                  current.IsMark == "FALSE" &&
+                  (current.IsMark == 0 || current.IsMark == "FALSE") &&
                   <TouchableOpacity onPress={handleCollection}>
                     <IconEntypo
                       name={"star-outlined"}

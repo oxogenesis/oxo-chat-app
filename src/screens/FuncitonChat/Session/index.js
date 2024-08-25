@@ -11,6 +11,7 @@ import AvatarImage from '../../../component/AvatarImage'
 import LinkBulletin from '../../../component/LinkBulletin'
 import LinkMsgInfo from '../../../component/LinkMsgInfo'
 import TextTimestamp from '../../../component/TextTimestamp'
+import { Dirs, FileSystem } from 'react-native-file-access'
 import tw from '../../../lib/tailwind'
 
 //聊天会话界面
@@ -210,7 +211,7 @@ const SessionScreen = (props) => {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={tw`w-4/5`}>
+        <View style={tw`w-7/10`}>
           <TextInput
             placeholderTextColor={tw.color('stone-500')}
             style={tw`border-solid border-t border-gray-300 dark:border-gray-700 text-sm text-slate-800 dark:text-slate-200`}
@@ -222,8 +223,15 @@ const SessionScreen = (props) => {
             onChangeText={text => setMsgInput(text)}
           />
         </View>
+        <View style={tw`w-1/10`}>
+          <TouchableOpacity style={tw`h-full rounded-none bg-yellow-500`} onPress={() => props.navigation.push('FileSelect', { address: props.route.params.address, dir: Dirs.SDCardDir })} >
+            <Text style={tw`h-full align-middle text-lg text-center font-bold text-slate-200`}>
+              +
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </View >
   )
 }
 

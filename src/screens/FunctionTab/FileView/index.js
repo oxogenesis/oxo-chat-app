@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import tw from '../../../lib/tailwind'
 import { FileSystem, Dirs } from 'react-native-file-access'
 import BulletinContent from '../../../component/BulletinContent'
-import { FileChunkSize } from '../../../lib/Const'
+import ViewEmpty from '../../../component/ViewEmpty'
 
 //文件查看
 const FileViewScreen = (props) => {
@@ -27,6 +27,7 @@ const FileViewScreen = (props) => {
     })
 
     let file_json = props.avatar.get('CurrentBulletinFile')
+    console.log(`--------------------------------------------------------------------------------------loadFile`)
     if (file_json && file_json.chunk_length == file_json.chunk_cursor) {
       // file exist
       let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
@@ -46,6 +47,7 @@ const FileViewScreen = (props) => {
     } else {
 
     }
+    console.log(file_json)
     setFile(file_json)
 
     // let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
@@ -86,7 +88,7 @@ const FileViewScreen = (props) => {
                 }
               </TouchableOpacity>
               :
-              <View>获取中:{`${file.chunk_cursor}/${file.chunk_length}`}</View>
+              <ViewEmpty msg={`获取中:${file.chunk_cursor}/${file.chunk_length}`} />
           }
         </View>
       }

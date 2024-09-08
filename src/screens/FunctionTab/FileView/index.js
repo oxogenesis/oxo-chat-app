@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { View, Image, TouchableOpacity, ToastAndroid } from 'react-native'
-import { actionType } from '../../../redux/actions/actionType'
 import { connect } from 'react-redux'
 import tw from '../../../lib/tailwind'
 import { FileSystem, Dirs } from 'react-native-file-access'
@@ -10,6 +9,7 @@ import ViewEmpty from '../../../component/ViewEmpty'
 //文件查看
 const FileViewScreen = (props) => {
   const [file, setFile] = useState(null)
+  const [file_image, setFileImage] = useState(null)
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
@@ -18,16 +18,13 @@ const FileViewScreen = (props) => {
   })
 
   const loadFile = async () => {
-    let address = props.route.params.address
     let hash = props.route.params.hash
-    props.dispatch({
-      type: actionType.avatar.LoadCurrentBulletinFile,
-      address: address,
-      hash: hash
-    })
 
     let file_json = props.avatar.get('CurrentBulletinFile')
     console.log(`--------------------------------------------------------------------------------------loadFile`)
+    console.log(file_json)
+    setFile(file_json)
+
     if (file_json && file_json.chunk_length == file_json.chunk_cursor) {
       // file exist
       let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
@@ -37,7 +34,7 @@ const FileViewScreen = (props) => {
       } else {
         // image file
         let result = await FileSystem.readFile(file_path, 'base64')
-        file_json.image = `data:image/png;base64,${result}`
+        setFileImage(`data:image/png;base64,${result}`)
         // Image.getSize(file_json.image, (w, h) => {
         //   file_json.image_width = w
         //   file_json.image_height = h
@@ -47,8 +44,6 @@ const FileViewScreen = (props) => {
     } else {
 
     }
-    console.log(file_json)
-    setFile(file_json)
 
     // let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
     // console.log(file_path)
@@ -70,25 +65,26 @@ const FileViewScreen = (props) => {
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       {
-        file != null &&
+        props.avatar.get('CurrentBulletinFile') != null &&
         <View>
           {
-            file.chunk_length == file.chunk_cursor ?
+            props.avatar.get('CurrentBulletinFile').chunk_length == props.avatar.get('CurrentBulletinFile').chunk_cursor ?
               <TouchableOpacity onPress={saveFile} >
                 {
-                  file.ext == 'txt' ?
-                    <BulletinContent content={file.content} />
+                  props.avatar.get('CurrentBulletinFile').ext == 'txt' ?
+                    <BulletinContent content={props.avatar.get('CurrentBulletinFile').content} />
                     :
                     // TODO:better display
+                    file_image != null &&
                     <Image
                       style={tw`h-full w-full border-2 border-gray-300 dark:border-gray-700`}
-                      source={{ uri: file.image }}
+                      source={{ uri: file_image }}
                       resizeMode='stretch'>
                     </Image>
                 }
               </TouchableOpacity>
               :
-              <ViewEmpty msg={`获取中:${file.chunk_cursor}/${file.chunk_length}`} />
+              <ViewEmpty msg={`获取中:${props.avatar.get('CurrentBulletinFile').chunk_cursor}/${props.avatar.get('CurrentBulletinFile').chunk_length}`} />
           }
         </View>
       }

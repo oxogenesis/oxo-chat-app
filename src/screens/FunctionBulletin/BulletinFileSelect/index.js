@@ -66,12 +66,7 @@ const BulletinFileSelectScreen = (props) => {
       }
       result = await FileSystem.cp(path, bulletin_file_path)
 
-      props.dispatch({
-        type: actionType.avatar.CacheLocalBulletinFile,
-        file_json: file_json
-      })
-
-      props.navigation.goBack()
+      props.navigation.replace('BulletinPublish', { file_json: file_json })
 
       // let fileChunk = Math.ceil(stat.size / FileChunkSize)
       // for (let i = 0; i < fileChunk; i++) {
@@ -95,7 +90,7 @@ const BulletinFileSelectScreen = (props) => {
           {
             Dirs.SDCardDir != props.route.params.dir &&
             <TouchableOpacity onPress={() => props.navigation.replace('BulletinFileSelect', { dir: parentDir })} >
-              <View style={tw`flex flex-row bg-stone-300 dark:bg-stone-100 p-5px mb-1px`}>
+              <View style={tw`flex flex-row bg-stone-500 dark:bg-stone-300 p-5px mb-1px`}>
                 <View>
                   <Text>
                     <TextName name={`返回上一级目录`} />

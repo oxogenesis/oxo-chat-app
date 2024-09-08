@@ -56,6 +56,7 @@ import FileViewScreen from '../FunctionTab/FileView'
 import FileExplorerScreen from '../FunctionTab/FileExplorer'
 import FileSelectScreen from '../FunctionTab/FileSelect'
 
+import { HeaderBackButton } from '@react-navigation/elements'
 import { Dirs } from 'react-native-file-access'
 import tw from '../../lib/tailwind'
 
@@ -252,7 +253,7 @@ const AppStack = (props) => {
                 name={'post-add'}
                 size={32}
                 color={headerIconColor}
-                onPress={() => navigation.push('BulletinFileSelect',
+                onPress={() => navigation.replace('BulletinFileSelect',
                   { dir: Dirs.SDCardDir })}
               />)
           })
@@ -313,6 +314,15 @@ const AppStack = (props) => {
           ({ route, navigation }) => ({
             title: '文件浏览',
             ...headerStyleOption,
+            headerBackTitle: null,
+            headerLeft: (props) => (
+              <HeaderBackButton
+                {...props}
+                onPress={() => {
+                  navigation.replace('BulletinPublish');
+                }}
+              />
+            )
           })
         }
       />

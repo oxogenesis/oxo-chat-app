@@ -310,12 +310,7 @@ reducer.prototype[actionType.avatar.delQuoteList] = (state, action) => {
   return state.set('QuoteList', tmp_quote_list)
 }
 
-reducer.prototype[actionType.avatar.setFileList] = (state, action) => {
-  return state.set('FileList', action.file_list)
-}
-
 reducer.prototype[actionType.avatar.addFileList] = (state, action) => {
-  // console.log(`addFileList-----------------------------------------------------------`)
   let file_json = action.file_json
   let file_list = state.get('FileList')
 
@@ -329,12 +324,10 @@ reducer.prototype[actionType.avatar.addFileList] = (state, action) => {
   }
 
   file_list.push(file_json)
-  // console.log(file_list)
   return state.set('FileList', file_list)
 }
 
 reducer.prototype[actionType.avatar.delFileList] = (state, action) => {
-  // console.log(`delFileList-----------------------------------------------------------`)
   let file_list = state.get('FileList')
   let tmp_file_list = []
   for (const file of file_list) {
@@ -342,7 +335,6 @@ reducer.prototype[actionType.avatar.delFileList] = (state, action) => {
       tmp_file_list.push(file)
     }
   }
-  // console.log(tmp_file_list)
   return state.set('FileList', tmp_file_list)
 }
 

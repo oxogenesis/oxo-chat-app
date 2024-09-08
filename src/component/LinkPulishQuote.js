@@ -10,7 +10,7 @@ const LinkPublishQuote = (props) => {
   return (
     <View style={tw`flex-row rounded-lg border-2 border-gray-400`}>
       <LinkBulletin address={props.address} sequence={props.sequence} hash={props.hash} to={props.to} />
-      <View style={tw`bg-gray-300 rounded-full px-2`}>
+      <View style={tw`bg-gray-300 rounded-full px-4`}>
         <Text
           style={tw`text-base text-red-500 text-center`}
           onPress={() => props.dispatch({

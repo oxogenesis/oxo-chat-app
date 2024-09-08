@@ -32,6 +32,7 @@ const BulletinPublishScreen = props => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
+      console.log('focus', Date.now())
       ReadDraft(props.avatar.get('Address'))
         .then(saved_draft => {
           if (saved_draft) {
@@ -40,8 +41,17 @@ const BulletinPublishScreen = props => {
             setDrfat('')
           }
         })
+
       props.navigation.setOptions({ title: `发布第${props.avatar.get('NextBulletinSequence')}号公告` })
-      // TODO:goBack refresh filelist
+
+      if (props.route.params && props.route.params.file_json) {
+        props.dispatch({
+          type: actionType.avatar.CacheLocalBulletinFile,
+          file_json: props.route.params.file_json
+        })
+      }
+
+
       if (props.master.get('Dark')) {
         setKeyboardAppearance('dark')
       } else {
@@ -96,7 +106,10 @@ const BulletinPublishScreen = props => {
             {
               props.avatar.get('FileList').map((item, index) => (
                 <View key={index} style={tw`border rounded-lg mr-5px`}>
-                  <LinkPublishFile name={item.Name} ext={item.Ext} hash={item.Hash} size={item.Size} />
+                  <LinkPublishFile name={item.Name} ext={item.Ext} hash={item.Hash} size={item.Size} onPress={() => props.dispatch({
+                    type: actionType.avatar.delFileList,
+                    Hash: item.Hash
+                  })} />
                 </View>
               ))
             }

@@ -47,7 +47,6 @@ export const actionType = {
     setQuoteWhiteList: 'SET_QUOTE_WHITE_LIST',
     addFileList: 'ADD_FILE_LIST',
     delFileList: 'DEL_FILE_LIST',
-    setFileList: 'SET_FILE_LIST',
     setReplyList: 'SET_REPLY_LIST',
 
     CacheLocalBulletinFile: 'CACHE_LOCAL_BULLETIN_FILE',

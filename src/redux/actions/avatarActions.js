@@ -51,31 +51,31 @@ async function readFile(path, cursor, size) {
 }
 
 async function appendFile(path, cursor, content) {
-  console.log(path)
-  console.log(cursor)
+  // console.log(path)
+  // console.log(cursor)
   // console.log(content)
-  console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[--------]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+  // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[--------]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
   if (cursor == 1) {
-    console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[exists]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+    // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[exists]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
     let is_exist = await FileSystem.exists(path)
-    console.log(is_exist)
+    // console.log(is_exist)
     if (is_exist) {
-      console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[unlink]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+      // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[unlink]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
       await FileSystem.unlink(path)
     }
-    console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[writeFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+    // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[writeFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
     await FileSystem.writeFile(path, content, "base64")
   } else {
-    console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[appendFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+    // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[appendFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
     await FileSystem.appendFile(path, content, "base64")
   }
-  console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[++++++++]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
+  // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[++++++++]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
 }
 
 async function verfifyFile(path, hash) {
   let file_hash = await FileSystem.hash(path, 'SHA-1')
   file_hash = file_hash.toUpperCase()
-  console.log("HASH", hash, file_hash)
+  // console.log("HASH", hash, file_hash)
   if (hash == file_hash) {
     return true
   } else {
@@ -485,7 +485,6 @@ export function* disableAvatar(action) {
       hashes.push(item.hash)
     })
     sql = `DELETE FROM BULLETINS where is_cache = 'TRUE' AND is_mark = 'FALSE' AND hash NOT IN (${Array2Str(hashes)})`
-    console.log(sql)
     yield call([db, db.runSQL], sql)
   }
 
@@ -565,8 +564,8 @@ export function* saveAddressName(action) {
   yield call([db, db.runSQL], sql)
   let address_map = yield select(state => state.avatar.get('AddressMap'))
   address_map[action.address] = action.name
-  console.log(`========================saveAddressName`)
-  console.log(address_map)
+  // console.log(`========================saveAddressName`)
+  // console.log(address_map)
   yield put({ type: actionType.avatar.setAddressBook, address_map: address_map })
 }
 
@@ -670,10 +669,8 @@ export function* changeHostList(action) {
 export function* addHost(action) {
   let timestamp = Date.now()
   let host_list = yield select(state => state.avatar.get('HostList'))
-  console.log(host_list)
   host_list = host_list.filter((host) => host.Address != action.host)
   host_list.unshift({ Address: action.host, UpdatedAt: timestamp })
-  console.log(host_list)
   yield put({ type: actionType.avatar.setHostList, host_list: host_list })
   yield call(setStorageItem, 'HostList', host_list)
 }
@@ -734,7 +731,6 @@ export function* HandleBulletinRequest(action) {
       current_sequence = last_bulletin.sequence
     }
     if (current_sequence < json.Sequence - 1) {
-      console.log(`syn self bulletin from server`)
       yield put({ type: actionType.avatar.FetchBulletin, address: self_address, sequence: current_sequence + 1, to: request_address })
     }
   }
@@ -837,7 +833,6 @@ export function* FetchBulletinFileChunk(action) {
   let file_json = action.file_json
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genBulletinFileChunkRequest(file_json.hash, file_json.chunk_cursor + 1, file_json.address)
-  console.log(msg)
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 
@@ -886,14 +881,14 @@ export function* HandleBulletinFileChunkRequest(action) {
   console.log(`===================================================================HandleBulletinFileChunkRequest`)
   let address = yield select(state => state.avatar.get('Address'))
   let json = action.json
-  console.log(json)
+  // console.log(json)
   let request_address = DeriveAddress(json.PublicKey)
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
 
   let db = yield select(state => state.avatar.get('Database'))
   let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${json.Hash}" AND chunk_length = chunk_cursor LIMIT 1`
   let item = yield call([db, db.getOne], sql)
-  console.log(item)
+  // console.log(item)
   if (item != null && json.Cursor <= item.chunk_length) {
     let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}/${json.Hash}`
     let content = yield call(readFile, file_path, json.Cursor, item.size)
@@ -983,12 +978,12 @@ export function* SaveQuote(action) {
 export function* SaveBulletinFile(action) {
   let db = yield select(state => state.avatar.get('Database'))
   let file_list = action.file_list
-  console.log(file_list)
+  // console.log(file_list)
   for (let index = 0; index < file_list.length; index++) {
     const file = file_list[index]
     let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${file.Hash}" LIMIT 1`
     let tmp_file = yield call([db, db.getOne], sql)
-    console.log(tmp_file)
+    // console.log(tmp_file)
     if (!tmp_file) {
       let chunk_length = Math.ceil(file.Size / FileChunkSize)
       sql = `INSERT INTO BULLETIN_FILES (hash, name, ext, size, chunk_length, chunk_cursor)
@@ -999,6 +994,7 @@ export function* SaveBulletinFile(action) {
 }
 
 export function* SaveBulletin(action) {
+  console.log(`===================================================================SaveBulletin`)
   let bulletin_json = action.bulletin_json
   let relay_address = action.relay_address
 
@@ -1025,18 +1021,28 @@ export function* SaveBulletin(action) {
     let bulletin = yield call([db, db.getOne], sql)
     if (bulletin != null) {
       // 已经保存了
-      if (follow_list.includes(object_address)) {
-        yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
-      } else if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
+      let next_sequence = bulletin_json.Sequence + 1
+      sql = `SELECT * FROM BULLETINS WHERE address = "${object_address}" AND sequence = ${next_sequence} LIMIT 1`
+      bulletin = yield call([db, db.getOne], sql)
+      if (bulletin == null) {
+        // 下一篇不存在
+        if (follow_list.includes(object_address)) {
+          yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: next_sequence, to: object_address })
+        } else if (self_address == object_address) {
+          yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: next_sequence, to: object_address })
+        }
+      }
+
+      if (random_bulletin_flag) {
+        yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
+        yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
+      }
+
+      if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
         let current_bulletin = yield select(state => state.avatar.get('CurrentBulletin'))
         if (current_bulletin == null) {
           yield put({ type: actionType.avatar.setCurrentBulletin, bulletin: bulletin_json })
         }
-      } else if (self_address == object_address) {
-        yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
-      } else if (random_bulletin_flag) {
-        yield put({ type: actionType.avatar.setRandomBulletin, bulletin: bulletin_json })
-        yield put({ type: actionType.avatar.setRandomBulletinFlag, flag: false })
       }
     } else {
       if (follow_list.includes(object_address)) {
@@ -1176,6 +1182,7 @@ export function* SaveBulletin(action) {
       }
     }
   }
+  console.log(`===================================================================SaveBulletin<<<`)
 }
 
 export function* LoadTabBulletinList(action) {

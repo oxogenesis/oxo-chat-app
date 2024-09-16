@@ -117,15 +117,15 @@ const UnlockScreen = (props) => {
     }
 
     // TEST
-    result = await FileSystem.stat(`${Dirs.SDCardDir}/Download/wjj.txt`)
-    console.log(result)
+    // result = await FileSystem.stat(`${Dirs.SDCardDir}/Download/wjj.txt`)
+    // console.log(result)
     // result = await FileSystem.readFile(`${Dirs.SDCardDir}/Download/wjj.txt`, 'utf8')
     // console.log(result)
-    file_path = `${Dirs.DocumentDir}/BulletinFile/o5u16bM76fMkX9tAiUPuruKWxEub6YPLkx`
-    result = await FileSystem.ls(file_path)
-    console.log(result)
-    result = await FileSystem.readFile(`${Dirs.DocumentDir}/BulletinFile/o5u16bM76fMkX9tAiUPuruKWxEub6YPLkx/1DA19E891780AFD8755E7100D70870A8890874DC`, 'utf8')
-    console.log(result)
+    // file_path = `${Dirs.DocumentDir}/BulletinFile/o5u16bM76fMkX9tAiUPuruKWxEub6YPLkx`
+    // result = await FileSystem.ls(file_path)
+    // console.log(result)
+    // result = await FileSystem.readFile(`${Dirs.DocumentDir}/BulletinFile/o5u16bM76fMkX9tAiUPuruKWxEub6YPLkx/1DA19E891780AFD8755E7100D70870A8890874DC`, 'utf8')
+    // console.log(result)
   }
 
   useEffect(() => {

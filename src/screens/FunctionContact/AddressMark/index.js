@@ -90,6 +90,13 @@ const AddressMarkScreen = (props) => {
       type: actionType.avatar.addFollow,
       address: props.avatar.get('CurrentAddressMark').Address
     })
+
+    props.dispatch({
+      type: actionType.avatar.FetchBulletin,
+      address: props.avatar.get('CurrentAddressMark').Address,
+      sequence: 1,
+      to: props.avatar.get('CurrentAddressMark').Address
+    })
   }
 
   const delFollow = () => {

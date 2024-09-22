@@ -37,11 +37,11 @@ function hasherSHA512(str) {
 }
 
 function halfSHA512(str) {
-  return hasherSHA512(str).toUpperCase().substr(0, 64)
+  return hasherSHA512(str).toUpperCase().substring(0, 64)
 }
 
 function quarterSHA512(str) {
-  return hasherSHA512(str).toUpperCase().substr(0, 32)
+  return hasherSHA512(str).toUpperCase().substring(0, 32)
 }
 
 function AesEncrypt(content, aes_key) {

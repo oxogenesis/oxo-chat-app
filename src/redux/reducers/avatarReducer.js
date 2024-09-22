@@ -234,8 +234,6 @@ reducer.prototype[actionType.avatar.setBulletinCacheSize] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setTabBulletinList] = (state, action) => {
-  // TODO
-  console.log(`setTabBulletinList=============================================${action.tab_bulletin_list.length}`)
   return state.set('TabBulletinList', action.tab_bulletin_list)
 }
 

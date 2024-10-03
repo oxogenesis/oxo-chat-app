@@ -3,10 +3,13 @@
 let DeclareSchema = {
   "type": "object",
   "required": ["Action", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 4,
+  "maxProperties": 5,
   "properties": {
     "Action": {
       "type": "number"
+    },
+    "URL": {
+      "type": "string"
     },
     "Timestamp": {
       "type": "number"

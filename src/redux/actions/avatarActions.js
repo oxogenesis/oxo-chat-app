@@ -10,7 +10,7 @@ import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, chec
 import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512, AvatarLoginTimeUpdate } from '../../lib/OXO'
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
-import { GBOB } from '../../lib/Util'
+import { GBOB, ConsoleInfo, ConsoleWarn, ConsoleError, ConsoleDebug } from '../../lib/Util'
 
 function DelayExec(ms) {
   return new Promise(resolve => {
@@ -921,8 +921,19 @@ export function* PublishBulletin(action) {
   // INSERT ' into sqlite
   let content = bulletin_json.Content.replace(/'/, "''")
   str_bulletin = str_bulletin.replace(/'/, "''")
+  let quote_count = 0
+  if (bulletin_json.Quote) {
+    quote_count = bulletin_json.Quote.length
+  }
+  let file_count = 0
+  ConsoleWarn(`----------------------------------------1`)
+  ConsoleWarn(bulletin_json)
+  if (bulletin_json.File) {
+    file_count = bulletin_json.File.length
+  }
+  ConsoleWarn(`----------------------------------------2`)
   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
-    VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, ${bulletin_json.File.length}, '${address}', 'FALSE')`
+    VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${address}', 'FALSE')`
   yield call([db, db.runSQL], sql)
   let bulletin = {
     "Address": address,
@@ -931,8 +942,8 @@ export function* PublishBulletin(action) {
     'Sequence': bulletin_json.Sequence,
     "Content": bulletin_json.Content,
     "Hash": hash,
-    "QuoteCount": bulletin_json.Quote.length,
-    "FileCount": bulletin_json.File.length,
+    "QuoteCount": quote_count,
+    "FileCount": file_count,
     "IsMark": false
   }
   yield put({ type: actionType.avatar.setNextBulletinSequence, sequence: next_sequence + 1 })

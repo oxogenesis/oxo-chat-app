@@ -185,8 +185,8 @@ let BulletinFileChunkRequest = {
 
 let BulletinAddressListResponseSchema = {
   "type": "object",
-  "required": ["Action", "Page", "List"],
-  "maxProperties": 3,
+  "required": ["Action", "Page", "List", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 6,
   "properties": {
     "Action": {
       "type": "number"
@@ -207,6 +207,15 @@ let BulletinAddressListResponseSchema = {
           "Count": { "type": "number" }
         }
       }
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
     }
   }
 }

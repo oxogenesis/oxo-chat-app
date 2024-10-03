@@ -11,6 +11,10 @@ export default class MessageGenerator {
     this.PrivateKey = private_key
   }
 
+  sign(msg) {
+    return Sign(msg, this.PrivateKey)
+  }
+
   signJson(json) {
     let sig = Sign(JSON.stringify(json), this.PrivateKey)
     json.Signature = sig
@@ -113,6 +117,25 @@ export default class MessageGenerator {
 
   // not a message, a bulletin string
   genBulletinJson(sequence, pre_hash, quote, file, content, timestamp) {
+    let content_hash = quarterSHA512(content)
+    let tmp_json = {
+      ObjectType: ObjectType.Bulletin,
+      Sequence: sequence,
+      PreHash: pre_hash,
+      Quote: quote,
+      File: file,
+      ContentHash: content_hash,
+      Timestamp: timestamp,
+      PublicKey: pk
+    }
+    if (quote == []) {
+      delete tmp_json["Quote"]
+    }
+    if (file == []) {
+      delete tmp_json["File"]
+    }
+    let sig = this.sign(JSON.stringify(tmp_json))
+
     let json = {
       ObjectType: ObjectType.Bulletin,
       Sequence: sequence,
@@ -121,7 +144,8 @@ export default class MessageGenerator {
       File: file,
       Content: content,
       Timestamp: timestamp,
-      PublicKey: this.PublicKey
+      PublicKey: pk,
+      Signature: sig
     }
     if (quote == []) {
       delete json["Quote"]
@@ -129,7 +153,7 @@ export default class MessageGenerator {
     if (file == []) {
       delete json["File"]
     }
-    return this.signJson(json)
+    return json
   }
 
   // not a message

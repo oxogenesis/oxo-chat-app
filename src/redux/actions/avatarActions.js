@@ -7,7 +7,7 @@ import { FileSystem, Dirs } from 'react-native-file-access'
 
 import { Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession, FileChunkSize } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
-import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, quarterSHA512, AvatarLoginTimeUpdate } from '../../lib/OXO'
+import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, QuarterSHA512, AvatarLoginTimeUpdate, VerifyBulletinJson } from '../../lib/OXO'
 import Database from '../../lib/Database'
 import MessageGenerator from '../../lib/MessageGenerator'
 import { GBOB, ConsoleInfo, ConsoleWarn, ConsoleError, ConsoleDebug } from '../../lib/Util'
@@ -917,7 +917,7 @@ export function* PublishBulletin(action) {
   let timestamp = Date.now()
   let bulletin_json = MessageGenerator.genBulletinJson(next_sequence, pre_hash, quote_list, file_list, action.content, timestamp)
   let str_bulletin = JSON.stringify(bulletin_json)
-  let hash = quarterSHA512(str_bulletin)
+  let hash = QuarterSHA512(str_bulletin)
   // INSERT ' into sqlite
   let content = bulletin_json.Content.replace(/'/, "''")
   str_bulletin = str_bulletin.replace(/'/, "''")
@@ -1011,9 +1011,9 @@ export function* SaveBulletin(action) {
 
   let object_address = DeriveAddress(bulletin_json.PublicKey)
   let strJson = JSON.stringify(bulletin_json)
-  let hash = quarterSHA512(strJson)
+  let hash = QuarterSHA512(strJson)
 
-  if (VerifyJsonSignature(bulletin_json) == true) {
+  if (VerifyBulletinJson(bulletin_json) == true) {
     bulletin_json.Address = object_address
     let timestamp = Date.now()
     let db = yield select(state => state.avatar.get('Database'))
@@ -1056,19 +1056,18 @@ export function* SaveBulletin(action) {
         }
       }
     } else {
+      let quote_count = 0
+      let file_count = 0
+      if (bulletin_json.Quote) {
+        quote_count = bulletin_json.Quote.length
+      }
+      if (bulletin_json.File) {
+        file_count = bulletin_json.File.length
+      }
       if (follow_list.includes(object_address)) {
         //bulletin from follow
-        let quote_count = 0
-        let file_count = 0
-        if (bulletin_json.Quote) {
-          quote_count = bulletin_json.Quote.length
-        }
-        if (bulletin_json.File) {
-          file_count = bulletin_json.File.length
-        }
-
         sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${relay_address}', 'FALSE')`
+          VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${relay_address}', 'FALSE')`
         //save bulletin
         yield call([db, db.runSQL], sql)
 
@@ -1119,8 +1118,8 @@ export function* SaveBulletin(action) {
         }
       } else if (quote_white_list.includes(hash) || message_white_list.includes(hash)) {
         //bulletin from quote
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
+        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
+          VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${relay_address}', 'TRUE')`
 
         //save bulletin
         yield call([db, db.runSQL], sql)
@@ -1131,7 +1130,7 @@ export function* SaveBulletin(action) {
         // } else if (message_white_list.includes(hash)) {
         //   //bulletin from message
         //   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
-        // VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
+        // VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, '${relay_address}', 'TRUE')`
 
         //   //save bulletin
         //   yield call([db, db.runSQL], sql)
@@ -1141,14 +1140,14 @@ export function* SaveBulletin(action) {
         //   }
       } else if (self_address == object_address) {
         //bulletin from myself
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
+        sql = `INSERT INTO BULLETINS(address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
+        VALUES('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${relay_address}', 'TRUE')`
         //save bulletin
         yield call([db, db.runSQL], sql)
         yield put({ type: actionType.avatar.setNextBulletinSequence, sequence: bulletin_json.Sequence + 1 })
 
         // save quote
-        if (bulletin_json.Quote.length > 0) {
+        if (quote_count > 0) {
           yield put({
             type: actionType.avatar.SaveQuote,
             quoter_address: object_address,
@@ -1163,13 +1162,13 @@ export function* SaveBulletin(action) {
         yield put({ type: actionType.avatar.FetchBulletin, address: object_address, sequence: bulletin_json.Sequence + 1, to: object_address })
       } else if (random_bulletin_flag) {
         //bulletin from random
-        sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, relay_address, is_cache)
-        VALUES ('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${bulletin_json.Quote.length}, '${relay_address}', 'TRUE')`
+        sql = `INSERT INTO BULLETINS(address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
+        VALUES('${object_address}', ${bulletin_json.Sequence}, '${bulletin_json.PreHash}', '${bulletin_json.Content}', '${bulletin_json.Timestamp}', '${strJson}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${relay_address}', 'TRUE')`
         //save bulletin
         yield call([db, db.runSQL], sql)
 
         // save quote
-        if (bulletin_json.Quote.length > 0) {
+        if (quote_count > 0) {
           yield put({
             type: actionType.avatar.SaveQuote,
             quoter_address: object_address,
@@ -1193,7 +1192,7 @@ export function* SaveBulletin(action) {
       }
     }
   }
-  console.log(`===================================================================SaveBulletin<<<`)
+  console.log(`===================================================================SaveBulletin <<< `)
 }
 
 export function* LoadTabBulletinList(action) {
@@ -1218,7 +1217,7 @@ export function* LoadTabBulletinList(action) {
     address_list.push(follow)
   })
   address_list.push(self_address)
-  sql = `SELECT * FROM BULLETINS WHERE address IN (${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
+  sql = `SELECT * FROM BULLETINS WHERE address IN(${Array2Str(address_list)}) ORDER BY timestamp DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size} `
   let tmp = []
   let items = yield call([db, db.getAll], sql)
   items.forEach(bulletin => {
@@ -1260,7 +1259,7 @@ export function* LoadBulletinList(action) {
   if (action.session == BulletinAddressSession) {
     // 显示本地数据
     yield put({ type: actionType.avatar.setCurrentBBSession, current_BB_session: action.address })
-    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
+    sql = `SELECT * FROM BULLETINS WHERE address = '${action.address}' ORDER BY sequence DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size} `
     // 获取更新
     // 甚至是自己的公告，为切换设备后从服务器取回历史公告 && action.address != self_address
     let next_sequence = 1
@@ -1290,9 +1289,9 @@ export function* LoadBulletinList(action) {
       yield put({ type: actionType.avatar.FetchBulletin, address: action.address, sequence: next_sequence, to: GenesisAddress })
     }
   } else if (action.session == BulletinHistorySession) {
-    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
+    sql = `SELECT * FROM BULLETINS ORDER BY view_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size} `
   } else if (action.session == BulletinMarkSession) {
-    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY mark_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size}`
+    sql = `SELECT * FROM BULLETINS WHERE is_mark = 'TRUE' ORDER BY mark_at DESC LIMIT ${BulletinPageSize} OFFSET ${bulletin_list_size} `
   }
 
   let tmp = []
@@ -1368,7 +1367,7 @@ export function* FetchBulletin(action) {
 export function* FetchRandomBulletin() {
   // let address = yield select(state => state.avatar.get('Address'))
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let msg = MessageGenerator.genBulletinRandom()
+  let msg = MessageGenerator.genBulletinRandomRequest()
   yield put({ type: actionType.avatar.SendMessage, message: msg })
 }
 
@@ -1410,7 +1409,7 @@ export function* LoadCurrentSession(action) {
   let ecdh_sequence = DHSequence(DefaultPartition, timestamp, self_address, address)
 
   //fetch aes-Key according to (address+partition+sequence)
-  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${DefaultPartition}" AND sequence = ${ecdh_sequence}`
+  let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${DefaultPartition}" AND sequence = ${ecdh_sequence} `
   let ecdh = yield call([db, db.getOne], sql)
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
@@ -1433,8 +1432,8 @@ export function* LoadCurrentSession(action) {
     // console.log(msg)
 
     //save my-sk-pk, self-not-ready-json
-    let sql = `INSERT INTO ECDHS (address, partition, sequence, private_key, self_json)
-      VALUES ('${address}', '${DefaultPartition}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
+    let sql = `INSERT INTO ECDHS(address, partition, sequence, private_key, self_json)
+        VALUES('${address}', '${DefaultPartition}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
     let reuslt = yield call([db, db.runSQL], sql)
     // {"insertId": 1, "rows": {"item": [Function item], "length": 0, "raw": [Function raw]}, "rowsAffected": 1}
     // {"code": 0, "message": "UNIQUE constraint failed: ECDHS.address, ECDHS.partition, ECDHS.sequence (code 1555 sqlITE_CONSTRAINT_PRIMARYKEY)"}
@@ -1486,7 +1485,7 @@ export function* LoadCurrentMessageList(action) {
   let message_list_size = message_list.length
   let message_white_list = yield select(state => state.avatar.get('MessageWhiteList'))
 
-  let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size}`
+  let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size} `
   let items = yield call([db, db.getAll], sql)
   let tmp = []
   items.forEach(item => {
@@ -1559,8 +1558,8 @@ export function* HandleFriendECDH(action) {
       sql = `UPDATE FRIEND_REQUESTS SET updated_at = ${timestamp} WHERE address = "${address}"`
       result = yield call([db, db.runSQL], sql)
     } else {
-      sql = `INSERT INTO FRIEND_REQUESTS (address, updated_at)
-        VALUES ('${address}', ${timestamp})`
+      sql = `INSERT INTO FRIEND_REQUESTS(address, updated_at)
+        VALUES('${address}', ${timestamp})`
       result = yield call([db, db.runSQL], sql)
     }
     if (result && result.code != 0) {
@@ -1571,7 +1570,7 @@ export function* HandleFriendECDH(action) {
   } else {
     //check dh(my-sk-pk pair-pk aes-key)
 
-    let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${json.Partition}" AND sequence = ${json.Sequence}`
+    let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${json.Partition}" AND sequence = ${json.Sequence} `
     let item = yield call([db, db.getOne], sql)
 
     if (item == null) {
@@ -1586,8 +1585,8 @@ export function* HandleFriendECDH(action) {
       let msg = MessageGenerator.genFriendECDHRequest(json.Partition, json.Sequence, ecdh_pk, json.DHPublicKey, address, timestamp)
 
       //save my-sk-pk, pair-pk, aes-key, self-not-ready-json
-      sql = `INSERT INTO ECDHS (address, partition, sequence, private_key, public_key, aes_key, self_json)
-        VALUES ('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
+      sql = `INSERT INTO ECDHS(address, partition, sequence, private_key, public_key, aes_key, self_json)
+        VALUES('${address}', '${json.Partition}', '${json.Sequence}', '${ecdh_sk}', '${json.DHPublicKey}', '${aes_key}', '${msg}')`
       let reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         yield put({ type: actionType.avatar.SendMessage, message: msg })
@@ -1640,7 +1639,7 @@ export function* HandleFriendMessage(action) {
   }
 
   //check pre-message
-  let sql = `SELECT * FROM MESSAGES WHERE sour_address = "${sour_address}" AND hash = "${json.PreHash}" AND sequence = ${json.Sequence - 1}`
+  let sql = `SELECT * FROM MESSAGES WHERE sour_address = "${sour_address}" AND hash = "${json.PreHash}" AND sequence = ${json.Sequence - 1} `
   let item = yield call([db, db.getOne], sql)
   if (item == null) {
     if (json.Sequence == 1) {
@@ -1673,7 +1672,7 @@ export function* SaveFriendMessage(action) {
   let self_address = yield select(state => state.avatar.get('Address'))
   let sequence = DHSequence(DefaultPartition, json.Timestamp, self_address, sour_address)
   //fetch chatkey(aes_key) to decrypt content
-  let sql = `SELECT * FROM ECDHS WHERE address = "${sour_address}" AND partition = "${DefaultPartition}" AND sequence = ${sequence}`
+  let sql = `SELECT * FROM ECDHS WHERE address = "${sour_address}" AND partition = "${DefaultPartition}" AND sequence = ${sequence} `
   let item = yield call([db, db.getOne], sql)
   if (item == null && item.aes_key == null) {
     console.log('chatkey not exist...')
@@ -1682,7 +1681,7 @@ export function* SaveFriendMessage(action) {
     let content = AesDecrypt(json.Content, item.aes_key)
 
     let strJson = JSON.stringify(json)
-    let hash = quarterSHA512(strJson)
+    let hash = QuarterSHA512(strJson)
     let created_at = Date.now()
 
     let readed = 'FALSE'
@@ -1711,8 +1710,8 @@ export function* SaveFriendMessage(action) {
     }
 
     //save message
-    let sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
-      VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+    let sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
+        VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
 
     let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
@@ -1741,7 +1740,8 @@ export function* SaveFriendMessage(action) {
       yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 
       //update db-message(confirmed)
-      sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN (${Array2Str(json.PairHash)})`
+      sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN(${Array2Str(json.PairHash)
+        })`
       reuslt = yield call([db, db.runSQL], sql)
       if (reuslt.code != 0) {
         //update view-message(confirmed)
@@ -1774,7 +1774,7 @@ export function* SaveFriendMessage(action) {
     //           file_saved = true
     //         }
     //         //update sql
-    //         sql = `INSERT INTO MESSAGES (sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash)
+    //         sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash)
     //           VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', ${readed}, ${is_file}, ${file_saved}, '${file_hash}')`
     //       }
     //     })
@@ -1852,7 +1852,7 @@ export function* SendFriendMessage(action) {
 
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genFriendMessage(sequence, current_session.Hash, pair_hash, content, dest_address, timestamp)
-  let hash = quarterSHA512(msg)
+  let hash = QuarterSHA512(msg)
   let is_file = 'FALSE'
   let file_saved = 'FALSE'
   let file_hash = null

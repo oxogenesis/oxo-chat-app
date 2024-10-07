@@ -5,7 +5,7 @@ const DefaultBulletinCacheSize = 0
 //const Epoch = Date.parse('2011-11-11 11:11:11')
 const Epoch = 1320981071000
 
-//const GenesisHash = quarterSHA512('obeTvR9XDbUwquA6JPQhmbgaCCaiFa2rvf')
+//const GenesisHash = QuarterSHA512('obeTvR9XDbUwquA6JPQhmbgaCCaiFa2rvf')
 const GenesisAddress = 'obeTvR9XDbUwquA6JPQhmbgaCCaiFa2rvf'
 const GenesisHash = 'F4C2EB8A3EBFC7B6D81676D79F928D0E'
 
@@ -16,7 +16,7 @@ const ActionCode = {
   Declare: 100,
   ObjectResponse: 101,
 
-  BulletinRandom: 200,
+  BulletinRandomRequest: 200,
   BulletinRequest: 201,
   BulletinFileChunkRequest: 202,
   BulletinAddressListRequest: 203,

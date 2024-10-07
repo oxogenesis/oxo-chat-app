@@ -1,4 +1,4 @@
-import { Sign, quarterSHA512 } from './OXO'
+import { Sign, QuarterSHA512 } from './OXO'
 import {
   ActionCode,
   ObjectType
@@ -39,9 +39,9 @@ export default class MessageGenerator {
     return JSON.stringify(this.signJson(json))
   }
 
-  genBulletinRandom() {
+  genBulletinRandomRequest() {
     let json = {
-      Action: ActionCode.BulletinRandom,
+      Action: ActionCode.BulletinRandomRequest,
       Timestamp: Date.now(),
       PublicKey: this.PublicKey
     }
@@ -95,7 +95,7 @@ export default class MessageGenerator {
 
   genObjectResponse(object, to) {
     let object_string = JSON.stringify(object)
-    let object_hash = quarterSHA512(object_string)
+    let object_hash = QuarterSHA512(object_string)
     let tmp_json = {
       Action: ActionCode.ObjectResponse,
       ObjectHash: object_hash,
@@ -117,7 +117,7 @@ export default class MessageGenerator {
 
   // not a message, a bulletin string
   genBulletinJson(sequence, pre_hash, quote, file, content, timestamp) {
-    let content_hash = quarterSHA512(content)
+    let content_hash = QuarterSHA512(content)
     let tmp_json = {
       ObjectType: ObjectType.Bulletin,
       Sequence: sequence,

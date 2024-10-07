@@ -1,7 +1,6 @@
 import crypto from 'react-native-quick-crypto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { set } from 'immutable'
-import { Epoch } from './Const'
+import { Epoch, ObjectType } from './Const'
 
 const oxoKeyPairs = require("oxo-keypairs")
 
@@ -40,7 +39,7 @@ function halfSHA512(str) {
   return hasherSHA512(str).toUpperCase().substring(0, 64)
 }
 
-function quarterSHA512(str) {
+function QuarterSHA512(str) {
   return hasherSHA512(str).toUpperCase().substring(0, 32)
 }
 
@@ -353,6 +352,28 @@ function VerifyJsonSignature(json) {
   }
 }
 
+function VerifyBulletinJson(bulletin) {
+  let content_hash = QuarterSHA512(bulletin.Content)
+  let tmp_json = {
+    ObjectType: ObjectType.Bulletin,
+    Sequence: bulletin.Sequence,
+    PreHash: bulletin.PreHash,
+    Quote: bulletin.Quote,
+    File: bulletin.File,
+    ContentHash: content_hash,
+    Timestamp: bulletin.Timestamp,
+    PublicKey: bulletin.PublicKey,
+    Signature: bulletin.Signature
+  }
+  if (!bulletin.Quote) {
+    delete tmp_json.Quote
+  }
+  if (!bulletin.File) {
+    delete tmp_json.File
+  }
+  return VerifyJsonSignature(tmp_json)
+}
+
 function DeriveAddress(publicKey) {
   return oxoKeyPairs.deriveAddress(publicKey)
 }
@@ -364,13 +385,14 @@ function DeriveKeypair(seed) {
 export {
   strToHex,
   halfSHA512,
-  quarterSHA512,
+  QuarterSHA512,
   encrypt,
   decrypt,
   DeriveAddress,
   DeriveKeypair,
   Sign,
   VerifyJsonSignature,
+  VerifyBulletinJson,
   AesEncrypt,
   AesDecrypt,
   MasterKeySet,

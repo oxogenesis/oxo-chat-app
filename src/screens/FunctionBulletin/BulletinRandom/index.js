@@ -176,7 +176,7 @@ const BulletinRandomScreen = (props) => {
                 }
                 {/* 收藏按键 */}
                 {
-                  (current.IsMark == 0 || current.IsMark == "FALSE") &&
+                  (random.IsMark == 0 || random.IsMark == "FALSE") &&
                   <TouchableOpacity onPress={handleCollection}>
                     <IconEntypo
                       name={"star-outlined"}

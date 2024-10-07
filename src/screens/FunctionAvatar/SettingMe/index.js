@@ -13,6 +13,7 @@ import ViewModal from '../../../component/ViewModal'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import QRCode from 'react-native-qrcode-svg'
 import tw from '../../../lib/tailwind'
+import { set } from 'immutable'
 
 //设置
 const SettingMeScreen = (props) => {
@@ -88,18 +89,27 @@ const SettingMeScreen = (props) => {
       // await FileSystem.mv(image_file_path, avatar_img_path)
       let content = `data:${image.mime};base64,${image.data}`
       setAvatarImg(content)
-      await FileSystem.writeFile(avatar_img_path, content, 'utf8')
+      // await FileSystem.writeFile(avatar_img_path, content, 'utf8')
+      props.dispatch({
+        type: actionType.master.updateAvatarImage,
+        address: address,
+        image: content
+      })
     }
   }
 
   const loadAvatar = async () => {
-    let address = props.avatar.get('Address')
-    let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
-    let avatar_img_path = `${avatar_img_dir}/${address}`
-    let result = await FileSystem.exists(avatar_img_path)
-    if (result) {
-      result = await FileSystem.readFile(avatar_img_path, 'utf8')
-      setAvatarImg(result)
+    // let address = props.avatar.get('Address')
+    // let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
+    // let avatar_img_path = `${avatar_img_dir}/${address}`
+    // let result = await FileSystem.exists(avatar_img_path)
+    // if (result) {
+    //   result = await FileSystem.readFile(avatar_img_path, 'utf8')
+    //   setAvatarImg(result)
+    // }
+    let avatar_image = props.master.get("AvatarImage")
+    if (avatar_image[props.avatar.get('Address')]) {
+      setAvatarImg(avatar_image[props.avatar.get('Address')])
     }
   }
 
@@ -117,7 +127,7 @@ const SettingMeScreen = (props) => {
   })
 
   useEffect(() => {
-    if (props.avatar.get('Database') == null) {
+    if (props.avatar.get('AvatarDB') == null) {
       if (props.master.get("Multi") == true) {
         props.navigation.reset({
           index: 0,

@@ -48,7 +48,7 @@ const AvatarListScreen = props => {
   // }, [props.master])
 
   useEffect(() => {
-    if (props.avatar.get('Database') != null) {
+    if (props.avatar.get('AvatarDB') != null) {
       props.navigation.replace('TabHome')
     }
   }, [props.avatar])

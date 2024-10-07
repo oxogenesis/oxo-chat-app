@@ -13,6 +13,8 @@ import LinkMsgInfo from '../../../component/LinkMsgInfo'
 import TextTimestamp from '../../../component/TextTimestamp'
 import { Dirs, FileSystem } from 'react-native-file-access'
 import tw from '../../../lib/tailwind'
+import ItemMessageFriend from '../../../component/ItemMessageFriend'
+import ItemMessageMe from '../../../component/ItemMessageMe'
 
 //聊天会话界面
 const SessionScreen = (props) => {
@@ -142,62 +144,12 @@ const SessionScreen = (props) => {
         renderItem={({ item }) => {
           if (item.SourAddress == friend_address) {
             return (
-              <View style={tw`flex flex-row`} key={item.Hash}>
-                <View style={tw``}>
-                  <AvatarImage address={friend_address} />
-                </View>
-
-                <View style={tw`max-w-64 mt-5px ml-5px`}>
-                  <Text style={tw`text-left`}>
-                    <LinkMsgInfo hash={item.Hash} sequence={item.Sequence} />
-                    <TextTimestamp timestamp={item.Timestamp} textSize={'text-xs'} />
-                  </Text>
-
-                  <View style={tw`flex flex-row`}>
-                    <Text style={tw`mr-5px mt-2px p-2px ${item.Confirmed ? 'bg-green-500' : 'bg-neutral-100'} rounded-r-md rounded-bl-md`}>
-                      {
-                        item.IsObject ?
-                          <LinkBulletin address={item.ObjectJson.Address} sequence={item.ObjectJson.Sequence} hash={item.ObjectJson.Hash} to={props.route.params.address} />
-                          :
-                          <Text style={tw`text-sm text-left`} onPress={() => { copyToClipboard(item.Content) }}>
-                            {item.Content}
-                          </Text>
-                      }
-                    </Text>
-                  </View>
-                </View>
-              </View>
+              <ItemMessageFriend message={item} friend_address={friend_address} />
             )
           }
           else {
             return (
-              <View style={tw`flex flex-row-reverse`} key={item.Hash}>
-                <View style={tw`ml-50px max-w-64 mt-5px`}>
-                  <Text style={tw`text-right mr-5px`}>
-                    <LinkMsgInfo hash={item.Hash} sequence={item.Sequence} />
-                    <TextTimestamp timestamp={item.Timestamp} textSize={'text-xs'} />
-                  </Text>
-
-                  <View style={tw`flex flex-row-reverse`}>
-                    <Text style={tw`mr-5px mt-2px p-2px ${item.Confirmed ? 'bg-green-500' : 'bg-neutral-100'} rounded-l-md rounded-br-md`}>
-                      {
-                        item.IsObject ?
-                          <View style={tw``}>
-                            <LinkBulletin address={item.ObjectJson.Address} sequence={item.ObjectJson.Sequence} hash={item.ObjectJson.Hash} to={props.route.params.address} />
-                          </View>
-                          :
-                          <Text style={tw`text-sm text-right`} onPress={() => { copyToClipboard(item.Content) }}>
-                            {item.Content}
-                          </Text>
-                      }
-                    </Text>
-                  </View>
-                </View>
-
-                <View>
-                  <AvatarImage address={self_address} />
-                </View>
-              </View>
+              <ItemMessageMe message={item} self_address={self_address} />
             )
           }
         }}
@@ -211,7 +163,7 @@ const SessionScreen = (props) => {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={tw`w-7/10`}>
+        <View style={tw`w-8/10`}>
           <TextInput
             placeholderTextColor={tw.color('stone-500')}
             style={tw`border-solid border-t border-gray-300 dark:border-gray-700 text-sm text-slate-800 dark:text-slate-200`}
@@ -223,13 +175,13 @@ const SessionScreen = (props) => {
             onChangeText={text => setMsgInput(text)}
           />
         </View>
-        <View style={tw`w-1/10`}>
+        {/* <View style={tw`w-1/10`}>
           <TouchableOpacity style={tw`h-full rounded-none bg-yellow-500`} onPress={() => props.navigation.push('FileSelect', { address: props.route.params.address, dir: Dirs.SDCardDir })} >
             <Text style={tw`h-full align-middle text-lg text-center font-bold text-slate-200`}>
               +
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </View >
   )

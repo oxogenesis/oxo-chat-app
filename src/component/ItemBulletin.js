@@ -27,13 +27,13 @@ const ItemBulletin = (props) => {
             {
               bulletin.QuoteCount != 0 &&
               <Text style={tw`text-sm font-bold text-gray-400 dark:text-gray-200`}>
-                引用：◀{bulletin.QuoteCount}
+                引用：{bulletin.QuoteCount}▶
               </Text>
             }
             {
               bulletin.FileCount != 0 &&
               <Text style={tw`text-sm font-bold text-gray-400 dark:text-gray-200`}>
-                附件：◀{bulletin.FileCount}
+                附件：{bulletin.FileCount}▦
               </Text>
             }
           </View>

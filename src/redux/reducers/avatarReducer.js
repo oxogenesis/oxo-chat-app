@@ -10,7 +10,7 @@ function initialState() {
       PublicKey: null,
       PrivateKey: null,
 
-      Database: null,
+      AvatarDB: null,
 
       HostList: [],
       CurrentHost: null,
@@ -74,7 +74,7 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('Address', action.address)
     .set('PublicKey', action.public_key)
     .set('PrivateKey', action.private_key)
-    .set('Database', null)
+    .set('AvatarDB', null)
     .set('CurrentHost', null)
     .set('CurrentBBSession', null)
     .set('CurrentBulletin', null)
@@ -114,8 +114,8 @@ reducer.prototype[actionType.avatar.setAvatarName] = (state, action) => {
   return state.set('Name', action.name)
 }
 
-reducer.prototype[actionType.avatar.setDatabase] = (state, action) => {
-  return state.set('Database', action.db)
+reducer.prototype[actionType.avatar.setAvatarDB] = (state, action) => {
+  return state.set('AvatarDB', action.db)
 }
 
 reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
@@ -123,7 +123,7 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('Address', null)
     .set('PublicKey', null)
     .set('PrivateKey', null)
-    .set('Database', null)
+    .set('AvatarDB', null)
     .set('CurrentHost', null)
     // Bulletin
     .set('CurrentBBSession', null)

@@ -130,22 +130,29 @@ const UnlockScreen = (props) => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
+      props.dispatch({
+        type: actionType.master.loadAvatarImage
+      })
+
       if (props.master.get('MasterKey') != null) {
         // 强制安全退出：加载此页面，置空MasterKey
         props.dispatch({
           type: actionType.master.setMasterKey,
           MasterKey: null
         })
+
       }
       setKey('')
       setErrorMsg('')
 
       mkdir()
+
+
     })
   })
 
   useEffect(() => {
-    if (props.avatar.get('Database') != null) {
+    if (props.avatar.get('AvatarDB') != null) {
       props.navigation.replace('TabHome')
     }
   }, [props.avatar])
@@ -181,7 +188,7 @@ const UnlockScreen = (props) => {
   //   console.log(`hasPermission------------------------------${hasPermission}`)
   //   if (hasPermission) {
   //     console.log(`${Dirs.DocumentDir}`)
-  //     console.log(`${Dirs.DatabaseDir}`)
+  //     console.log(`${Dirs.AvatarDBDir}`)
   //     console.log(`${Dirs.CacheDir}`)
   //     console.log(`${Dirs.MainBundleDir}`)
   //     console.log(`${Dirs.SDCardDir}`)

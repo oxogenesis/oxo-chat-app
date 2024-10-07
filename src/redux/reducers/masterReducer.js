@@ -6,7 +6,9 @@ function initialState() {
     {
       MasterKey: null,
       Multi: false,
-      Dark: false
+      Dark: false,
+      MainDB: null,
+      AvatarImage: {}
     }
   )
 }
@@ -29,4 +31,12 @@ reducer.prototype[actionType.master.setMulti] = (state, action) => {
 
 reducer.prototype[actionType.master.setDark] = (state, action) => {
   return state.set('Dark', action.dark)
+}
+
+reducer.prototype[actionType.master.setMainDB] = (state, action) => {
+  return state.set('MainDB', action.db)
+}
+
+reducer.prototype[actionType.master.setAvatarImage] = (state, action) => {
+  return state.set('AvatarImage', action.avatar_image)
 }

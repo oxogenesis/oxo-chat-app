@@ -5,7 +5,12 @@ import * as masterActions from './masterActions'
 import * as avatarActions from './avatarActions'
 
 export default function* rootSaga() {
-  //avatar
+
+  //-------------------------------------------->master
+  yield takeEvery(actionType.master.loadAvatarImage, masterActions.loadAvatarImage)
+  yield takeEvery(actionType.master.updateAvatarImage, masterActions.updateAvatarImage)
+
+  //-------------------------------------------->avatar
   yield takeEvery(actionType.avatar.enableAvatar, avatarActions.enableAvatar)
   yield takeEvery(actionType.avatar.disableAvatar, avatarActions.disableAvatar)
   yield takeEvery(actionType.avatar.loadFromDB, avatarActions.loadFromDB)

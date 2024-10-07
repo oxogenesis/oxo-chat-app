@@ -2,28 +2,32 @@ import React, { useState, useEffect } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { View, Image, Text } from 'react-native'
-import { Dirs, FileSystem } from 'react-native-file-access'
+// import { Dirs, FileSystem } from 'react-native-file-access'
 import tw from '../lib/tailwind'
 
 const AvatarImage = (props) => {
 
   const [avatarImg, setAvatarImg] = useState(null)
 
-  const loadImg = async () => {
-    let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
-    let avatar_img_path = `${avatar_img_dir}/${props.address}`
-    let result = await FileSystem.exists(avatar_img_path)
-    if (result) {
-      result = await FileSystem.readFile(avatar_img_path, 'utf8')
-      setAvatarImg(result)
-    }
-  }
+  // const loadImg = async () => {
+  //   let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
+  //   let avatar_img_path = `${avatar_img_dir}/${props.address}`
+  //   let result = await FileSystem.exists(avatar_img_path)
+  //   if (result) {
+  //     result = await FileSystem.readFile(avatar_img_path, 'utf8')
+  //     setAvatarImg(result)
+  //   }
+  // }
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      loadImg()
+      let avatar_image = props.master.get("AvatarImage")
+      if (avatar_image[props.address]) {
+        setAvatarImg(avatar_image[props.address])
+      }
     })
   })
+
 
   return (
     <View>
@@ -55,6 +59,7 @@ const AvatarImage = (props) => {
 
 const ReduxAvatarImage = connect((state) => {
   return {
+    master: state.master,
     avatar: state.avatar
   }
 })(AvatarImage)

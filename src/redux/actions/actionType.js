@@ -2,12 +2,16 @@ export const actionType = {
   master: {
     setMasterKey: 'SET_MASTER_KEY',
     setDark: 'SET_DARK',
-    setMulti: 'SET_MULTI'
+    setMulti: 'SET_MULTI',
+    setMainDB: 'SET_MAIN_DB',
+    updateAvatarImage: 'UPDATE_AVATAR_IMAGE',
+    setAvatarImage: 'SET_AVATAR_IMAGE',
+    loadAvatarImage: 'LOAD_AVATAR_IMAGE'
   },
   avatar: {
     setAvatar: 'SET_AVATAR',
     setAvatarName: 'SET_AVATAR_NAME',
-    setDatabase: 'SET_DATABASE',
+    setAvatarDB: 'SET_AVATAR_DB',
 
     enableAvatar: 'ENABLE_AVATAR',
     disableAvatar: 'DISABLE_AVATAR',

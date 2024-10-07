@@ -7,7 +7,7 @@ import tw from '../lib/tailwind'
 
 const LinkMsgInfo = (props) => {
   return (
-    <View style={tw`rounded-full px-1 border border-gray-400 bg-green-400`}>
+    <View style={tw`rounded-full px-1 border border-gray-400 bg-green-200`}>
       <Text style={tw`text-xs text-gray-400 text-center`} onPress={() => props.navigation.push('MsgInfo', { hash: props.hash })}>
         {`#${props.sequence}`}
       </Text>

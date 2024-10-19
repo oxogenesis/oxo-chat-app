@@ -6,12 +6,6 @@ import { DefaultPartition } from '../../../lib/Const'
 import { DHSequence } from '../../../lib/OXO'
 import { actionType } from '../../../redux/actions/actionType'
 import { connect } from 'react-redux'
-import Clipboard from '@react-native-clipboard/clipboard'
-import AvatarImage from '../../../component/AvatarImage'
-import LinkBulletin from '../../../component/LinkBulletin'
-import LinkMsgInfo from '../../../component/LinkMsgInfo'
-import TextTimestamp from '../../../component/TextTimestamp'
-import { Dirs, FileSystem } from 'react-native-file-access'
 import tw from '../../../lib/tailwind'
 import ItemMessageFriend from '../../../component/ItemMessageFriend'
 import ItemMessageMe from '../../../component/ItemMessageMe'
@@ -61,13 +55,6 @@ const SessionScreen = (props) => {
       init_flag: init_flag,
       address: props.route.params.address
     })
-  }
-
-  const copyToClipboard = (content) => {
-    Clipboard.setString(content)
-    ToastAndroid.show('拷贝成功！',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER)
   }
 
   useEffect(() => {

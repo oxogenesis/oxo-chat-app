@@ -1,7 +1,8 @@
 import React from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { View, Text } from 'react-native'
+import { View, Text, ToastAndroid } from 'react-native'
 import { connect } from 'react-redux'
+import Clipboard from '@react-native-clipboard/clipboard'
 import AvatarImage from './AvatarImage'
 import TextTimestamp from './TextTimestamp'
 import LinkMsgInfo from './LinkMsgInfo'
@@ -10,6 +11,12 @@ import tw from '../lib/tailwind'
 
 const ItemMessageMe = (props) => {
   const msg = props.message
+  const copyToClipboard = (content) => {
+    Clipboard.setString(content)
+    ToastAndroid.show('拷贝成功！',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
+  }
   return (
     <View style={tw`flex flex-row-reverse`} key={msg.Hash}>
       <View>

@@ -66,6 +66,18 @@ function timestamp_format(timestamp) {
   return tmp + add0(h) + ':' + add0(mm) + ':' + add0(s)
 }
 
+function timestamp2Number(timestamp) {
+  let time = new Date(timestamp)
+  let y = time.getFullYear()
+  let m = time.getMonth() + 1
+  let d = time.getDate()
+  let h = time.getHours()
+  let mm = time.getMinutes()
+  let s = time.getSeconds()
+  let tmp = ''
+  return tmp + y + add0(m) + add0(d) + add0(h) + add0(mm) + add0(s)
+}
+
 function filesize_format(filesize) {
   if (filesize >= gb) {
     return `${Number((filesize / gb).toFixed(2))}GB`
@@ -125,6 +137,7 @@ export {
   ConsoleError,
   ConsoleDebug,
   timestamp_format,
+  timestamp2Number,
   filesize_format,
   AddressToName,
   GBOB,

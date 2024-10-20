@@ -16,6 +16,7 @@ import AvatarCreateScreen from '../FunctionAvatar/AvatarCreate'
 import AvatarCreateFromScanSeedQrcodeScreen from '../FunctionAvatar/AvatarCreateFromScanSeedQrcode'
 import AvatarNameEditScreen from '../FunctionAvatar/AvatarNameEdit'
 import AvatarSeedScreen from '../FunctionAvatar/AvatarSeed'
+import DatabaseFileSelectScreen from '../FunctionAvatar/DatabaseFileSelect'
 import AvatarSeedQrcodeScreen from '../FunctionAvatar/AvatarSeedQrcode'
 import SettingMeScreen from '../FunctionAvatar/SettingMe'
 
@@ -184,6 +185,17 @@ const AppStack = (props) => {
           })
         }
       />
+      <Stack.Screen
+        name="DatabaseFileSelect"
+        component={DatabaseFileSelectScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '加载备份数据',
+            ...headerStyleOption,
+          })
+        }
+      />
+
       <Stack.Screen
         name="AvatarSeedQrcode"
         component={AvatarSeedQrcodeScreen}

@@ -7,6 +7,8 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import ViewModal from '../../../component/ViewModal'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import tw from '../../../lib/tailwind'
+import { Dirs, FileSystem } from 'react-native-file-access'
+import { ConsoleWarn, timestamp2Number } from '../../../lib/Util'
 
 // 查看种子
 const AvatarSeedScreen = (props) => {
@@ -54,10 +56,24 @@ const AvatarSeedScreen = (props) => {
               routes: [{ name: 'Unlock' }],
             })
           }
-
         }
         showRemoveAvatar(false)
       })
+  }
+
+  const backupDB = async () => {
+    let timestamp = timestamp2Number(Date.now())
+
+    let sour_file_path = `${Dirs.DatabaseDir}/${props.avatar.get('Address')}`
+    let dest_file_path = `${Dirs.SDCardDir}/Download/oxo.${props.avatar.get('Address')}.${timestamp}.db`
+    result = await FileSystem.cp(sour_file_path, dest_file_path)
+    ToastAndroid.show(`文件已复制到${dest_file_path}`,
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER)
+  }
+
+  const selectDB = async () => {
+    props.navigation.push('DatabaseFileSelect', { dir: Dirs.SDCardDir })
   }
 
   return (
@@ -73,9 +89,9 @@ const AvatarSeedScreen = (props) => {
         <Text style={tw`text-base text-neutral-500`}>
           {`注意：查看种子，应回避具备视觉的生物或设备，应在私密可控环境下。`}
         </Text>
-        {
-          <ButtonPrimary title='删除账号' bg='bg-red-500' onPress={() => viewRemoveAvatar()} />
-        }
+        <ButtonPrimary title='删除账号' bg='bg-red-500' onPress={() => viewRemoveAvatar()} />
+        <ButtonPrimary title='备份数据' bg='bg-green-500' onPress={() => backupDB()} />
+        <ButtonPrimary title='加载数据' bg='bg-green-500' onPress={() => selectDB()} />
       </View>
 
       <ViewModal

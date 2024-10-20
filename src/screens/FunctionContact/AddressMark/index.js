@@ -1,36 +1,30 @@
 import React, { useState, useEffect } from 'react'
-import { View, ToastAndroid } from 'react-native'
+import { View, ScrollView, ToastAndroid } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import ImagePicker from 'react-native-image-crop-picker'
-import { Dirs, FileSystem } from 'react-native-file-access'
+import QRCode from 'react-native-qrcode-svg'
 import { BulletinAddressSession } from '../../../lib/Const'
 import Clipboard from '@react-native-clipboard/clipboard'
 import ViewModal from '../../../component/ViewModal'
-import AvatarImage from '../../../component/AvatarImage'
 import LinkSetting from '../../../component/LinkSetting'
 import SwitchSetting from '../../../component/SwitchSetting'
 import ButtonPrimary from '../../../component/ButtonPrimary'
-import { AddressToName } from '../../../lib/Util'
+import { AddressToName, ConsoleInfo, ConsoleWarn } from '../../../lib/Util'
 import tw from '../../../lib/tailwind'
 
 //地址标记
 const AddressMarkScreen = (props) => {
-  const [isFriend, setFriend] = useState(undefined)
-  const [isFollow, setFollow] = useState(undefined)
+  const [current, setCurrent] = useState(undefined)
   const [visible_delete, show_visible_delete] = useState(false)
   const [visible_del_friend, show_visible_del_friend] = useState(false)
   const [visible_del_follow, show_visible_del_follow] = useState(false)
 
-  const current = props.avatar.get('CurrentAddressMark')
-  const { Address, IsFriend, IsFollow } = current || {}
-  const currentFriend = isFriend === undefined ? IsFriend : isFriend
-  const currentFollow = isFollow === undefined ? IsFollow : isFollow
+  const [avatarImg, setAvatarImg] = useState(null)
+  const [qrcode, setQrcode] = useState('')
 
   const picker = async () => {
-    let avatar_img_dir = `${Dirs.DocumentDir}/AvatarImg`
-    let avatar_img_path = `${avatar_img_dir}/${Address}`
     let image = await ImagePicker.openPicker({
       width: 50,
       height: 50,
@@ -38,26 +32,23 @@ const AddressMarkScreen = (props) => {
       includeBase64: true
     })
     if (image) {
-      let result = await FileSystem.exists(avatar_img_dir)
-      if (!result) {
-        result = await FileSystem.mkdir(avatar_img_dir)
-      }
-      result = await FileSystem.exists(avatar_img_path)
-      if (result) {
-        await FileSystem.unlink(avatar_img_path)
-      }
-      // await FileSystem.mv(image_file_path, avatar_img_path)
-      await FileSystem.writeFile(avatar_img_path, `data:${image.mime};base64,${image.data}`, 'utf8')
+      let content = `data:${image.mime};base64,${image.data}`
+      setAvatarImg(content)
+      props.dispatch({
+        type: actionType.master.updateAvatarImage,
+        address: props.route.params.address,
+        image: content
+      })
     }
   }
 
   const delAddressMark = () => {
-    if (props.avatar.get('CurrentAddressMark').IsFollow || props.avatar.get('CurrentAddressMark').IsFriend) {
+    if (current.IsFollow || current.IsFriend) {
       show_visible_delete(true)
     } else {
       props.dispatch({
         type: actionType.avatar.delAddressMark,
-        address: props.avatar.get('CurrentAddressMark').Address
+        address: props.route.params.address
       })
       props.navigation.goBack()
     }
@@ -72,7 +63,7 @@ const AddressMarkScreen = (props) => {
   const addFriend = () => {
     props.dispatch({
       type: actionType.avatar.addFriend,
-      address: props.avatar.get('CurrentAddressMark').Address
+      address: props.route.params.address
     })
   }
 
@@ -81,21 +72,21 @@ const AddressMarkScreen = (props) => {
     show_visible_del_friend(false)
     props.dispatch({
       type: actionType.avatar.delFriend,
-      address: props.avatar.get('CurrentAddressMark').Address
+      address: props.route.params.address
     })
   }
 
   const addFollow = () => {
     props.dispatch({
       type: actionType.avatar.addFollow,
-      address: props.avatar.get('CurrentAddressMark').Address
+      address: props.route.params.address
     })
 
     props.dispatch({
       type: actionType.avatar.FetchBulletin,
-      address: props.avatar.get('CurrentAddressMark').Address,
+      address: props.route.params.address,
       sequence: 1,
-      to: props.avatar.get('CurrentAddressMark').Address
+      to: props.route.params.address
     })
   }
 
@@ -104,9 +95,21 @@ const AddressMarkScreen = (props) => {
     show_visible_del_follow(false)
     props.dispatch({
       type: actionType.avatar.delFollow,
-      address: props.avatar.get('CurrentAddressMark').Address
+      address: props.route.params.address
     })
   }
+
+  useEffect(() => {
+    if (props.avatar.get('CurrentAddressMark')) {
+      setCurrent(props.avatar.get('CurrentAddressMark'))
+
+      let json = {
+        Relay: props.avatar.get('CurrentHost'),
+        Address: props.route.params.address
+      }
+      setQrcode(JSON.stringify(json))
+    }
+  }, [props.avatar])
 
   const loadAddressMark = () => {
     props.dispatch({
@@ -116,7 +119,7 @@ const AddressMarkScreen = (props) => {
   }
 
   const copyToClipboard = () => {
-    Clipboard.setString(props.avatar.get('CurrentAddressMark').Address)
+    Clipboard.setString(props.route.params.address)
     ToastAndroid.show('拷贝成功！',
       ToastAndroid.SHORT,
       ToastAndroid.CENTER)
@@ -130,12 +133,15 @@ const AddressMarkScreen = (props) => {
         props.navigation.replace('AddressAdd', { address: props.route.params.address })
       } else {
         loadAddressMark()
+        let avatar_image = props.master.get("AvatarImage")
+        if (avatar_image[props.avatar.get('Address')]) {
+          setAvatarImg(avatar_image[props.avatar.get('Address')])
+        }
       }
     })
   })
 
   const onSwitchChangeFollow = async value => {
-    console.log(value)
     if (value) {
       await addFollow()
       setFollow(value)
@@ -154,30 +160,51 @@ const AddressMarkScreen = (props) => {
   }
 
   return (
-    <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
+    <ScrollView style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       {
         current &&
         <>
-          <View style={tw`mx-auto`}>
-            <AvatarImage address={Address} />
+          <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
+            {
+              avatarImg != null ?
+                <QRCode
+                  value={qrcode}
+                  size={350}
+                  logo={avatarImg}
+                  logoSize={50}
+                  backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+                  color={tw.color(`neutral-800 dark:neutral-200`)}
+                  logoBackgroundColor='grey'
+                />
+                :
+                <QRCode
+                  value={qrcode}
+                  size={350}
+                  logo={require('../../../assets/app.png')}
+                  logoSize={50}
+                  backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+                  color={tw.color(`neutral-800 dark:neutral-200`)}
+                  logoBackgroundColor='grey'
+                />
+            }
           </View>
-          <LinkSetting title={AddressToName(props.avatar.get('AddressMap'), Address)} icon={'edit'} onPress={() => {
-            props.navigation.navigate('AddressEdit', { address: Address })
+          <LinkSetting title={AddressToName(props.avatar.get('AddressMap'), props.route.params.address)} icon={'edit'} onPress={() => {
+            props.navigation.navigate('AddressEdit', { address: props.route.params.address })
           }} />
-          <LinkSetting title={Address} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
+          <LinkSetting title={props.route.params.address} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
           <LinkSetting title={'编辑头像'} icon={'edit'} onPress={picker} />
-          <SwitchSetting title={'关注公告'} checked={currentFollow} onChange={onSwitchChangeFollow} />
-          <SwitchSetting title={'添加好友'} checked={currentFriend} onChange={onSwitchChangeFriend} />
+          <SwitchSetting title={'关注公告'} checked={current.IsFollow} onChange={onSwitchChangeFollow} />
+          <SwitchSetting title={'添加好友'} checked={current.IsFriend} onChange={onSwitchChangeFriend} />
 
           <View style={tw`my-5px px-25px`}>
             {
-              currentFollow &&
-              <ButtonPrimary title='查看公告' bg='bg-green-500' onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: Address })} />
+              current.IsFollow &&
+              <ButtonPrimary title='查看公告' bg='bg-green-500' onPress={() => props.navigation.push('BulletinList', { session: BulletinAddressSession, address: props.route.params.address })} />
             }
 
             {
-              currentFriend &&
-              <ButtonPrimary title='开始聊天' bg='bg-green-500' onPress={() => props.navigation.push('Session', { address: Address })} />
+              current.IsFriend &&
+              <ButtonPrimary title='开始聊天' bg='bg-green-500' onPress={() => props.navigation.push('Session', { address: props.route.params.address })} />
             }
 
             <ButtonPrimary title='删除' bg='bg-red-500' onPress={delAddressMark} />
@@ -203,13 +230,13 @@ const AddressMarkScreen = (props) => {
         onClose={onClose}
         onConfirm={onClose}
       />
-    </View>
+    </ScrollView>
   )
-
 }
 
 const ReduxAddressMarkScreen = connect((state) => {
   return {
+    master: state.master,
     avatar: state.avatar
   }
 })(AddressMarkScreen)

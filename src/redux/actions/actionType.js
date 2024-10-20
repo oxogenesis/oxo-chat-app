@@ -9,6 +9,7 @@ export const actionType = {
     loadAvatarImage: 'LOAD_AVATAR_IMAGE'
   },
   avatar: {
+    setReady: 'SET_READY',
     setAvatar: 'SET_AVATAR',
     setAvatarName: 'SET_AVATAR_NAME',
     setAvatarDB: 'SET_AVATAR_DB',
@@ -31,6 +32,7 @@ export const actionType = {
     addFollow: 'ADD_FOLLOW',
     delFollow: 'DEL_FOLLOW',
 
+    // Network
     Conn: 'CONN',
     setConnStatus: 'SET_CONN_STATUS',
     changeHostList: 'CHANGE_HOST_LIST',
@@ -53,6 +55,7 @@ export const actionType = {
     delFileList: 'DEL_FILE_LIST',
     setReplyList: 'SET_REPLY_LIST',
 
+    // Bulletin
     CacheLocalBulletinFile: 'CACHE_LOCAL_BULLETIN_FILE',
     LoadCurrentBulletinFile: 'LOAD_CURRENT_BULLETIN_FILE',
     setCurrentBulletinFile: 'SET_CURRENT_BULLETIN_FILE',

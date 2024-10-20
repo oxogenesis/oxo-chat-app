@@ -10,6 +10,7 @@ import InputPrimary from '../../../component/InputPrimary'
 import ErrorMsg from '../../../component/ErrorMsg'
 import { useAppColorScheme } from 'twrnc'
 import tw from '../../../lib/tailwind'
+import { ConsoleError } from '../../../lib/Util'
 
 //口令设置界面
 const MasterKeyScreen = props => {
@@ -88,7 +89,7 @@ const MasterKeyScreen = props => {
           }
         })
       } catch (e) {
-        console.log(e)
+        ConsoleError(e)
       }
     })
   })

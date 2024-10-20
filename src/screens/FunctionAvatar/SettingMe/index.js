@@ -13,7 +13,6 @@ import ViewModal from '../../../component/ViewModal'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import QRCode from 'react-native-qrcode-svg'
 import tw from '../../../lib/tailwind'
-import { set } from 'immutable'
 
 //设置
 const SettingMeScreen = (props) => {
@@ -143,65 +142,63 @@ const SettingMeScreen = (props) => {
   }, [props.avatar])
 
   return (
-    <ScrollView>
-      <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
-        <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
-          {
-            avatarImg != null ?
-              <QRCode
-                value={qrcode}
-                size={350}
-                logo={avatarImg}
-                logoSize={50}
-                backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
-                color={tw.color(`neutral-800 dark:neutral-200`)}
-                logoBackgroundColor='grey'
-              />
-              :
-              <QRCode
-                value={qrcode}
-                size={350}
-                logo={require('../../../assets/app.png')}
-                logoSize={50}
-                backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
-                color={tw.color(`neutral-800 dark:neutral-200`)}
-                logoBackgroundColor='grey'
-              />
-          }
-        </View>
-        <View style={tw`h-5`}></View>
-        <LinkSetting title={'我的公告'} onPress={() => {
-          props.navigation.push('BulletinList', { session: BulletinAddressSession, address: props.avatar.get('Address') })
-        }} />
-        <LinkSetting title={'我的头像'} icon={'edit'} onPress={picker} />
-        <LinkSetting title={props.avatar.get('Name')} icon={'edit'} onPress={() => {
-          props.navigation.navigate('AvatarNameEdit')
-        }} />
-        <LinkSetting title={props.avatar.get('Address')} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
-        <SwitchSetting title={'切换多账号模式'} checked={isMulti} onChange={onSwitchMulti} />
-        <LinkSetting title={'查看种子二维码'} onPress={viewSeedQrcodeAlert} />
+    <ScrollView style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
+      <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
+        {
+          avatarImg != null ?
+            <QRCode
+              value={qrcode}
+              size={350}
+              logo={avatarImg}
+              logoSize={50}
+              backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+              color={tw.color(`neutral-800 dark:neutral-200`)}
+              logoBackgroundColor='grey'
+            />
+            :
+            <QRCode
+              value={qrcode}
+              size={350}
+              logo={require('../../../assets/app.png')}
+              logoSize={50}
+              backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+              color={tw.color(`neutral-800 dark:neutral-200`)}
+              logoBackgroundColor='grey'
+            />
+        }
+      </View>
+      <View style={tw`h-5`}></View>
+      <LinkSetting title={'我的公告'} onPress={() => {
+        props.navigation.push('BulletinList', { session: BulletinAddressSession, address: props.avatar.get('Address') })
+      }} />
+      <LinkSetting title={'我的头像'} icon={'edit'} onPress={picker} />
+      <LinkSetting title={props.avatar.get('Name')} icon={'edit'} onPress={() => {
+        props.navigation.navigate('AvatarNameEdit')
+      }} />
+      <LinkSetting title={props.avatar.get('Address')} textSize={'text-sm'} icon={'copy1'} onPress={copyToClipboard} />
+      <SwitchSetting title={'切换多账号模式'} checked={isMulti} onChange={onSwitchMulti} />
+      <LinkSetting title={'查看种子二维码'} onPress={viewSeedQrcodeAlert} />
 
-        <View style={tw`my-5px px-25px`}>
-          {
-            isMulti ?
-              <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
-              :
-              <ButtonPrimary title='安全退出' bg='bg-red-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
-          }
-        </View >
-
-        <ViewModal
-          visible={visible}
-          onClose={onClose}
-          msg='确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
-        确定要查看种子二维码？'
-          onConfirm={() => {
-            showModal(false)
-            props.navigation.navigate('AvatarSeedQrcode')
-          }}
-        />
+      <View style={tw`my-5px px-25px`}>
+        {
+          isMulti ?
+            <ButtonPrimary title='切换账户' bg='bg-indigo-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
+            :
+            <ButtonPrimary title='安全退出' bg='bg-red-500' onPress={() => { props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false }) }} />
+        }
       </View >
-    </ScrollView>
+
+      <ViewModal
+        visible={visible}
+        onClose={onClose}
+        msg='确保在私密环境下，通过可信设备扫描种子二维码，迁移种子。
+        确定要查看种子二维码？'
+        onConfirm={() => {
+          showModal(false)
+          props.navigation.navigate('AvatarSeedQrcode')
+        }}
+      />
+    </ScrollView >
   )
 }
 

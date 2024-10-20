@@ -34,7 +34,7 @@ function setStorageItem(key, json) {
       // return true
     })
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     // return false
   }
 }
@@ -90,15 +90,15 @@ function createWebSocket(url) {
   return new Promise((resolve, reject) => {
     let ws = new WebSocket(url)
     ws.onopen = () => {
-      console.log(`DEBUG======================================================createWebSocket-open`)
+      ConsoleDebug(`DEBUG======================================================createWebSocket-open`)
       resolve(ws)
     }
-    ws.onerror = (error) => {
+    ws.onerror = (e) => {
       //{"isTrusted": false, "message": "Connection reset"}
       //TODO: catch this error
-      console.log(`DEBUG======================================================createWebSocket-error`)
-      console.log(error)
-      reject(error)
+      ConsoleDebug(`DEBUG======================================================createWebSocket-error`)
+      ConsoleError(e)
+      reject(e)
     }
   })
 }
@@ -107,15 +107,15 @@ function createWebSocketChannel(ws) {
   return eventChannel(emit => {
     // Pass websocket messages straight though
     ws.onmessage = (event) => {
-      // console.log(`DEBUG======================================================onmessage>>>`)
-      console.log(event.data)
-      // console.log(`DEBUG======================================================onmessage<<<`)
+      // ConsoleDebug(`DEBUG======================================================onmessage>>>`)
+      ConsoleDebug(event.data)
+      // ConsoleDebug(`DEBUG======================================================onmessage<<<`)
       emit(event.data)
     }
 
     // Close the channel as appropriate
     ws.onclose = () => {
-      console.log(`DEBUG======================================================onclose`)
+      ConsoleDebug(`DEBUG======================================================onclose`)
       emit(END)
     }
 
@@ -135,14 +135,14 @@ export function* Conn(action) {
   let CurrentHostTimestamp = state.avatar.get('CurrentHostTimestamp')
   let Address = state.avatar.get('Address')
 
-  console.log(`======================================================CurrentHost`)
-  console.log(`${CurrentHost}==${action.host}==${CurrentHostTimestamp}==${action.timestamp}`)
+  ConsoleWarn(`======================================================CurrentHost`)
+  ConsoleWarn(`${CurrentHost}==${action.host}==${CurrentHostTimestamp}==${action.timestamp}`)
   if (CurrentHost == null || CurrentHostTimestamp != action.timestamp) {
     return
   }
 
-  // console.log(`======================================================${CurrentHost}`)
-  // console.log(`======================================================Conn`)
+  // ConsoleWarn(`======================================================${CurrentHost}`)
+  // ConsoleWarn(`======================================================Conn`)
   try {
 
     // Make our connection
@@ -182,7 +182,7 @@ export function* Conn(action) {
       else if (checkJsonSchema(json)) {
         //check receiver is me
         if (json.To != Address && json.Action != ActionCode.ChatSyncFromServer) {
-          console.log('receiver is not me...')
+          ConsoleWarn('receiver is not me...')
         }
 
         // verfiy object signature
@@ -255,16 +255,16 @@ export function* Conn(action) {
       }
       //yield put(nowPlayingUpdate(stationName, artist, title, artUrl))
     }
-  } catch (error) {
+  } catch (e) {
     console.log(`======================================================Conn-catch-error`)
-    console.log(error)
-    if (error.name == 'SyntaxError' && error.message == 'JSON Parse error: Unexpected identifier "object"') {
-      console.log(`======================================================never go here${error}`)
+    ConsoleError(e)
+    if (e.name == 'SyntaxError' && e.message == 'JSON Parse error: Unexpected identifier "object"') {
+      console.log(`======================================================never go here${e}`)
     } else {
 
     }
     // let regx = /^failed to connect to/
-    // let rs = regx.exec(error.message)
+    // let rs = regx.exec(e.message)
     // if (rs != null) {
     //   console.log(`====================================================yield put(Conn)`)
     //   yield put({ type: actionType.avatar.Conn })
@@ -440,6 +440,7 @@ export function* loadFromDB(action) {
     file.address = ""
     yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
   }
+  yield put({ type: actionType.avatar.setReady })
 }
 
 export function* enableAvatar(action) {
@@ -574,7 +575,7 @@ export function* addFriend(action) {
   let db = yield select(state => state.avatar.get('AvatarDB'))
   let timestamp = Date.now()
   let sql = `INSERT INTO FRIENDS (address, created_at, updated_at)
-VALUES ('${action.address}', ${timestamp}, ${timestamp})`
+    VALUES ('${action.address}', ${timestamp}, ${timestamp})`
   yield call([db, db.runSQL], sql)
   let friend_list = yield select(state => state.avatar.get('Friends'))
   friend_list.push(action.address)
@@ -965,7 +966,7 @@ export function* SaveBulletinDraft(action) {
     AsyncStorage.setItem(`${self_address}#draft`, action.draft).then(() => {
     })
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
   }
 }
 
@@ -1549,7 +1550,7 @@ export function* HandleFriendECDH(action) {
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let friend_list = yield select(state => state.avatar.get('Friends'))
   if (!friend_list.includes(address)) {
-    console.log('message is not from my friend...')
+    ConsoleWarn('message is not from my friend...')
     //Strangers
     let sql = `SELECT * FROM FRIEND_REQUESTS WHERE address = "${address}"`
     let item = yield call([db, db.getOne], sql)
@@ -1675,7 +1676,7 @@ export function* SaveFriendMessage(action) {
   let sql = `SELECT * FROM ECDHS WHERE address = "${sour_address}" AND partition = "${DefaultPartition}" AND sequence = ${sequence} `
   let item = yield call([db, db.getOne], sql)
   if (item == null && item.aes_key == null) {
-    console.log('chatkey not exist...')
+    ConsoleWarn('chatkey not exist...')
   } else {
     //decrypt content
     let content = AesDecrypt(json.Content, item.aes_key)
@@ -1780,7 +1781,7 @@ export function* SaveFriendMessage(action) {
     //     })
     //   }
     // } catch (e) {
-    //   console.log(e)
+    //   ConsoleError(e)
     // }
   }
 }

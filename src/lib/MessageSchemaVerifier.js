@@ -638,6 +638,7 @@ let ObjectSchema = {
 //end local schema
 
 let Ajv = require('ajv')
+const { ConsoleWarn } = require('./Util')
 let ajv = new Ajv({ allErrors: true })
 
 //client
@@ -672,7 +673,7 @@ function checkBulletinAddressListResponseSchema(json) {
     if (vBulletinAddressListResponseSchema(json)) {
       return true
     } else {
-      console.log(`BulletinAddressListResponse Schema invalid`)
+      ConsoleWarn(`BulletinAddressListResponse Schema invalid`)
       return false
     }
   } catch (e) {
@@ -685,7 +686,7 @@ function checkBulletinReplyListResponseSchema(json) {
     if (vBulletinReplyListResponseSchema(json)) {
       return true
     } else {
-      console.log(`BulletinReplyListResponse Schema invalid`)
+      ConsoleWarn(`BulletinReplyListResponse Schema invalid`)
       return false
     }
   } catch (e) {
@@ -698,10 +699,10 @@ let vBulletinSchema = ajv.compile(BulletinSchema)
 function checkBulletinSchema(json) {
   try {
     if (vBulletinSchema(json)) {
-      console.log(`Bulletin schema ok`)
+      ConsoleWarn(`Bulletin schema ok`)
       return true
     } else {
-      console.log(`Bulletin schema invalid`)
+      ConsoleWarn(`Bulletin schema invalid`)
       return false
     }
   } catch (e) {
@@ -714,10 +715,10 @@ let vFileChunkSchema = ajv.compile(FileChunkSchema)
 function checkFileChunkSchema(json) {
   try {
     if (vFileChunkSchema(json)) {
-      console.log(`File schema ok`)
+      ConsoleWarn(`File schema ok`)
       return true
     } else {
-      console.log(`File schema invalid`)
+      ConsoleWarn(`File schema invalid`)
       return false
     }
   } catch (e) {
@@ -730,10 +731,10 @@ let vGroupManageSchema = ajv.compile(GroupManageSchema)
 function checkGroupManageSchema(json) {
   try {
     if (vGroupManageSchema(json)) {
-      console.log(`GroupManage schema ok`)
+      ConsoleWarn(`GroupManage schema ok`)
       return true
     } else {
-      console.log(`GroupManage schema invalid`)
+      ConsoleWarn(`GroupManage schema invalid`)
       return false
     }
   } catch (e) {
@@ -746,10 +747,10 @@ let vGroupMessageSchema = ajv.compile(GroupMessageSchema)
 function checkGroupMessageSchema(json) {
   try {
     if (vGroupMessageSchema(json)) {
-      console.log(`GroupMessage schema ok`)
+      ConsoleWarn(`GroupMessage schema ok`)
       return true
     } else {
-      console.log(`GroupMessage schema invalid`)
+      ConsoleWarn(`GroupMessage schema invalid`)
       return false
     }
   } catch (e) {
@@ -760,10 +761,10 @@ function checkGroupMessageSchema(json) {
 function checkGroupRequestSchema(json) {
   try {
     if (vGroupRequestSchema(json)) {
-      console.log(`GroupRequest schema ok`)
+      ConsoleWarn(`GroupRequest schema ok`)
       return true
     } else {
-      console.log(`GroupRequest schema invalid`)
+      ConsoleWarn(`GroupRequest schema invalid`)
       return false
     }
   } catch (e) {
@@ -778,7 +779,7 @@ function deriveJson(str) {
     let json = JSON.parse(str)
     return json
   } catch (e) {
-    console.log(`not a json`)
+    ConsoleWarn(`not a json`)
     return false
   }
 }
@@ -786,10 +787,10 @@ function deriveJson(str) {
 function checkFileSchema(json) {
   try {
     if (vFileSchema(json)) {
-      console.log(`File schema ok`)
+      ConsoleWarn(`File schema ok`)
       return true
     } else {
-      console.log(`File schema invalid`)
+      ConsoleWarn(`File schema invalid`)
       return false
     }
   } catch (e) {
@@ -802,10 +803,10 @@ let vObjectSchema = ajv.compile(ObjectSchema)
 function checkObjectSchema(json) {
   try {
     if (vObjectSchema(json)) {
-      console.log(`Object schema ok`)
+      ConsoleWarn(`Object schema ok`)
       return true
     } else {
-      console.log(`Object schema invalid`)
+      ConsoleWarn(`Object schema invalid`)
       return false
     }
   } catch (e) {

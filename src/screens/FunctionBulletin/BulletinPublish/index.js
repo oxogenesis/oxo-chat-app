@@ -32,7 +32,6 @@ const BulletinPublishScreen = props => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      console.log('focus', Date.now())
       ReadDraft(props.avatar.get('Address'))
         .then(saved_draft => {
           if (saved_draft) {

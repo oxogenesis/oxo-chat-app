@@ -8,6 +8,7 @@ import TextFileSize from '../../../component/TextFileSize'
 import TextName from '../../../component/TextName'
 import tw from '../../../lib/tailwind'
 import { Dirs, FileSystem } from 'react-native-file-access'
+import { ConsoleWarn } from '../../../lib/Util'
 
 //文件浏览界面
 const FileSelectScreen = (props) => {
@@ -38,7 +39,7 @@ const FileSelectScreen = (props) => {
     let result = await FileSystem.exists(path)
     if (result) {
       let stat = await FileSystem.stat(path)
-      console.log(stat)
+      ConsoleWarn(stat)
       let file_hash = await FileSystem.hash(path, 'SHA-1')
       file_hash = file_hash.toUpperCase()
 

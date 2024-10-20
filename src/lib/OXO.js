@@ -1,6 +1,7 @@
 import crypto from 'react-native-quick-crypto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Epoch, ObjectType } from './Const'
+import { ConsoleError, ConsoleWarn } from './Util'
 
 const oxoKeyPairs = require("oxo-keypairs")
 
@@ -69,7 +70,7 @@ async function MasterKeySet(masterKey) {
     await AsyncStorage.setItem('<#MasterKey#>', JSON.stringify(save))
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -83,7 +84,7 @@ async function MasterKeyDerive(masterKey) {
     mk = JSON.parse(mk)
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -107,7 +108,7 @@ async function MasterConfig({ multi, dark }) {
     await AsyncStorage.setItem('<#MasterConfig#>', JSON.stringify(config))
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -133,7 +134,7 @@ async function AvatarCreateNew(name, password) {
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return seed
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -166,7 +167,7 @@ async function AvatarCreateWithSeed(name, seed, password) {
     }
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -198,7 +199,7 @@ async function AvatarNameEdit(name, seed, password) {
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -219,13 +220,13 @@ async function AvatarNameEdit(name, seed, password) {
 //     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
 //     return true
 //   } catch (e) {
-//     console.log(e)
+//     ConsoleError(e)
 //     return false
 //   }
 // }
 
 async function AvatarLoginTimeUpdate(address) {
-  // console.log(`AvatarLoginTimeUpdate::::address}`)
+  // ConsoleWarn(`AvatarLoginTimeUpdate::::address}`)
   try {
     const result = await AsyncStorage.getItem('<#Avatars#>')
     let avatarList = []
@@ -249,7 +250,7 @@ async function AvatarLoginTimeUpdate(address) {
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatarList))
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -262,7 +263,7 @@ async function AvatarDerive(strSave, masterKey) {
     let seed = JSON.parse(strSave).seed
     return seed
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -270,10 +271,13 @@ async function AvatarDerive(strSave, masterKey) {
 function ParseQrcodeAddress(qrcode) {
   try {
     let json = JSON.parse(qrcode)
-    let address = oxoKeyPairs.deriveAddress(json.PublicKey)
+    let address = json.Address
+    if (json.PublicKey) {
+      address = oxoKeyPairs.deriveAddress(json.PublicKey)
+    }
     return { Relay: json.Relay, Address: address }
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -295,7 +299,7 @@ async function AvatarRemove(address) {
     await AsyncStorage.setItem('<#Avatars#>', JSON.stringify(avatar_list))
     return true
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -306,7 +310,7 @@ function ParseQrcodeSeed(qrcode) {
     let keypair = oxoKeyPairs.deriveKeypair(json.Seed)
     return { Name: json.Name, Seed: json.Seed }
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }
@@ -347,7 +351,7 @@ function VerifyJsonSignature(json) {
     json["Signature"] = sig
     return true
   } else {
-    console.log('signature invalid...')
+    ConsoleWarn('signature invalid...')
     return false
   }
 }

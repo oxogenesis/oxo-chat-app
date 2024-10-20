@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, TouchableOpacity, ToastAndroid, FlatList, KeyboardAvoidingView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { AddressToName } from '../../../lib/Util'
+import { AddressToName, ConsoleWarn } from '../../../lib/Util'
 import { DefaultPartition } from '../../../lib/Const'
 import { DHSequence } from '../../../lib/OXO'
 import { actionType } from '../../../redux/actions/actionType'
@@ -69,7 +69,7 @@ const SessionScreen = (props) => {
       let message_input = ''
       if (props.route.params.content != null) {
         message_input = JSON.stringify(props.route.params.content)
-        // console.log(message_input)
+        // ConsoleWarn(message_input)
       }
       setMsgInput(message_input)
 
@@ -99,9 +99,9 @@ const SessionScreen = (props) => {
   //向下拉，加载更到本地消息
   const refreshing = () => {
     if (refreshFlag) {
-      console.log("现在正在刷新")
+      ConsoleWarn("现在正在刷新")
     } else {
-      console.log("下拉加载")
+      ConsoleWarn("下拉加载")
       setRefreshFlag(true)
       loadMessageList(false)
       setRefreshFlag(false)

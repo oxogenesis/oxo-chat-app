@@ -5,6 +5,7 @@ import { DefaultBulletinCacheSize } from '../../lib/Const'
 function initialState() {
   return fromJS(
     {
+      Ready: false,
       Seed: null,
       Address: null,
       PublicKey: null,
@@ -74,40 +75,40 @@ reducer.prototype[actionType.avatar.setAvatar] = (state, action) => {
     .set('Address', action.address)
     .set('PublicKey', action.public_key)
     .set('PrivateKey', action.private_key)
-    .set('AvatarDB', null)
-    .set('CurrentHost', null)
-    .set('CurrentBBSession', null)
-    .set('CurrentBulletin', null)
-    .set('NextBulletinSequence', null)
-    .set('CurrentBulletinFile', null)
-    .set('RandomBulletin', null)
-    .set('RandomBulletinFlag', false)
-    .set('AddressMap', {})
-    .set('AddressArray', [])
-    .set('CurrentAddressMark', null)
-    .set('Friends', [])
-    .set('FriendRequests', [])
-    .set('Follows', [])
-    .set('TabBulletinList', [])
-    // Bulletin
-    .set('BulletinList', [])
-    .set('QuoteList', [])
-    .set('QuoteWhiteList', [])
-    .set('FileList', [])
-    .set('ReplyList', [])
-    .set('BulletinAddressList', [])
-    .set('BulletinReplyList', [])
-    // Chat
-    .set('SessionMap', {})
-    .set('SessionList', [])
-    .set('UnreadMessage', 0,)
-    .set('UnreadSessionMap', {})
-    .set('CurrentSession', {})
-    .set('CurrentSessionAesKey', {})
-    .set('CurrentMessageList', [])
-    .set('MsgInfo', null)
-    .set('CountUnreadMessage', null)
-    .set('MessageWhiteList', [])
+  // .set('AvatarDB', null)
+  // .set('CurrentHost', null)
+  // .set('CurrentBBSession', null)
+  // .set('CurrentBulletin', null)
+  // .set('NextBulletinSequence', null)
+  // .set('CurrentBulletinFile', null)
+  // .set('RandomBulletin', null)
+  // .set('RandomBulletinFlag', false)
+  // .set('AddressMap', {})
+  // .set('AddressArray', [])
+  // .set('CurrentAddressMark', null)
+  // .set('Friends', [])
+  // .set('FriendRequests', [])
+  // .set('Follows', [])
+  // .set('TabBulletinList', [])
+  // // Bulletin
+  // .set('BulletinList', [])
+  // .set('QuoteList', [])
+  // .set('QuoteWhiteList', [])
+  // .set('FileList', [])
+  // .set('ReplyList', [])
+  // .set('BulletinAddressList', [])
+  // .set('BulletinReplyList', [])
+  // // Chat
+  // .set('SessionMap', {})
+  // .set('SessionList', [])
+  // .set('UnreadMessage', 0,)
+  // .set('UnreadSessionMap', {})
+  // .set('CurrentSession', {})
+  // .set('CurrentSessionAesKey', {})
+  // .set('CurrentMessageList', [])
+  // .set('MsgInfo', null)
+  // .set('CountUnreadMessage', null)
+  // .set('MessageWhiteList', [])
 }
 
 reducer.prototype[actionType.avatar.setAvatarName] = (state, action) => {
@@ -119,7 +120,8 @@ reducer.prototype[actionType.avatar.setAvatarDB] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
-  return state.set('Seed', null)
+  return state.set('Ready', false)
+    .set('Seed', null)
     .set('Address', null)
     .set('PublicKey', null)
     .set('PrivateKey', null)
@@ -156,6 +158,10 @@ reducer.prototype[actionType.avatar.resetAvatar] = (state) => {
     .set('MsgInfo', [])
     .set('CountUnreadMessage', null)
     .set('MessageWhiteList', [])
+}
+
+reducer.prototype[actionType.avatar.setReady] = (state, action) => {
+  return state.set('Ready', true)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -400,7 +406,6 @@ reducer.prototype[actionType.avatar.setCurrentSessionAesKey] = (state, action) =
 }
 
 reducer.prototype[actionType.avatar.setCurrentMessageList] = (state, action) => {
-  // console.log(action.message_list)
   return state.set('CurrentMessageList', action.message_list)
 }
 
@@ -409,6 +414,5 @@ reducer.prototype[actionType.avatar.setMsgInfo] = (state, action) => {
 }
 
 reducer.prototype[actionType.avatar.setMessageWhiteList] = (state, action) => {
-  // console.log(action.message_white_list)
   return state.set('MessageWhiteList', action.message_white_list)
 }

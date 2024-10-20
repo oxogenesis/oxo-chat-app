@@ -91,7 +91,7 @@ async function ReadDraft(address) {
     const draft = await AsyncStorage.getItem(`${address}#draft`)
     return draft
   } catch (e) {
-    console.log(e)
+    ConsoleError(e)
     return false
   }
 }

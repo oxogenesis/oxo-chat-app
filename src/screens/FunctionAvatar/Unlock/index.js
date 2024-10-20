@@ -152,7 +152,7 @@ const UnlockScreen = (props) => {
   })
 
   useEffect(() => {
-    if (props.avatar.get('AvatarDB') != null) {
+    if (props.avatar.get('Ready')) {
       props.navigation.replace('TabHome')
     }
   }, [props.avatar])

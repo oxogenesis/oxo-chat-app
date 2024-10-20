@@ -1,4 +1,5 @@
 import SQLite from "react-native-sqlite-storage"
+import { ConsoleError, ConsoleInfo } from "./Util"
 // import { resolve } from "url"
 
 SQLite.enablePromise(true)
@@ -10,9 +11,9 @@ export default class Database {
 
   async initDB(name, version, displayName, size) {
     try {
-      // console.log(`=====================Database opening`)
+      // ConsoleInfo(`=====================Database opening`)
       this.db = await SQLite.openDatabase(name, version, displayName, size)
-      // console.log(`=====================Database opened`)
+      // ConsoleInfo(`=====================Database opened`)
       await this.createTable('ADDRESS_MARKS', `CREATE TABLE IF NOT EXISTS ADDRESS_MARKS(
         address VARCHAR(35) PRIMARY KEY,
         name VARCHAR(20) NOT NULL,
@@ -180,9 +181,9 @@ export default class Database {
         created_at INTEGER
         )`)
 
-      console.log(`************db init done********************`)
+      ConsoleInfo(`************db init done********************`)
     } catch (e) {
-      console.log(e)
+      ConsoleError(e)
     }
   }
 
@@ -191,10 +192,10 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
       }).then((result) => {
-        // console.log(`${table_name} drop successfully`)
+        // ConsoleInfo(`${table_name} drop successfully`)
         resolve(result)
-      }).catch(error => {
-        console.log(error)
+      }).catch(e => {
+        ConsoleError(e)
       })
     })
   }
@@ -204,44 +205,45 @@ export default class Database {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
       }).then((result) => {
-        // console.log(`${table_name} created successfully`)
+        // ConsoleInfo(`${table_name} created successfully`)
         resolve(result)
-      }).catch(error => {
-        console.log(error)
+      }).catch(e => {
+        ConsoleError(e)
       })
     })
   }
 
   closeDB(flag_clear_db, address) {
-    console.log("DB Checking")
+    ConsoleInfo("DB Checking")
     if (this.db) {
-      console.log("DB Closing")
+      ConsoleInfo("DB Closing")
       this.db.close()
         .then(() => {
-          console.log("DB closed")
+          ConsoleInfo("DB closed")
           if (flag_clear_db) {
             SQLite.deleteDatabase({ name: address, location: 'default' }, () => {
-              console.log(`Database ${address} deleted successfully.`)
-            }, error => {
-              console.log(`Error while deleting database ${address}: `, error)
+              ConsoleInfo(`Database ${address} deleted successfully.`)
+            }, e => {
+              ConsoleError(`Error while deleting database ${address}: `)
+              ConsoleError(e)
             })
           }
         })
-        .catch(error => {
-          console.log(error)
-          // this.errorCB(error)
+        .catch(e => {
+          ConsoleError(e)
+          // this.errorCB(e)
         })
     } else {
-      console.log("Database was not OPENED")
+      ConsoleInfo("Database was not OPENED")
     }
   }
 
   runSQL(sql) {
     if (sql.indexOf('INSERT') != -1) {
-      // console.log(`DEBUG======================================================INSERT SQL OK`)
+      // ConsoleInfo(`DEBUG======================================================INSERT SQL OK`)
     } else {
-      // console.log(`DEBUG======================================================INSERT SQL fail`)
-      // console.log(sql)
+      // ConsoleInfo(`DEBUG======================================================INSERT SQL fail`)
+      // ConsoleInfo(sql)
     }
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
@@ -249,15 +251,15 @@ export default class Database {
           .then(([tx, results]) => {
             resolve(results)
           })
-      }).catch((err) => {
-        console.log(err)
+      }).catch((e) => {
+        ConsoleError(e)
       })
     })
   }
 
   getOne(sql) {
-    // console.log(`DEBUG======================================================getOne SQL`)
-    console.log(sql)
+    // ConsoleInfo(`DEBUG======================================================getOne SQL`)
+    ConsoleInfo(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -268,15 +270,15 @@ export default class Database {
               resolve(null)
             }
           })
-      }).catch((err) => {
-        console.log(err)
+      }).catch((e) => {
+        ConsoleError(e)
       })
     })
   }
 
   getAll(sql) {
-    // console.log(`DEBUG======================================================getOne SQL`)
-    console.log(sql)
+    // ConsoleInfo(`DEBUG======================================================getOne SQL`)
+    ConsoleInfo(sql)
     return new Promise((resolve, reject) => {
       this.db.transaction((tx) => {
         tx.executeSql(sql)
@@ -287,11 +289,11 @@ export default class Database {
               let item = results.rows.item(i)
               items.push(item)
             }
-            console.log(`#####################getAll#${items.length}`)
+            ConsoleInfo(`#####################getAll#${items.length}`)
             resolve(items)
           })
-      }).catch((err) => {
-        console.log(err)
+      }).catch((e) => {
+        ConsoleError(e)
       })
     })
   }

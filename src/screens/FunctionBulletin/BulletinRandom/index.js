@@ -6,7 +6,7 @@ import { actionType } from '../../../redux/actions/actionType'
 import IconFontisto from 'react-native-vector-icons/Fontisto'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
-import { AddressToName } from '../../../lib/Util'
+import { AddressToName, ConsoleWarn } from '../../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
 import Avatar from '../../../component/Avatar'
 import LinkBulletin from '../../../component/LinkBulletin'
@@ -86,9 +86,9 @@ const BulletinRandomScreen = (props) => {
   //向下拉，从服务器请求更多公告
   const refreshing = () => {
     if (refreshFlag) {
-      console.log("现在正在刷新")
+      ConsoleWarn("现在正在刷新")
     } else {
-      console.log("下拉刷新")
+      ConsoleWarn("下拉刷新")
       setRefreshFlag(true)
       loadRandomBulletin()
       setRefreshFlag(false)

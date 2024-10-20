@@ -21,7 +21,6 @@ const AddressEditScreen = (props) => {
       setMsg('昵称不能为空...')
       return
     }
-    console.log(address)
     props.dispatch({
       type: actionType.avatar.saveAddressName,
       address: address,

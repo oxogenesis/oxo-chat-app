@@ -6,6 +6,7 @@ import { actionType } from '../../../redux/actions/actionType'
 import ViewEmpty from '../../../component/ViewEmpty'
 import ItemBulletin from '../../../component/ItemBulletin'
 import tw from '../../../lib/tailwind'
+import { ConsoleWarn } from '../../../lib/Util'
 
 //公告Tab
 const TabBulletinScreen = (props) => {
@@ -30,9 +31,9 @@ const TabBulletinScreen = (props) => {
   //向上拉到底部，加载更到本地公告
   const loadMore = () => {
     if (loadmoreFlag) {
-      console.log("现在正在加载")
+      ConsoleWarn("现在正在加载")
     } else {
-      console.log("上拉加载")
+      ConsoleWarn("上拉加载")
       setLoadmoreFlag(true)
       loadTabBulletinList(false)
       setTimeout(() => {
@@ -44,9 +45,9 @@ const TabBulletinScreen = (props) => {
   //向下拉，从服务器请求更多公告
   const refreshing = () => {
     if (refreshFlag) {
-      console.log("现在正在刷新")
+      ConsoleWarn("现在正在刷新")
     } else {
-      console.log("下拉刷新")
+      ConsoleWarn("下拉刷新")
       setRefreshFlag(true)
       props.dispatch({ type: actionType.avatar.UpdateFollowBulletin })
       setRefreshFlag(false)
@@ -55,7 +56,7 @@ const TabBulletinScreen = (props) => {
 
   useEffect(() => {
     // TODO:refresh
-    // console.log(`TabBulletinScreen===========================${props.avatar.get('TabBulletinList').length}`)
+    // ConsoleWarn(`TabBulletinScreen===========================${props.avatar.get('TabBulletinList').length}`)
     // if (props.avatar.get('AvatarDB') != null && props.avatar.get('AvatarDB') != null) {
     //   props.navigation.replace('TabHome')
     // }

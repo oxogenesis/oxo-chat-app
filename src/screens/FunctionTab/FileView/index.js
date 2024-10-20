@@ -5,6 +5,7 @@ import tw from '../../../lib/tailwind'
 import { FileSystem, Dirs } from 'react-native-file-access'
 import BulletinContent from '../../../component/BulletinContent'
 import ViewEmpty from '../../../component/ViewEmpty'
+import { ConsoleWarn } from '../../../lib/Util'
 
 //文件查看
 const FileViewScreen = (props) => {
@@ -21,8 +22,8 @@ const FileViewScreen = (props) => {
     let hash = props.route.params.hash
 
     let file_json = props.avatar.get('CurrentBulletinFile')
-    console.log(`--------------------------------------------------------------------------------------loadFile`)
-    console.log(file_json)
+    ConsoleWarn(`--------------------------------------------------------------------------------------loadFile`)
+    ConsoleWarn(file_json)
     setFile(file_json)
 
     if (file_json && file_json.chunk_length == file_json.chunk_cursor) {
@@ -39,19 +40,19 @@ const FileViewScreen = (props) => {
         //   file_json.image_width = w
         //   file_json.image_height = h
         // })
-        // console.log(`fileview--------------------------------------------------`)
+        // ConsoleWarn(`fileview--------------------------------------------------`)
       }
     } else {
 
     }
 
     // let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
-    // console.log(file_path)
+    // ConsoleWarn(file_path)
 
     // let result = await FileSystem.stat(file_path)
-    // console.log(result)
+    // ConsoleWarn(result)
     // result = await FileSystem.readFile(file_path, 'utf8')
-    // console.log(result)
+    // ConsoleWarn(result)
   }
 
   const saveFile = async () => {

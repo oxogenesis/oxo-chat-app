@@ -14,6 +14,7 @@ import TextName from '../../../component/TextName'
 import TextAddress from '../../../component/TextAddress'
 import tw from '../../../lib/tailwind'
 import { Dirs, FileSystem } from 'react-native-file-access'
+import { ConsoleError } from '../../../lib/Util'
 
 //账号选择界面
 const AvatarListScreen = props => {
@@ -29,7 +30,7 @@ const AvatarListScreen = props => {
         }
       })
     } catch (e) {
-      console.log(e)
+      ConsoleError(e)
     }
   }
 
@@ -39,16 +40,8 @@ const AvatarListScreen = props => {
     })
   })
 
-  // useEffect(() => {
-  //   console.log('>>>>>>>>>useEffect flagLoading is: ', props.flagLoading);
-  // }, [props.flagLoading])
-
-  // useEffect(() => {
-  //   console.log('>>>>>>>>>useEffect master is: ', props.master);
-  // }, [props.master])
-
   useEffect(() => {
-    if (props.avatar.get('AvatarDB') != null) {
+    if (props.avatar.get('Ready')) {
       props.navigation.replace('TabHome')
     }
   }, [props.avatar])

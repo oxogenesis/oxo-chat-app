@@ -1,8 +1,5 @@
 import { Sign, QuarterSHA512 } from './OXO'
-import {
-  ActionCode,
-  ObjectType
-} from './Const'
+import { ActionCode, ObjectType } from './Const'
 
 export default class MessageGenerator {
 
@@ -117,6 +114,10 @@ export default class MessageGenerator {
 
   // not a message, a bulletin string
   genBulletinJson(sequence, pre_hash, quote, file, content, timestamp) {
+    quote = JSON.stringify(quote)
+    quote = JSON.parse(quote)
+    file = JSON.stringify(file)
+    file = JSON.parse(file)
     let content_hash = QuarterSHA512(content)
     let tmp_json = {
       ObjectType: ObjectType.Bulletin,

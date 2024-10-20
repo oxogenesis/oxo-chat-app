@@ -927,12 +927,9 @@ export function* PublishBulletin(action) {
     quote_count = bulletin_json.Quote.length
   }
   let file_count = 0
-  ConsoleWarn(`----------------------------------------1`)
-  ConsoleWarn(bulletin_json)
   if (bulletin_json.File) {
     file_count = bulletin_json.File.length
   }
-  ConsoleWarn(`----------------------------------------2`)
   sql = `INSERT INTO BULLETINS (address, sequence, pre_hash, content, timestamp, json, created_at, hash, quote_count, file_count, relay_address, is_cache)
     VALUES ('${address}', ${next_sequence}, '${bulletin_json.PreHash}', '${content}', '${bulletin_json.Timestamp}', '${str_bulletin}', ${timestamp}, '${hash}', ${quote_count}, ${file_count}, '${address}', 'FALSE')`
   yield call([db, db.runSQL], sql)

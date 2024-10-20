@@ -1712,7 +1712,8 @@ export function* SaveFriendMessage(action) {
 
     //save message
     let sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
-        VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+      VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+    ConsoleWarn(sql)
 
     let reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {

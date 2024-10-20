@@ -68,7 +68,6 @@ const AddressMarkScreen = (props) => {
   }
 
   const delFriend = () => {
-    setFriend(false)
     show_visible_del_friend(false)
     props.dispatch({
       type: actionType.avatar.delFriend,
@@ -91,7 +90,6 @@ const AddressMarkScreen = (props) => {
   }
 
   const delFollow = () => {
-    setFollow(false)
     show_visible_del_follow(false)
     props.dispatch({
       type: actionType.avatar.delFollow,
@@ -135,7 +133,7 @@ const AddressMarkScreen = (props) => {
         loadAddressMark()
         let avatar_image = props.master.get("AvatarImage")
         if (avatar_image[props.avatar.get('Address')]) {
-          setAvatarImg(avatar_image[props.avatar.get('Address')])
+          setAvatarImg(avatar_image[props.route.params.address])
         }
       }
     })
@@ -144,7 +142,6 @@ const AddressMarkScreen = (props) => {
   const onSwitchChangeFollow = async value => {
     if (value) {
       await addFollow()
-      setFollow(value)
     } else {
       show_visible_del_follow(true)
     }
@@ -153,7 +150,6 @@ const AddressMarkScreen = (props) => {
   const onSwitchChangeFriend = async value => {
     if (value) {
       await addFriend()
-      setFriend(value)
     } else {
       show_visible_del_friend(true)
     }

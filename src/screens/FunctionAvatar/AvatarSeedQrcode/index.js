@@ -9,6 +9,7 @@ import ButtonPrimary from '../../../component/ButtonPrimary'
 
 //地址标记
 const AvatarSeedQrcodeScreen = (props) => {
+  const [avatarImg, setAvatarImg] = useState(null)
   const [qrcode, seQrcode] = useState('xxx')
   const [visible, showModal] = useState(false)
 
@@ -24,21 +25,39 @@ const AvatarSeedQrcodeScreen = (props) => {
     return props.navigation.addListener('focus', () => {
       let json = { "Name": props.avatar.get('Name'), "Seed": props.avatar.get('Seed') }
       seQrcode(JSON.stringify(json))
+
+      let avatar_image = props.master.get("AvatarImage")
+      if (avatar_image[props.avatar.get('Address')]) {
+        setAvatarImg(avatar_image[props.avatar.get('Address')])
+      }
     })
   })
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <View style={tw`items-center bg-neutral-100 dark:bg-neutral-600 p-32px`}>
-        <QRCode
-          value={qrcode}
-          size={350}
-          logo={require('../../../assets/app.png')}
-          logoSize={50}
-          backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
-          color={tw.color(`neutral-800 dark:neutral-200`)}
-          logoBackgroundColor='grey'
-        />
+        {
+          avatarImg != null ?
+            <QRCode
+              value={qrcode}
+              size={350}
+              logo={avatarImg}
+              logoSize={50}
+              backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+              color={tw.color(`neutral-800 dark:neutral-200`)}
+              logoBackgroundColor='grey'
+            />
+            :
+            <QRCode
+              value={qrcode}
+              size={350}
+              logo={require('../../../assets/app.png')}
+              logoSize={50}
+              backgroundColor={tw.color(`neutral-200 dark:neutral-800`)}
+              color={tw.color(`neutral-800 dark:neutral-200`)}
+              logoBackgroundColor='grey'
+            />
+        }
       </View>
 
       <View style={tw`px-25px`}>
@@ -64,7 +83,8 @@ const AvatarSeedQrcodeScreen = (props) => {
 
 const ReduxAvatarSeedQrcodeScreen = connect((state) => {
   return {
-    avatar: state.avatar
+    avatar: state.avatar,
+    master: state.master
   }
 })(AvatarSeedQrcodeScreen)
 

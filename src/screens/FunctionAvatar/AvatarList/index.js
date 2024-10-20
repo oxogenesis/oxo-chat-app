@@ -34,18 +34,6 @@ const AvatarListScreen = props => {
     }
   }
 
-  useEffect(() => {
-    return props.navigation.addListener('focus', () => {
-      loadAvatarList()
-    })
-  })
-
-  useEffect(() => {
-    if (props.avatar.get('Ready')) {
-      props.navigation.replace('TabHome')
-    }
-  }, [props.avatar])
-
   const mkdir_for_avatar = async (address) => {
     let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}`
     result = await FileSystem.exists(file_path)
@@ -85,6 +73,18 @@ const AvatarListScreen = props => {
     })
     props.navigation.replace('Unlock')
   }
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      loadAvatarList()
+    })
+  })
+
+  useEffect(() => {
+    if (props.avatar.get('Ready')) {
+      props.navigation.replace('TabHome')
+    }
+  }, [props.avatar])
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>

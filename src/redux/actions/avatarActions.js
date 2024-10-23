@@ -51,25 +51,15 @@ async function readFile(path, cursor, size) {
 }
 
 async function appendFile(path, cursor, content) {
-  // console.log(path)
-  // console.log(cursor)
-  // console.log(content)
-  // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[--------]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
   if (cursor == 1) {
-    // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[exists]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
     let is_exist = await FileSystem.exists(path)
-    // console.log(is_exist)
     if (is_exist) {
-      // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[unlink]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
       await FileSystem.unlink(path)
     }
-    // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[writeFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
     await FileSystem.writeFile(path, content, "base64")
   } else {
-    // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[appendFile]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
     await FileSystem.appendFile(path, content, "base64")
   }
-  // console.log(`[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[++++++++]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]`)
 }
 
 async function verfifyFile(path, hash) {
@@ -440,6 +430,7 @@ export function* loadFromDB(action) {
     file.address = ""
     yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
   }
+
   yield put({ type: actionType.avatar.setReady })
 }
 
@@ -1708,8 +1699,8 @@ export function* SaveFriendMessage(action) {
     }
 
     //save message
-    let sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
-      VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+    let sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, confirmed, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
+      VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', 'FALSE', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
     ConsoleWarn(sql)
 
     let reuslt = yield call([db, db.runSQL], sql)
@@ -1869,8 +1860,8 @@ export function* SendFriendMessage(action) {
   } catch (e) {
   }
 
-  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
-VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, confirmed, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
+    VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', 'FALSE', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
   reuslt = yield call([db, db.runSQL], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })

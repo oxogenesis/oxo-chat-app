@@ -44,6 +44,8 @@ const DatabaseFileSelectScreen = (props) => {
       // copy db
       let dest_file_path = `${Dirs.DatabaseDir}/${props.avatar.get('Address')}`
       result = await FileSystem.cp(path, dest_file_path)
+      // WTF
+      result = await FileSystem.stat(dest_file_path)
       // exit
       props.dispatch({ type: actionType.avatar.disableAvatar, flag_clear_db: false })
     }

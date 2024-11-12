@@ -172,7 +172,7 @@ export default class MessageGenerator {
   //Chat
   genFriendECDHRequest(partition, sequence, ecdh_pk, pair, address, timestamp) {
     let json = {
-      Action: ActionCode.ChatDH,
+      ObjectType: ObjectType.ChatDH,
       Partition: partition,
       Sequence: sequence,
       DHPublicKey: ecdh_pk,
@@ -181,34 +181,36 @@ export default class MessageGenerator {
       Timestamp: timestamp,
       PublicKey: this.PublicKey
     }
-    // console.log(json)
     return JSON.stringify(this.signJson(json))
   }
 
-  genFriendSync(current_sequence, sour_address) {
+  genFriendMsgSync(address, sequence) {
     let json = {
-      Action: ActionCode.ChatSync,
-      CurrentSequence: current_sequence,
-      To: sour_address,
+      Action: ActionCode.ChatMessageSync,
+      CurrentSequence: sequence,
+      To: address,
       Timestamp: Date.now(),
       PublicKey: this.PublicKey,
     }
-    // console.log(json)
     return JSON.stringify(this.signJson(json))
   }
 
-  genFriendMessage(sequence, pre_hash, pair_hash, content, dest_address, timestamp) {
+  genFriendMessage(sequence, pre_hash, ack, content, dest_address, timestamp) {
+    ack = JSON.stringify(ack)
+    ack = JSON.parse(ack)
     let json = {
-      Action: ActionCode.ChatMessage,
+      ObjectType: ObjectType.ChatMessage,
       Sequence: sequence,
       PreHash: pre_hash,
-      PairHash: pair_hash,
+      ACK: ack,
       Content: content,
       To: dest_address,
       Timestamp: timestamp,
       PublicKey: this.PublicKey,
     }
-    // console.log(json)
+    if (ack && ack.length == 0) {
+      delete json["ACK"]
+    }
     return JSON.stringify(this.signJson(json))
   }
 

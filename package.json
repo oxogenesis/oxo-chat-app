@@ -30,6 +30,7 @@
     "react-native-file-access": "^3.1.0",
     "react-native-gesture-handler": "^2.15.0",
     "react-native-image-crop-picker": "^0.40.3",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-permissions": "^4.1.4",
     "react-native-qrcode-scanner": "^1.5.5",
     "react-native-qrcode-svg": "^6.3.0",

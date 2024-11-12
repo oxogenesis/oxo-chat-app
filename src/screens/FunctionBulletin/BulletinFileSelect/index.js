@@ -48,7 +48,7 @@ const BulletinFileSelectScreen = (props) => {
         return
       }
       if (!filename[1] || !BulletinFileExtRegex.test(filename[1])) {
-        ToastAndroid.show(`文件格式只能是jpg/png/jpeg或者txt/md...`,
+        ToastAndroid.show(`文件格式只能是jpg、png、jpeg或者txt、md...`,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER)
         return

@@ -229,6 +229,10 @@ const UnlockScreen = (props) => {
   // <ButtonPrimary title={'webview'} onPress={webview} />
   // <ButtonPrimary title={'View'} onPress={() => props.navigation.push('FileExplorer', { dir: Dirs.SDCardDir })} />
 
+  const showTutorial = () => {
+    props.navigation.push('Tutorial', { key: 'App' })
+  }
+
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       {flagLoading == false ?
@@ -240,6 +244,7 @@ const UnlockScreen = (props) => {
           }
 
           <ButtonPrimary title={'解锁'} onPress={unlock} />
+          <ButtonPrimary title={'使用教程'} bg={'bg-yellow-500'} onPress={showTutorial} />
         </View>
         :
         <LoadingView />

@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { FileSystem, Dirs } from 'react-native-file-access'
 
 import { Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession, FileChunkSize } from '../../lib/Const'
-import { deriveJson, checkJsonSchema, checkBulletinSchema, checkFileSchema, checkFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
+import { deriveJson, checkJsonSchema, checkBulletinSchema, checkBulletinFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
 import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, QuarterSHA512, AvatarLoginTimeUpdate, VerifyBulletinJson } from '../../lib/OXO'
 import Database from '../../lib/AvatarDB'
 import MessageGenerator from '../../lib/MessageGenerator'
@@ -171,43 +171,45 @@ export function* Conn(action) {
       //handle message send To me
       else if (checkJsonSchema(json)) {
         //check receiver is me
-        if (json.To != Address && json.Action != ActionCode.ChatSyncFromServer) {
+        if (json.To != Address && json.Action != ActionCode.ChatMessageSyncFromServer) {
           ConsoleWarn('receiver is not me...')
         }
 
-        // verfiy object signature
-        else if (json.Action == ActionCode.ObjectResponse) {
-          let address = DeriveAddress(json.PublicKey)
-          let objectJson = json.Object
-          if (objectJson.ObjectType == ObjectType.Bulletin && checkBulletinSchema(objectJson)) {
-            yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
-          } else if (objectJson.ObjectType == ObjectType.BulletinFileChunk && checkFileChunkSchema(objectJson)) {
-            yield put({ type: actionType.avatar.SaveBulletinFileChunk, file_chunk_json: objectJson })
+        else if (json.ObjectType) {
+          switch (json.ObjectType) {
+            case ObjectType.Bulletin:
+              yield put({ type: actionType.avatar.SaveBulletin, json: json })
+              break
+            case ObjectType.ChatDH:
+              yield put({ type: actionType.avatar.HandleFriendECDH, json: json })
+              break
+            case ObjectType.ChatMessage:
+              yield put({ type: actionType.avatar.HandleFriendMessage, json: json })
+              break
           }
-          // else if (objectJson.ObjectType == ObjectType.PrivateFile && checkFileChunkSchema(objectJson)) {
-          //   console.log('SavePrivateFile(address, objectJson)')
-          // } else if (objectJson.ObjectType == ObjectType.GroupFile && checkFileChunkSchema(objectJson)) {
-          //   console.log('SaveGroupFile(address, objectJson)')
-          // } else if (objectJson.ObjectType == ObjectType.GroupManage && checkGroupManageSchema(objectJson)) {
-          //   console.log('SaveGroupManage(address, objectJson)')
-          // } else if (objectJson.ObjectType == ObjectType.GroupMessage) {
-          //   console.log('SaveGroupMessage(address, objectJson)')
-          // }
         }
 
         //verify message signature
         else if (VerifyJsonSignature(json) == true) {
           switch (json.Action) {
-            case ActionCode.ChatDH:
-              yield put({ type: actionType.avatar.HandleFriendECDH, json: json })
+            case ActionCode.ObjectResponse:
+              if (VerifyObjectResponseJson(json)) {
+                let address = DeriveAddress(json.PublicKey)
+                let objectJson = json.Object
+                if (objectJson.ObjectType == ObjectType.Bulletin && checkBulletinSchema(objectJson)) {
+                  yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
+                } else if (objectJson.ObjectType == ObjectType.BulletinFileChunk && checkBulletinFileChunkSchema(objectJson)) {
+                  yield put({ type: actionType.avatar.SaveBulletinFileChunk, file_chunk_json: objectJson })
+                }
+                // else if (objectJson.ObjectType == ObjectType.ChatFileChunk && checkChatFileChunkSchema(objectJson)) {
+                //   yield put({ type: actionType.avatar.SaveChatFileChunk, file_chunk_json: objectJson })
+                // }
+              }
               break
-            case ActionCode.ChatMessage:
-              yield put({ type: actionType.avatar.HandleFriendMessage, json: json })
-              break
-            case ActionCode.ChatSync:
+            case ActionCode.ChatMessageSync:
               yield put({ type: actionType.avatar.HandleChatSyncFromFriend, json: json })
               break
-            case ActionCode.ChatSyncFromServer:
+            case ActionCode.ChatMessageSyncFromServer:
               yield put({ type: actionType.avatar.HandleChatSyncFromServer, json: json })
               break
             case ActionCode.BulletinRequest:
@@ -403,12 +405,12 @@ export function* loadFromDB(action) {
   for (let index = 0; index < items.length; index++) {
     const item = items[index]
     friend_list = friend_list.filter(friend => friend != item.sour_address)
-    let msg = MessageGenerator.genFriendSync(item.sequence, item.sour_address)
+    let msg = MessageGenerator.genFriendMsgSync(item.sour_address, item.sequence)
     yield put({ type: actionType.avatar.SendMessage, message: msg })
   }
   for (let index = 0; index < friend_list.length; index++) {
     const friend = friend_list[index]
-    let msg = MessageGenerator.genFriendSync(0, friend)
+    let msg = MessageGenerator.genFriendMsgSync(friend, 0)
     yield put({ type: actionType.avatar.SendMessage, message: msg })
   }
 
@@ -1465,7 +1467,7 @@ export function* LoadCurrentMessageList(action) {
       last_sequence = last_message.sequence
     }
     let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-    let msg = MessageGenerator.genFriendSync(last_sequence, action.address)
+    let msg = MessageGenerator.genFriendMsgSync(action.address, last_sequence)
     yield put({ type: actionType.avatar.SendMessage, message: msg })
   } else {
     // 延长列表
@@ -1520,7 +1522,7 @@ export function* LoadMsgInfo(action) {
       "Sequence": item.sequence,
 
       "Content": json.Content,
-      "PairHash": json.PairHash
+      "ACK": json.ACK
     }
 
     yield put({ type: actionType.avatar.setMsgInfo, msg_info: msg_info })
@@ -1643,7 +1645,7 @@ export function* HandleFriendMessage(action) {
       // if (item != null) {
       //   current_sequence = item.sequence
       // }
-      // let msg = MessageGenerator.genFriendSync(current_sequence, sour_address)
+      // let msg = MessageGenerator.genFriendMsgSync(sour_address, current_sequence)
       // yield put({ type: actionType.avatar.SendMessage, message: msg })
     }
   } else {
@@ -1730,19 +1732,22 @@ export function* SaveFriendMessage(action) {
       yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 
       //update db-message(confirmed)
-      sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN(${Array2Str(json.PairHash)
-        })`
-      reuslt = yield call([db, db.runSQL], sql)
-      if (reuslt.code != 0) {
-        //update view-message(confirmed)
-        if (current_session && sour_address == current_session.Address) {
-          let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
-          for (let i = message_list.length - 1; i >= 0; i--) {
-            if (json.PairHash.includes(message_list[i].Hash)) {
-              message_list[i].Confirmed = true
+      if (json.ACK) {
+        let hash_list = json.ACK.map((item) => item.Hash)
+        sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN(${Array2Str(hash_list)
+          })`
+        reuslt = yield call([db, db.runSQL], sql)
+        if (reuslt.code != 0) {
+          //update view-message(confirmed)
+          if (current_session && sour_address == current_session.Address) {
+            let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+            for (let i = message_list.length - 1; i >= 0; i--) {
+              if (json.ACK.includes(message_list[i].Hash)) {
+                message_list[i].Confirmed = true
+              }
             }
+            yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
           }
-          yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
         }
       }
     }
@@ -1831,17 +1836,20 @@ export function* SendFriendMessage(action) {
 
   let sequence = current_session.Sequence + 1
 
-  let pair_hash = []
+  let ack = []
   let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${dest_address}' AND confirmed = 'FALSE' ORDER BY sequence ASC LIMIT 8`
   let items = yield call([db, db.getAll], sql)
   if (items.length != 0) {
     items.forEach(item => {
-      pair_hash.push(item.hash)
+      ack.push({
+        Sequence: item.sequence,
+        Hash: item.hash
+      })
     })
   }
 
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
-  let msg = MessageGenerator.genFriendMessage(sequence, current_session.Hash, pair_hash, content, dest_address, timestamp)
+  let msg = MessageGenerator.genFriendMessage(sequence, current_session.Hash, ack, content, dest_address, timestamp)
   let hash = QuarterSHA512(msg)
   let is_file = 'FALSE'
   let file_saved = 'FALSE'
@@ -1892,14 +1900,14 @@ export function* SendFriendMessage(action) {
     yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 
     //update db-message(confirmed)
-    sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE sour_address = '${dest_address}' AND hash IN (${Array2Str(pair_hash)})`
+    sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE sour_address = '${dest_address}' AND hash IN (${Array2Str(ack)})`
     reuslt = yield call([db, db.runSQL], sql)
     if (reuslt.code != 0) {
       //update view-message(confirmed)
       if (current_session && dest_address == current_session.Address) {
         let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
         for (let i = message_list.length - 1; i >= 0; i--) {
-          if (pair_hash.includes(message_list[i].Hash)) {
+          if (ack.includes(message_list[i].Hash)) {
             message_list[i].Confirmed = true
           }
         }

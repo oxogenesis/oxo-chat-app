@@ -52,13 +52,13 @@ const MsgInfoScreen = (props) => {
                 </Text>
               }
               {
-                props.avatar.get('MsgInfo').PairHash.length != 0 &&
+                props.avatar.get('MsgInfo').ACK.length != 0 &&
                 <View>
                   <Text style={tw`text-base text-slate-800`}>
                     确认消息列表：
                   </Text>
                   {
-                    props.avatar.get('MsgInfo').PairHash.map((item, index) => (
+                    props.avatar.get('MsgInfo').ACK.map((item, index) => (
                       <Text key={index} style={tw`text-sm text-slate-800`}>
                         {item}
                       </Text>

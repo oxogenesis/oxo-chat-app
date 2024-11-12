@@ -378,6 +378,20 @@ function VerifyBulletinJson(bulletin) {
   return VerifyJsonSignature(tmp_json)
 }
 
+function VerifyObjectResponseJson(object_response) {
+  let object_string = JSON.stringify(object_response.object)
+  let object_hash = QuarterSHA512(object_string)
+  let tmp_json = {
+    Action: ActionCode.ObjectResponse,
+    ObjectHash: object_hash,
+    To: object_response.to,
+    Timestamp: object_response.Timestamp,
+    PublicKey: object_response.PublicKey,
+    Signature: object_response.Signature
+  }
+  return VerifyJsonSignature(tmp_json)
+}
+
 function DeriveAddress(publicKey) {
   return oxoKeyPairs.deriveAddress(publicKey)
 }
@@ -397,6 +411,7 @@ export {
   Sign,
   VerifyJsonSignature,
   VerifyBulletinJson,
+  VerifyObjectResponseJson,
   AesEncrypt,
   AesDecrypt,
   MasterKeySet,

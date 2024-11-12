@@ -112,6 +112,10 @@ const MasterKeyScreen = props => {
     })
   }
 
+  const showTutorial = () => {
+    props.navigation.push('Tutorial', { key: 'App' })
+  }
+
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       <View style={tw`my-auto p-25px`}>
@@ -124,13 +128,7 @@ const MasterKeyScreen = props => {
         }
 
         <ButtonPrimary title={'设置'} onPress={saveMasterKey} />
-
-        <Text style={tw`text-base text-red-500`}>
-          {`说明：
-1、口令用于在本设备上加密/解密账户的种子。
-2、账户的种子是账户的唯一凭证，不可泄漏、灭失，应做好备份。
-3、本地存储的聊天和公告，未进行加密，如需销毁，请删除应用或相关数据。`}
-        </Text>
+        <ButtonPrimary title={'使用教程'} bg={'bg-yellow-500'} onPress={showTutorial} />
       </View>
     </View>
   )

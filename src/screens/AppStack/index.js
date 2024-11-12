@@ -56,6 +56,8 @@ import AddressSelectScreen from '../FunctionTab/AddressSelect'
 import FileViewScreen from '../FunctionTab/FileView'
 import FileExplorerScreen from '../FunctionTab/FileExplorer'
 import FileSelectScreen from '../FunctionTab/FileSelect'
+import MarkdownDisplayScreen from '../FunctionTab/MarkdownDisplay'
+import TutorialScreen from '../FunctionTab/Tutorial'
 
 import { HeaderBackButton } from '@react-navigation/elements'
 import { Dirs } from 'react-native-file-access'
@@ -335,6 +337,26 @@ const AppStack = (props) => {
                 }}
               />
             )
+          })
+        }
+      />
+      <Stack.Screen
+        name="MarkdownDisplay"
+        component={MarkdownDisplayScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: 'Markdown文档',
+            ...headerStyleOption,
+          })
+        }
+      />
+      <Stack.Screen
+        name="Tutorial"
+        component={TutorialScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '使用教程',
+            ...headerStyleOption,
           })
         }
       />

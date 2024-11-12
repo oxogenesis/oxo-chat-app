@@ -1,12 +1,18 @@
-//client schema
-//>>>declare<<<
-let DeclareSchema = {
+const Ajv = require('ajv')
+const ajv = new Ajv({ allErrors: true })
+const { ActionCode, ObjectType } = require('./Const')
+const { ConsoleWarn } = require('./Util')
+
+// client schema
+// >>>declare<<<
+const DeclareSchema = {
   "type": "object",
   "required": ["Action", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 5,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.Declare
     },
     "URL": {
       "type": "string"
@@ -23,13 +29,14 @@ let DeclareSchema = {
   }
 }
 
-let ObjectResponseSchema = {
+const ObjectResponseSchema = {
   "type": "object",
   "required": ["Action", "Object", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 6,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.ObjectResponse
     },
     "Object": {
       "type": "object"
@@ -49,14 +56,15 @@ let ObjectResponseSchema = {
   }
 }
 
-//>>>bulletin<<<
+// >>>bulletin<<<
 let BulletinSchema = {
   "type": "object",
   "required": ["ObjectType", "Sequence", "PreHash", "Content", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 9,
   "properties": {
     "ObjectType": {
-      "type": "number"
+      "type": "number",
+      "const": ObjectType.Bulletin
     },
     "Sequence": {
       "type": "number"
@@ -69,8 +77,8 @@ let BulletinSchema = {
     },
     "Quote": {
       "type": "array",
-      "minItems": 0,
-      "maxItems": 8,
+      "minItems": 1,
+      // "maxItems": 8,
       "items": {
         "type": "object",
         "required": ["Address", "Sequence", "Hash"],
@@ -83,8 +91,8 @@ let BulletinSchema = {
     },
     "File": {
       "type": "array",
-      "minItems": 0,
-      "maxItems": 8,
+      "minItems": 1,
+      // "maxItems": 8,
       "items": {
         "type": "object",
         "required": ["Name", "Ext", "Size", "Hash"],
@@ -108,13 +116,35 @@ let BulletinSchema = {
   }
 }
 
-let BulletinRequestSchema = {
+const BulletinRandomRequestSchema = {
+  "type": "object",
+  "required": ["Action", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 4,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.BulletinRandomRequest
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+const BulletinRequestSchema = {
   "type": "object",
   "required": ["Action", "Address", "Sequence", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.BulletinRequest
     },
     "Address": {
       "type": "string"
@@ -137,33 +167,14 @@ let BulletinRequestSchema = {
   }
 }
 
-let FileChunkSchema = {
-  "type": "object",
-  "required": ["ObjectType", "Hash", "Cursor", "Content"],
-  "maxProperties": 4,
-  "properties": {
-    "ObjectType": {
-      "type": "number"
-    },
-    "Hash": {
-      "type": "string"
-    },
-    "Cursor": {
-      "type": "number"
-    },
-    "Content": {
-      "type": "string"
-    }
-  }
-}
-
-let BulletinFileChunkRequest = {
+const BulletinFileChunkRequestSchema = {
   "type": "object",
   "required": ["Action", "Hash", "Cursor", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.BulletinFileChunkRequest
     },
     "Hash": {
       "type": "string"
@@ -186,20 +197,97 @@ let BulletinFileChunkRequest = {
   }
 }
 
-let BulletinAddressListResponseSchema = {
+// BulletinCount DESC
+const BulletinAddressListRequestSchema = {
+  "type": "object",
+  "required": ["Action", "Page", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 5,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.BulletinAddressListRequest
+    },
+    "Page": {
+      "type": "number"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+let BulletinFileChunkSchema = {
+  "type": "object",
+  "required": ["ObjectType", "Hash", "Cursor", "Content"],
+  "maxProperties": 4,
+  "properties": {
+    "ObjectType": {
+      "type": "number",
+      "const": ObjectType.BulletinFileChunk
+    },
+    "Hash": {
+      "type": "string"
+    },
+    "Cursor": {
+      "type": "number"
+    },
+    "Content": {
+      "type": "string"
+    }
+  }
+}
+
+let BulletinFileChunkRequest = {
+  "type": "object",
+  "required": ["Action", "Hash", "Cursor", "To", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 7,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.BulletinFileChunkRequest
+    },
+    "Hash": {
+      "type": "string"
+    },
+    "Cursor": {
+      "type": "number"
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+const BulletinAddressListResponseSchema = {
   "type": "object",
   "required": ["Action", "Page", "List", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 6,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.BulletinAddressListResponse
     },
     "Page": {
       "type": "number"
     },
     "List": {
       "type": "array",
-      "minItems": 0,
+      "minItems": 1,
       // "maxItems": 8,
       "items": {
         "type": "object",
@@ -223,13 +311,42 @@ let BulletinAddressListResponseSchema = {
   }
 }
 
+// Timestamp DESC
+const BulletinReplyListRequestSchema = {
+  "type": "object",
+  "required": ["Action", "Hash", "Page", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 6,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.BulletinReplyListRequest
+    },
+    "Hash": {
+      "type": "string"
+    },
+    "Page": {
+      "type": "number"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
 let BulletinReplyListResponseSchema = {
   "type": "object",
   "required": ["Action", "Hash", "Page", "List"],
   "maxProperties": 4,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.BulletinReplyListResponse
     },
     "Hash": {
       "type": "string"
@@ -239,7 +356,7 @@ let BulletinReplyListResponseSchema = {
     },
     "List": {
       "type": "array",
-      "minItems": 0,
+      "minItems": 1,
       // "maxItems": 8,
       "items": {
         "type": "object",
@@ -257,107 +374,16 @@ let BulletinReplyListResponseSchema = {
   }
 }
 
-//>>>chat<<<
-let ChatMessageSchema = {
+// >>>chat<<<
+// ChatDH
+const ChatDHSchema = {
   "type": "object",
-  "required": ["Action", "Sequence", "PreHash", "PairHash", "Content", "To", "Timestamp", "PublicKey", "Signature"],
+  "required": ["ObjectType", "Partition", "Sequence", "DHPublicKey", "Pair", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 9,
   "properties": {
-    "Action": {
-      "type": "number"
-    },
-    "Sequence": {
-      "type": "number"
-    },
-    "PreHash": {
-      "type": "string"
-    },
-    "PairHash": {
-      "type": "array",
-      "minItems": 0,
-      "maxItems": 8,
-      "items": {
-        "type": "string",
-      }
-    },
-    "Content": {
-      "type": "string"
-    },
-    "To": {
-      "type": "string"
-    },
-    "Timestamp": {
-      "type": "number"
-    },
-    "PublicKey": {
-      "type": "string"
-    },
-    "Signature": {
-      "type": "string"
-    }
-  }
-}
-
-let ChatSyncSchema = {
-  "type": "object",
-  "required": ["Action", "CurrentSequence", "To", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 6,
-  "properties": {
-    "Action": {
-      "type": "number"
-    },
-    "CurrentSequence": {
-      "type": "number"
-    },
-    "To": {
-      "type": "string"
-    },
-    "Timestamp": {
-      "type": "number"
-    },
-    "PublicKey": {
-      "type": "string"
-    },
-    "Signature": {
-      "type": "string"
-    }
-  }
-}
-
-let ChatSyncFromServerSchema = {
-  "type": "object",
-  "required": ["Action", "PairAddress", "CurrentSequence", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 6,
-  "properties": {
-    "Action": {
-      "type": "number"
-    },
-    "PairAddress": {
-      "type": "string"
-    },
-    "CurrentSequence": {
-      "type": "number"
-    },
-    "Timestamp": {
-      "type": "number"
-    },
-    "PublicKey": {
-      "type": "string"
-    },
-    "Signature": {
-      "type": "string"
-    }
-  }
-}
-
-//ChatDH
-let ChatDHSchema = {
-  "type": "object",
-  "required": ["Action", "Partition", "Sequence", "DHPublicKey", "Pair", "To", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 9,
-  "properties": {
-    "Action": {
-      "type": "number"
+    "ObjectType": {
+      "type": "number",
+      "const": ObjectType.ChatDH
     },
     "Partition": {
       "type": "number"
@@ -386,15 +412,117 @@ let ChatDHSchema = {
   }
 }
 
-//>>>group<<<
-//group request
-let GroupRequestSchema = {
+const ChatMessageSchema = {
+  "type": "object",
+  "required": ["ObjectType", "Sequence", "PreHash", "Content", "To", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 9,
+  "properties": {
+    "ObjectType": {
+      "type": "number",
+      "const": ObjectType.ChatMessage
+    },
+    "Sequence": {
+      "type": "number"
+    },
+    "PreHash": {
+      "type": "string"
+    },
+    "ACK": {
+      "type": "array",
+      "minItems": 1,
+      // "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["Sequence", "Hash"],
+        "maxProperties": 5,
+        "properties": {
+          "Sequence": { "type": "number" },
+          "Hash": { "type": "string" }
+        }
+      }
+    },
+    "Content": {
+      "type": "string"
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+const ChatMessageSyncSchema = {
+  "type": "object",
+  "required": ["Action", "CurrentSequence", "To", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 6,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.ChatMessageSync
+    },
+    "CurrentSequence": {
+      "type": "number"
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+let ChatMessageSyncFromServerSchema = {
+  "type": "object",
+  "required": ["Action", "PairAddress", "CurrentSequence", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 6,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.ChatMessageSyncFromServer
+    },
+    "PairAddress": {
+      "type": "string"
+    },
+    "CurrentSequence": {
+      "type": "number"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+// >>>group<<<
+// group request
+const GroupRequestSchema = {
   "type": "object",
   "required": ["Action", "GroupHash", "GroupManageAction", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.GroupRequest
     },
     "GroupHash": {
       "type": "string"
@@ -419,54 +547,14 @@ let GroupRequestSchema = {
   }
 }
 
-//group control for group admin
-let GroupManageSchema = {
-  "type": "object",
-  "required": ["ObjectType", "GroupHash", "Sequence", "PreHash", "GroupManageAction", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 9,
-  "properties": {
-    "ObjectType": {
-      "type": "number"
-    },
-    "GroupHash": {
-      "type": "string"
-    },
-    "Sequence": {
-      "type": "number"
-    },
-    "PreHash": {
-      "type": "string"
-    },
-    //dismiss:0
-    //create:1
-    //member approve:2   need Request
-    //remove member:3    Request = {"Address":address}
-    //member release:4   need Request
-    "GroupManageAction": {
-      "type": "number"
-    },
-    "Request": {
-      "type": "object"
-    },
-    "Timestamp": {
-      "type": "number"
-    },
-    "PublicKey": {
-      "type": "string"
-    },
-    "Signature": {
-      "type": "string"
-    }
-  }
-}
-
-let GroupManageSyncSchema = {
+const GroupManageSyncSchema = {
   "type": "object",
   "required": ["Action", "GroupHash", "CurrentSequence", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 7,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.GroupManageSync
     },
     "GroupHash": {
       "type": "string"
@@ -489,13 +577,14 @@ let GroupManageSyncSchema = {
   }
 }
 
-let GroupDHSchema = {
+const GroupDHSchema = {
   "type": "object",
   "required": ["Action", "GroupHash", "DHPublicKey", "Pair", "To", "Timestamp", "PublicKey", "Signature"],
   "maxProperties": 8,
   "properties": {
     "Action": {
-      "type": "number"
+      "type": "number",
+      "const": ActionCode.GroupDH
     },
     "GroupHash": {
       "type": "string"
@@ -505,6 +594,39 @@ let GroupDHSchema = {
     },
     "Pair": {
       "type": "string"
+    },
+    "To": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "number"
+    },
+    "PublicKey": {
+      "type": "string"
+    },
+    "Signature": {
+      "type": "string"
+    }
+  }
+}
+
+const GroupMessageSyncSchema = {
+  "type": "object",
+  "required": ["Action", "GroupHash", "Address", "CurrentSequence", "To", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 8,
+  "properties": {
+    "Action": {
+      "type": "number",
+      "const": ActionCode.GroupMessageSync
+    },
+    "GroupHash": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "string"
+    },
+    "CurrentSequence": {
+      "type": "number"
     },
     "To": {
       "type": "string"
@@ -558,26 +680,45 @@ let GroupMessageSchema = {
     }
   }
 }
+//end client schema
 
-let GroupMessageSyncSchema = {
+
+
+
+
+
+
+
+
+
+//group control for group admin
+let GroupManageSchema = {
   "type": "object",
-  "required": ["Action", "GroupHash", "Address", "CurrentSequence", "To", "Timestamp", "PublicKey", "Signature"],
-  "maxProperties": 8,
+  "required": ["ObjectType", "GroupHash", "Sequence", "PreHash", "GroupManageAction", "Timestamp", "PublicKey", "Signature"],
+  "maxProperties": 9,
   "properties": {
-    "Action": {
+    "ObjectType": {
       "type": "number"
     },
     "GroupHash": {
       "type": "string"
     },
-    "Address": {
-      "type": "string"
-    },
-    "CurrentSequence": {
+    "Sequence": {
       "type": "number"
     },
-    "To": {
+    "PreHash": {
       "type": "string"
+    },
+    //dismiss:0
+    //create:1
+    //member approve:2   need Request
+    //remove member:3    Request = {"Address":address}
+    //member release:4   need Request
+    "GroupManageAction": {
+      "type": "number"
+    },
+    "Request": {
+      "type": "object"
     },
     "Timestamp": {
       "type": "number"
@@ -637,9 +778,6 @@ let ObjectSchema = {
 }
 //end local schema
 
-let Ajv = require('ajv')
-const { ConsoleWarn } = require('./Util')
-let ajv = new Ajv({ allErrors: true })
 
 //client
 let vDeclare = ajv.compile(DeclareSchema)
@@ -650,8 +788,8 @@ let vBulletinRequestSchema = ajv.compile(BulletinRequestSchema)
 let vBulletinFileChunkRequest = ajv.compile(BulletinFileChunkRequest)
 
 let vChatMessageSchema = ajv.compile(ChatMessageSchema)
-let vChatSyncSchema = ajv.compile(ChatSyncSchema)
-let vChatSyncFromServerSchema = ajv.compile(ChatSyncFromServerSchema)
+let vChatMessageSyncSchema = ajv.compile(ChatMessageSyncSchema)
+let vChatMessageSyncFromServerSchema = ajv.compile(ChatMessageSyncFromServerSchema)
 let vChatDHSchema = ajv.compile(ChatDHSchema)
 
 let vGroupManageSyncSchema = ajv.compile(GroupManageSyncSchema)
@@ -660,7 +798,7 @@ let vGroupMessageSyncSchema = ajv.compile(GroupMessageSyncSchema)
 let vGroupRequestSchema = ajv.compile(GroupRequestSchema)
 
 function checkJsonSchema(json) {
-  if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vBulletinFileChunkRequest(json) || vChatMessageSchema(json) || vChatSyncSchema(json) || vChatSyncFromServerSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
+  if (vObjectResponseSchema(json) || vBulletinRequestSchema(json) || vBulletinFileChunkRequest(json) || vChatMessageSchema(json) || vChatMessageSyncSchema(json) || vChatMessageSyncFromServerSchema(json) || vChatDHSchema(json) || vDeclare(json) || vGroupManageSyncSchema(json) || vGroupDHSchema(json) || vGroupMessageSyncSchema(json) || vGroupRequestSchema(json)) {
     return true
   } else {
     return false
@@ -710,11 +848,11 @@ function checkBulletinSchema(json) {
   }
 }
 
-let vFileChunkSchema = ajv.compile(FileChunkSchema)
+let vBulletinFileChunkSchema = ajv.compile(BulletinFileChunkSchema)
 
-function checkFileChunkSchema(json) {
+function checkBulletinFileChunkSchema(json) {
   try {
-    if (vFileChunkSchema(json)) {
+    if (vBulletinFileChunkSchema(json)) {
       ConsoleWarn(`File schema ok`)
       return true
     } else {
@@ -772,32 +910,6 @@ function checkGroupRequestSchema(json) {
   }
 }
 
-var vFileSchema = ajv.compile(FileSchema)
-
-function deriveJson(str) {
-  try {
-    let json = JSON.parse(str)
-    return json
-  } catch (e) {
-    ConsoleWarn(`not a json`)
-    return false
-  }
-}
-
-function checkFileSchema(json) {
-  try {
-    if (vFileSchema(json)) {
-      ConsoleWarn(`File schema ok`)
-      return true
-    } else {
-      ConsoleWarn(`File schema invalid`)
-      return false
-    }
-  } catch (e) {
-    return false
-  }
-}
-
 let vObjectSchema = ajv.compile(ObjectSchema)
 
 function checkObjectSchema(json) {
@@ -814,15 +926,24 @@ function checkObjectSchema(json) {
   }
 }
 
+function deriveJson(str) {
+  try {
+    let json = JSON.parse(str)
+    return json
+  } catch (e) {
+    ConsoleWarn(`not a json`)
+    return false
+  }
+}
+
 module.exports = {
   deriveJson,
   checkJsonSchema,
   checkBulletinSchema,
-  checkFileChunkSchema,
+  checkBulletinFileChunkSchema,
   checkGroupManageSchema,
   checkGroupRequestSchema,
   checkGroupMessageSchema,
-  checkFileSchema,
   checkObjectSchema,
   checkBulletinAddressListResponseSchema,
   checkBulletinReplyListResponseSchema

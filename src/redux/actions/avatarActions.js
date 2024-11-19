@@ -1399,22 +1399,22 @@ export function* LoadCurrentSession(action) {
   let self_address = yield select(state => state.avatar.get('Address'))
   let ecdh_sequence = DHSequence(DefaultPartition, timestamp, self_address, address)
 
-  //fetch aes-Key according to (address+partition+sequence)
+  // fetch aes-Key according to (address+partition+sequence)
   let sql = `SELECT * FROM ECDHS WHERE address = "${address}" AND partition = "${DefaultPartition}" AND sequence = ${ecdh_sequence} `
   let ecdh = yield call([db, db.getOne], sql)
   if (ecdh != null) {
     if (ecdh.aes_key != null) {
-      //aes ready
+      // aes ready
       yield put({ type: actionType.avatar.setCurrentSessionAesKey, address: address, ecdh_sequence: ecdh_sequence, aes_key: ecdh.aes_key })
-      //handsake already done, ready to chat
+      // handsake already done, ready to chat
     } else {
-      //my-sk-pk exist, aes not ready
-      //send self-not-ready-json
+      // my-sk-pk exist, aes not ready
+      // send self-not-ready-json
       yield put({ type: actionType.avatar.SendMessage, message: ecdh.self_json })
     }
   } else {
-    //my-sk-pk not exist
-    //gen my-sk-pk
+    // my-sk-pk not exist
+    // gen my-sk-pk
     let ecdh = crypto.createECDH('secp256k1')
     let ecdh_pk = ecdh.generateKeys('hex')
     let ecdh_sk = ecdh.getPrivateKey('hex')
@@ -1422,7 +1422,7 @@ export function* LoadCurrentSession(action) {
     let msg = MessageGenerator.genFriendECDHRequest(DefaultPartition, ecdh_sequence, ecdh_pk, "", address, timestamp)
     // console.log(msg)
 
-    //save my-sk-pk, self-not-ready-json
+    // save my-sk-pk, self-not-ready-json
     let sql = `INSERT INTO ECDHS(address, partition, sequence, private_key, self_json)
         VALUES('${address}', '${DefaultPartition}', ${ecdh_sequence}, '${ecdh_sk}', '${msg}')`
     let reuslt = yield call([db, db.runSQL], sql)
@@ -1478,6 +1478,7 @@ export function* LoadCurrentMessageList(action) {
 
   let sql = `SELECT * FROM MESSAGES WHERE sour_address = '${action.address}' OR dest_address = '${action.address}' ORDER BY timestamp DESC LIMIT ${MessagePageSize} OFFSET ${message_list_size} `
   let items = yield call([db, db.getAll], sql)
+  ConsoleWarn(items)
   let tmp = []
   items.forEach(item => {
     let confirmed = (item.confirmed == "TRUE")
@@ -1503,6 +1504,7 @@ export function* LoadCurrentMessageList(action) {
   })
   if (tmp.length != 0) {
     message_list = tmp.concat(message_list)
+    ConsoleWarn(message_list)
     yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
     yield put({ type: actionType.avatar.setMessageWhiteList, message_white_list: message_white_list })
   }
@@ -1723,7 +1725,7 @@ export function* SaveFriendMessage(action) {
         })
         yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
       } else {
-        //not CurrentSession: update unread_count
+        // not CurrentSession: update unread_count
         session_map[sour_address].CountUnread += 1
       }
 
@@ -1731,11 +1733,10 @@ export function* SaveFriendMessage(action) {
       session_map[sour_address].Content = content
       yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 
-      //update db-message(confirmed)
+      // update db-message(confirmed)
       if (json.ACK) {
         let hash_list = json.ACK.map((item) => item.Hash)
-        sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN(${Array2Str(hash_list)
-          })`
+        sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE dest_address = '${sour_address}' AND hash IN(${Array2Str(hash_list)})`
         reuslt = yield call([db, db.runSQL], sql)
         if (reuslt.code != 0) {
           //update view-message(confirmed)
@@ -1830,8 +1831,10 @@ export function* SendFriendMessage(action) {
   let db = yield select(state => state.avatar.get('AvatarDB'))
   let current_session_aes_key = yield select(state => state.avatar.get('CurrentSessionAesKey'))
   let current_session = yield select(state => state.avatar.get('CurrentSession'))
+  ConsoleWarn(`SendFriendMessage`)
+  ConsoleWarn(current_session)
 
-  //encrypt content
+  // encrypt content
   let content = AesEncrypt(action.message, current_session_aes_key.AesKey)
 
   let sequence = current_session.Sequence + 1
@@ -1893,25 +1896,36 @@ export function* SendFriendMessage(action) {
 
     yield put({ type: actionType.avatar.setCurrentSession, address: dest_address, sequence: sequence, hash: hash })
 
-    //update session map
+    // update session map
     let session_map = yield select(state => state.avatar.get('SessionMap'))
     session_map[dest_address].Timestamp = timestamp
     session_map[dest_address].Content = action.message
     yield put({ type: actionType.avatar.setSessionMap, session_map: session_map })
 
-    //update db-message(confirmed)
-    sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE sour_address = '${dest_address}' AND hash IN (${Array2Str(ack)})`
-    reuslt = yield call([db, db.runSQL], sql)
-    if (reuslt.code != 0) {
-      //update view-message(confirmed)
-      if (current_session && dest_address == current_session.Address) {
-        let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
-        for (let i = message_list.length - 1; i >= 0; i--) {
-          if (ack.includes(message_list[i].Hash)) {
-            message_list[i].Confirmed = true
+    // update db-message(confirmed)
+    if (ack.length > 0) {
+      let hash_list = ack.map((item) => item.Hash)
+      ConsoleWarn(hash_list)
+      ConsoleWarn(Array2Str(hash_list))
+      sql = `UPDATE MESSAGES SET confirmed = 'TRUE' WHERE sour_address = '${dest_address}' AND hash IN (${Array2Str(hash_list)})`
+      ConsoleWarn(sql)
+      reuslt = yield call([db, db.runSQL], sql)
+      ConsoleWarn(result)
+      if (result) {
+        ConsoleWarn(result)
+        // update view-message(confirmed)
+        if (current_session && dest_address == current_session.Address) {
+          ConsoleWarn(current_session)
+          ConsoleWarn(dest_address)
+          let message_list = yield select(state => state.avatar.get('CurrentMessageList'))
+          for (let i = message_list.length - 1; i >= 0; i--) {
+            if (hash_list.includes(message_list[i].Hash)) {
+              message_list[i].Confirmed = true
+            }
           }
+          yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
+          ConsoleWarn(message_list)
         }
-        yield put({ type: actionType.avatar.setCurrentMessageList, message_list: message_list })
       }
     }
   }

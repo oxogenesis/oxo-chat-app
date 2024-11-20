@@ -7,7 +7,7 @@ import { FileSystem, Dirs } from 'react-native-file-access'
 
 import { Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession, FileChunkSize } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkBulletinFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
-import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, QuarterSHA512, AvatarLoginTimeUpdate, VerifyBulletinJson } from '../../lib/OXO'
+import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, HalfSHA512, QuarterSHA512, AvatarLoginTimeUpdate, VerifyBulletinJson } from '../../lib/OXO'
 import Database from '../../lib/AvatarDB'
 import MessageGenerator from '../../lib/MessageGenerator'
 import { GBOB, ConsoleInfo, ConsoleWarn, ConsoleError, ConsoleDebug } from '../../lib/Util'
@@ -1416,8 +1416,10 @@ export function* LoadCurrentSession(action) {
     // my-sk-pk not exist
     // gen my-sk-pk
     let ecdh = crypto.createECDH('secp256k1')
-    let ecdh_pk = ecdh.generateKeys('hex')
-    let ecdh_sk = ecdh.getPrivateKey('hex')
+    let seed = yield select(state => state.avatar.get('Seed'))
+    let ecdh_sk = HalfSHA512('chat' + seed + address + ecdh_sequence)
+    ecdh.setPrivateKey(ecdh_sk, 'hex')
+    let ecdh_pk = ecdh.getPublicKey('hex')
     let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
     let msg = MessageGenerator.genFriendECDHRequest(DefaultPartition, ecdh_sequence, ecdh_pk, "", address, timestamp)
     // console.log(msg)
@@ -1570,8 +1572,10 @@ export function* HandleFriendECDH(action) {
       //self not ready, so pair could not be ready
       //gen my-sk-pk and aes-key
       let ecdh = crypto.createECDH('secp256k1')
-      let ecdh_pk = ecdh.generateKeys('hex')
-      let ecdh_sk = ecdh.getPrivateKey('hex')
+      let seed = yield select(state => state.avatar.get('Seed'))
+      let ecdh_sk = HalfSHA512('chat' + seed + address + ecdh_sequence)
+      ecdh.setPrivateKey(ecdh_sk, 'hex')
+      let ecdh_pk = ecdh.getPublicKey('hex')
       let aes_key = ecdh.computeSecret(json.DHPublicKey, 'hex', 'hex')
 
       //gen message with my-pk, indicate self ready

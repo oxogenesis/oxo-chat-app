@@ -47,11 +47,10 @@ import MsgInfoScreen from '../FuncitonChat/MsgInfo'
 import SettingFriendScreen from '../FuncitonChat/SettingFriend'
 import SettingFriendRequestScreen from '../FuncitonChat/SettingFriendRequest'
 
-//tab network about etc...
+//tab network tutorial etc...
 import TabHomeScreen from '../FunctionTab/TabHome'
 import SettingNetworkScreen from '../FunctionTab/SettingNetwork'
 import ServerAddScreen from '../FunctionTab/ServerAdd'
-import AboutScreen from '../FunctionTab/About'
 import AddressSelectScreen from '../FunctionTab/AddressSelect'
 import FileViewScreen from '../FunctionTab/FileView'
 import FileExplorerScreen from '../FunctionTab/FileExplorer'
@@ -546,16 +545,6 @@ const AppStack = (props) => {
         options={
           ({ route, navigation }) => ({
             title: '地址设置',
-            ...headerStyleOption,
-          })
-        }
-      />
-      <Stack.Screen
-        name="About"
-        component={AboutScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '关于',
             ...headerStyleOption,
           })
         }

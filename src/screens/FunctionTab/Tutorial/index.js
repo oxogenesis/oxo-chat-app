@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { SafeAreaView, ScrollView, StatusBar } from 'react-native'
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import Markdown from 'react-native-markdown-display'
 
@@ -414,6 +414,35 @@ TODO...
     return true
   }
 
+  const styles = StyleSheet.create({
+    body: {
+      color: '#9FE2BF', fontSize: 12
+    },
+    code_block: {
+      color: 'black', fontSize: 14
+    },
+    heading1: {
+      fontSize: 32,
+      // backgroundColor: '#000000',
+      // color: '#FFFFFF',
+    },
+    heading2: {
+      fontSize: 24,
+    },
+    heading3: {
+      fontSize: 18,
+    },
+    heading4: {
+      fontSize: 16,
+    },
+    heading5: {
+      fontSize: 13,
+    },
+    heading6: {
+      fontSize: 11,
+    }
+  });
+
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -422,7 +451,7 @@ TODO...
           contentInsetAdjustmentBehavior="automatic"
           style={{ height: '100%', backgroundColor: 'black' }}
         >
-          <Markdown onLinkPress={onLinkPress}>
+          <Markdown onLinkPress={onLinkPress} style={styles}>
             {Tutorial[key]}
           </Markdown>
         </ScrollView>

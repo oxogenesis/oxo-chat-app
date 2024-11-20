@@ -36,7 +36,7 @@ function hasherSHA512(str) {
   return sha512.digest('hex')
 }
 
-function halfSHA512(str) {
+function HalfSHA512(str) {
   return hasherSHA512(str).toUpperCase().substring(0, 64)
 }
 
@@ -61,7 +61,7 @@ function AesDecrypt(str, aes_key) {
 
 async function MasterKeySet(masterKey) {
   let salt = crypto.randomBytes(16).toString('hex')
-  let key = halfSHA512(salt + masterKey).toString('hex').slice(0, 32)
+  let key = HalfSHA512(salt + masterKey).toString('hex').slice(0, 32)
   let iv = crypto.randomBytes(8).toString('hex')
   let info = { "MasterKey": masterKey }
   let crypted = encrypt(key, iv, JSON.stringify(info))
@@ -79,7 +79,7 @@ async function MasterKeyDerive(masterKey) {
   try {
     const result = await AsyncStorage.getItem('<#MasterKey#>')
     let json = JSON.parse(result)
-    let key = halfSHA512(json.salt + masterKey).toString('hex').slice(0, 32)
+    let key = HalfSHA512(json.salt + masterKey).toString('hex').slice(0, 32)
     let mk = decrypt(key, json.iv, json.ct)
     mk = JSON.parse(mk)
     return true
@@ -118,7 +118,7 @@ async function AvatarCreateNew(name, password) {
   let keypair = oxoKeyPairs.deriveKeypair(seed)
   let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
   let salt = crypto.randomBytes(16).toString('hex')
-  let key = halfSHA512(salt + password).toString('hex').slice(0, 32)
+  let key = HalfSHA512(salt + password).toString('hex').slice(0, 32)
   let iv = crypto.randomBytes(8).toString('hex')
   let msg = { "seed": seed }
   let crypted = encrypt(key, iv, JSON.stringify(msg))
@@ -143,7 +143,7 @@ async function AvatarCreateWithSeed(name, seed, password) {
   let keypair = oxoKeyPairs.deriveKeypair(seed)
   let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
   let salt = crypto.randomBytes(16).toString('hex')
-  let key = halfSHA512(salt + password).toString('hex').slice(0, 32)
+  let key = HalfSHA512(salt + password).toString('hex').slice(0, 32)
   let iv = crypto.randomBytes(8).toString('hex')
   let msg = { "seed": seed }
   let crypted = encrypt(key, iv, JSON.stringify(msg))
@@ -176,7 +176,7 @@ async function AvatarNameEdit(name, seed, password) {
   let keypair = oxoKeyPairs.deriveKeypair(seed)
   let address = oxoKeyPairs.deriveAddress(keypair.publicKey)
   let salt = crypto.randomBytes(16).toString('hex')
-  let key = halfSHA512(salt + password).toString('hex').slice(0, 32)
+  let key = HalfSHA512(salt + password).toString('hex').slice(0, 32)
   let iv = crypto.randomBytes(8).toString('hex')
   let msg = { "seed": seed }
   let crypted = encrypt(key, iv, JSON.stringify(msg))
@@ -258,7 +258,7 @@ async function AvatarLoginTimeUpdate(address) {
 async function AvatarDerive(strSave, masterKey) {
   try {
     let jsonSave = JSON.parse(strSave)
-    let key = halfSHA512(jsonSave.salt + masterKey).toString('hex').slice(0, 32)
+    let key = HalfSHA512(jsonSave.salt + masterKey).toString('hex').slice(0, 32)
     strSave = decrypt(key, jsonSave.iv, jsonSave.ct)
     let seed = JSON.parse(strSave).seed
     return seed
@@ -322,7 +322,7 @@ function DHSequence(partition, timestamp, address1, address2) {
   } else {
     tmpStr = address2 + address1
   }
-  let tmpInt = parseInt(halfSHA512(tmpStr).substring(0, 6), 16)
+  let tmpInt = parseInt(HalfSHA512(tmpStr).substring(0, 6), 16)
   let cursor = (tmpInt % partition) * 1000
   let seq = parseInt((timestamp - (Epoch + cursor)) / (partition * 1000))
   return seq
@@ -402,7 +402,7 @@ function DeriveKeypair(seed) {
 
 export {
   strToHex,
-  halfSHA512,
+  HalfSHA512,
   QuarterSHA512,
   encrypt,
   decrypt,

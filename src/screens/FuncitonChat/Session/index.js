@@ -162,13 +162,13 @@ const SessionScreen = (props) => {
             onChangeText={text => setMsgInput(text)}
           />
         </View>
-        {/* <View style={tw`w-1/10`}>
-          <TouchableOpacity style={tw`h-full rounded-none bg-yellow-500`} onPress={() => props.navigation.push('FileSelect', { address: props.route.params.address, dir: Dirs.SDCardDir })} >
+        <View style={tw`w-1/10`}>
+          <TouchableOpacity style={tw`h-full rounded-none bg-yellow-500`} onPress={() => props.navigation.push('ChatFileSelect', { address: props.route.params.address, dir: Dirs.SDCardDir })} >
             <Text style={tw`h-full align-middle text-lg text-center font-bold text-slate-200`}>
               +
             </Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
       </View>
     </View >
   )

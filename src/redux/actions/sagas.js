@@ -33,7 +33,7 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.Conn, avatarActions.Conn)
   yield takeEvery(actionType.avatar.SendMessage, avatarActions.SendMessage)
 
-  //Bulletin
+  // Bulletin
   yield takeEvery(actionType.avatar.ChangeBulletinCacheSize, avatarActions.ChangeBulletinCacheSize)
   yield takeEvery(actionType.avatar.ClearBulletinCache, avatarActions.ClearBulletinCache)
 
@@ -63,7 +63,7 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.FetchBulletinAddressList, avatarActions.FetchBulletinAddressList)
   yield takeEvery(actionType.avatar.FetchBulletinReplyList, avatarActions.FetchBulletinReplyList)
 
-  //Chat
+  // Chat
   yield takeEvery(actionType.avatar.LoadCurrentSession, avatarActions.LoadCurrentSession)
   yield takeEvery(actionType.avatar.LoadCurrentMessageList, avatarActions.LoadCurrentMessageList)
   yield takeEvery(actionType.avatar.LoadMsgInfo, avatarActions.LoadMsgInfo)
@@ -73,4 +73,8 @@ export default function* rootSaga() {
   yield takeEvery(actionType.avatar.HandleChatSyncFromFriend, avatarActions.HandleChatSyncFromFriend)
   yield takeEvery(actionType.avatar.HandleChatSyncFromServer, avatarActions.HandleChatSyncFromServer)
   yield takeEvery(actionType.avatar.SendFriendMessage, avatarActions.SendFriendMessage)
+
+  // Chat File
+  yield takeEvery(actionType.avatar.FetchChatFileChunk, avatarActions.FetchChatFileChunk)
+  yield takeEvery(actionType.avatar.SaveChatFileChunk, avatarActions.SaveChatFileChunk)
 }

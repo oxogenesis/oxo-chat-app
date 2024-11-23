@@ -103,14 +103,20 @@ export const actionType = {
     setCurrentMessageList: 'SET_CURRENT_MESSAGE_LIST',
     LoadCurrentSession: 'LOAD_CURRENT_SESSION',
     LoadCurrentMessageList: 'LOAD_CURRENT_MESSAGE_LIST',
+
     LoadMsgInfo: 'LOAD_MSG_INFO',
     setMsgInfo: 'SET_MSG_INFO',
+
     HandleFriendECDH: 'HANDLE_FRIEND_ECDH',
+    
     HandleFriendMessage: 'HANDLE_FRIEND_MESSAGE',
     SaveFriendMessage: 'SAVE_FRIEND_MESSAGE',
     HandleChatSyncFromFriend: 'HANDLE_CHAT_SYNC_FROM_FRIEND',
     HandleChatSyncFromServer: 'HANDLE_CHAT_SYNC_FROM_SERVER',
     SendFriendMessage: 'SEND_FRIEND_MESSAGE',
-    setMessageWhiteList: 'SET_MESSAGE_WHITE_LIST'
+    setMessageWhiteList: 'SET_MESSAGE_WHITE_LIST',
+
+    FetchChatFileChunk: 'FETCH_CHAT_FILE_CHUNK',
+    SaveChatFileChunk: 'SAVE_CHAT_FILE_CHUNK'
   }
 }

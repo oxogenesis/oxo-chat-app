@@ -46,6 +46,7 @@ import SessionScreen from '../FuncitonChat/Session'
 import MsgInfoScreen from '../FuncitonChat/MsgInfo'
 import SettingFriendScreen from '../FuncitonChat/SettingFriend'
 import SettingFriendRequestScreen from '../FuncitonChat/SettingFriendRequest'
+import ChatFileSelectScreen from '../FuncitonChat/ChatFileSelect'
 
 //tab network tutorial etc...
 import TabHomeScreen from '../FunctionTab/TabHome'
@@ -53,8 +54,6 @@ import SettingNetworkScreen from '../FunctionTab/SettingNetwork'
 import ServerAddScreen from '../FunctionTab/ServerAdd'
 import AddressSelectScreen from '../FunctionTab/AddressSelect'
 import FileViewScreen from '../FunctionTab/FileView'
-import FileExplorerScreen from '../FunctionTab/FileExplorer'
-import FileSelectScreen from '../FunctionTab/FileSelect'
 import MarkdownDisplayScreen from '../FunctionTab/MarkdownDisplay'
 import TutorialScreen from '../FunctionTab/Tutorial'
 
@@ -191,7 +190,7 @@ const AppStack = (props) => {
         component={DatabaseFileSelectScreen}
         options={
           ({ route, navigation }) => ({
-            title: '加载备份数据',
+            title: '备份数据文件浏览',
             ...headerStyleOption,
           })
         }
@@ -207,7 +206,9 @@ const AppStack = (props) => {
           })
         }
       />
+
       {/* bulletin */}
+
       <Stack.Screen
         name="Bulletin"
         component={BulletinScreen}
@@ -325,7 +326,7 @@ const AppStack = (props) => {
         component={BulletinFileSelectScreen}
         options={
           ({ route, navigation }) => ({
-            title: '文件浏览',
+            title: '公告文件浏览',
             ...headerStyleOption,
             headerBackTitle: null,
             headerLeft: (props) => (
@@ -359,7 +360,9 @@ const AppStack = (props) => {
           })
         }
       />
+
       {/* chat */}
+
       <Stack.Screen
         name="Session"
         component={SessionScreen}
@@ -389,7 +392,20 @@ const AppStack = (props) => {
           })
         }
       />
+      <Stack.Screen
+        name="ChatFileSelect"
+        component={ChatFileSelectScreen}
+        options={
+          ({ route, navigation }) => ({
+            title: '私聊文件浏览',
+            ...headerStyleOption,
+            headerBackTitle: null
+          })
+        }
+      />
+
       {/* contact */}
+
       <Stack.Screen
         name="AddressMark"
         component={AddressMarkScreen}
@@ -451,26 +467,6 @@ const AppStack = (props) => {
         }
       />
       <Stack.Screen
-        name="FileExplorer"
-        component={FileExplorerScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '文件浏览',
-            ...headerStyleOption,
-          })
-        }
-      />
-      <Stack.Screen
-        name="FileSelect"
-        component={FileSelectScreen}
-        options={
-          ({ route, navigation }) => ({
-            title: '文件浏览',
-            ...headerStyleOption,
-          })
-        }
-      />
-      <Stack.Screen
         name="AddressScan"
         component={AddressScanScreen}
         options={
@@ -480,7 +476,9 @@ const AppStack = (props) => {
           })
         }
       />
+
       {/* setting */}
+
       <Stack.Screen
         name="SettingMe"
         component={SettingMeScreen}

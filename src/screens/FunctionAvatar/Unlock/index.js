@@ -224,11 +224,6 @@ const UnlockScreen = (props) => {
   //     console.log(`no permisson`)
   //   }
   // }
-
-
-  // <ButtonPrimary title={'webview'} onPress={webview} />
-  // <ButtonPrimary title={'View'} onPress={() => props.navigation.push('FileExplorer', { dir: Dirs.SDCardDir })} />
-
   const showTutorial = () => {
     props.navigation.push('Tutorial', { key: 'App' })
   }

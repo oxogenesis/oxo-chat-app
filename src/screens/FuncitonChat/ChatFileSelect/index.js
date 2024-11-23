@@ -11,7 +11,7 @@ import { Dirs, FileSystem } from 'react-native-file-access'
 import { ConsoleWarn } from '../../../lib/Util'
 
 //文件浏览界面
-const FileSelectScreen = (props) => {
+const ChatFileSelectScreen = (props) => {
   const [fileList, setList] = useState([])
   const [parentDir, setParentDir] = useState([])
 
@@ -45,10 +45,18 @@ const FileSelectScreen = (props) => {
 
       let fileChunk = Math.ceil(stat.size / FileChunkSize)
       let filename = stat.filename.split('.')
-      let fileJson = { "Name": filename[0], "Ext": filename[1], "Size": stat.size, "Chunk": fileChunk, "Hash": file_hash }
+      let content = {
+        ObjectType: "File",
+        Name: filename[0],
+        Ext: filename[1],
+        Size: stat.size,
+        Chunk: fileChunk,
+        Hash: file_hash
+      }
+      ConsoleWarn(content)
       props.navigation.replace('Session', {
         address: props.route.params.address,
-        content: fileJson
+        content: content
       })
     }
   }
@@ -116,11 +124,11 @@ const FileSelectScreen = (props) => {
   )
 }
 
-const ReduxFileSelectScreen = connect((state) => {
+const ReduxChatFileSelectScreen = connect((state) => {
   return {
     avatar: state.avatar,
     master: state.master
   }
-})(FileSelectScreen)
+})(ChatFileSelectScreen)
 
-export default ReduxFileSelectScreen
+export default ReduxChatFileSelectScreen

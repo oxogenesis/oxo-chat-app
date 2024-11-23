@@ -71,6 +71,16 @@ export default class Database {
         file_hash VARCHAR(40)
         )`)
 
+      // chat file
+      await this.createTable('CHAT_FILES', `CREATE TABLE IF NOT EXISTS CHAT_FILES(
+        hash VARCHAR(32) NOT NULL PRIMARY KEY,
+        name text NOT NULL,
+        ext VARCHAR(5) NOT NULL,
+        size INTEGER NOT NULL,
+        chunk_length INTEGER NOT NULL,
+        chunk_cursor INTEGER NOT NULL
+        )`)
+
       // bulletin
       await this.createTable('BULLETINS', `CREATE TABLE IF NOT EXISTS BULLETINS(
         hash VARCHAR(32) PRIMARY KEY,

@@ -27,6 +27,7 @@ const ActionCode = {
   ChatMessageSync: 301,
   ChatMessageSyncFromServer: 302,
   ChatFileRequest: 303,
+  ChatFileChunkRequest:304,
 
   // GroupRequest: 401,
   // GroupManageSync: 402,

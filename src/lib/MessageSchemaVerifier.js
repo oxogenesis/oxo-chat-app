@@ -513,6 +513,27 @@ let ChatMessageSyncFromServerSchema = {
   }
 }
 
+let ChatFileChunkSchema = {
+  "type": "object",
+  "required": ["ObjectType", "Hash", "Cursor", "Content"],
+  "maxProperties": 4,
+  "properties": {
+    "ObjectType": {
+      "type": "number",
+      "const": ObjectType.ChatFileChunk
+    },
+    "Hash": {
+      "type": "string"
+    },
+    "Cursor": {
+      "type": "number"
+    },
+    "Content": {
+      "type": "string"
+    }
+  }
+}
+
 // >>>group<<<
 // group request
 const GroupRequestSchema = {
@@ -853,6 +874,22 @@ let vBulletinFileChunkSchema = ajv.compile(BulletinFileChunkSchema)
 function checkBulletinFileChunkSchema(json) {
   try {
     if (vBulletinFileChunkSchema(json)) {
+      ConsoleWarn(`File schema ok`)
+      return true
+    } else {
+      ConsoleWarn(`File schema invalid`)
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+}
+
+let vChatFileChunkSchema = ajv.compile(ChatFileChunkSchema)
+
+function checkChatFileChunkSchema(json) {
+  try {
+    if (vChatFileChunkSchema(json)) {
       ConsoleWarn(`File schema ok`)
       return true
     } else {

@@ -1,5 +1,6 @@
 import { Sign, QuarterSHA512 } from './OXO'
 import { ActionCode, ObjectType } from './Const'
+import { ConsoleWarn } from './Util'
 
 export default class MessageGenerator {
 
@@ -93,11 +94,12 @@ export default class MessageGenerator {
   genObjectResponse(object, to) {
     let object_string = JSON.stringify(object)
     let object_hash = QuarterSHA512(object_string)
+    let timestamp = Date.now()
     let tmp_json = {
       Action: ActionCode.ObjectResponse,
       ObjectHash: object_hash,
       To: to,
-      Timestamp: Date.now(),
+      Timestamp: timestamp,
       PublicKey: this.PublicKey
     }
     tmp_json = this.signJson(tmp_json)
@@ -105,7 +107,7 @@ export default class MessageGenerator {
       Action: ActionCode.ObjectResponse,
       Object: object,
       To: to,
-      Timestamp: Date.now(),
+      Timestamp: timestamp,
       PublicKey: this.PublicKey,
       Signature: tmp_json.Signature
     }
@@ -169,7 +171,7 @@ export default class MessageGenerator {
     return json
   }
 
-  //Chat
+  // Chat
   genFriendECDHRequest(partition, sequence, ecdh_pk, pair, address, timestamp) {
     let json = {
       ObjectType: ObjectType.ChatDH,
@@ -212,6 +214,29 @@ export default class MessageGenerator {
       delete json["ACK"]
     }
     return JSON.stringify(this.signJson(json))
+  }
+
+  genChatFileChunkRequest(hash, cursor, to) {
+    let json = {
+      Action: ActionCode.ChatFileChunkRequest,
+      Hash: hash,
+      Cursor: cursor,
+      To: to,
+      Timestamp: Date.now(),
+      PublicKey: this.PublicKey
+    }
+    return JSON.stringify(this.signJson(json))
+  }
+
+  // not a message
+  genChatFileChunkJson(hash, cursor, content) {
+    let json = {
+      ObjectType: ObjectType.ChatFileChunk,
+      Hash: hash,
+      Cursor: cursor,
+      Content: content
+    }
+    return json
   }
 
 }

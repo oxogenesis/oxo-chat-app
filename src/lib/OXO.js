@@ -379,12 +379,12 @@ function VerifyBulletinJson(bulletin) {
 }
 
 function VerifyObjectResponseJson(object_response) {
-  let object_string = JSON.stringify(object_response.object)
+  let object_string = JSON.stringify(object_response.Object)
   let object_hash = QuarterSHA512(object_string)
   let tmp_json = {
     Action: ActionCode.ObjectResponse,
     ObjectHash: object_hash,
-    To: object_response.to,
+    To: object_response.To,
     Timestamp: object_response.Timestamp,
     PublicKey: object_response.PublicKey,
     Signature: object_response.Signature

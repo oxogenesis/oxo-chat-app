@@ -200,10 +200,9 @@ export function* Conn(action) {
                   yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
                 } else if (objectJson.ObjectType == ObjectType.BulletinFileChunk && checkBulletinFileChunkSchema(objectJson)) {
                   yield put({ type: actionType.avatar.SaveBulletinFileChunk, file_chunk_json: objectJson })
+                } else if (objectJson.ObjectType == ObjectType.ChatFileChunk && checkChatFileChunkSchema(objectJson)) {
+                  yield put({ type: actionType.avatar.SaveChatFileChunk, file_chunk_json: objectJson })
                 }
-                // else if (objectJson.ObjectType == ObjectType.ChatFileChunk && checkChatFileChunkSchema(objectJson)) {
-                //   yield put({ type: actionType.avatar.SaveChatFileChunk, file_chunk_json: objectJson })
-                // }
               }
               break
             case ActionCode.ChatMessageSync:
@@ -1931,6 +1930,42 @@ export function* SendFriendMessage(action) {
           ConsoleWarn(message_list)
         }
       }
+    }
+  }
+}
+
+export function* FetchChatFileChunk(action) {
+  let file_json = action.file_json
+  let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
+  let msg = MessageGenerator.genChatFileChunkRequest(file_json.hash, file_json.chunk_cursor + 1, file_json.address)
+  yield put({ type: actionType.avatar.SendMessage, message: msg })
+}
+
+export function* SaveChatFileChunk(action) {
+  console.log(`===================================================================SaveChatFileChunk`)
+  let json = action.file_chunk_json
+  let db = yield select(state => state.avatar.get('AvatarDB'))
+  let sql = `SELECT * FROM CHAT_FILES WHERE hash = "${json.Hash}" LIMIT 1`
+  let file = yield call([db, db.getOne], sql)
+  if (file && file.chunk_cursor + 1 == json.Cursor) {
+    let address = yield select(state => state.avatar.get('Address'))
+    let file_path = `${Dirs.DocumentDir}/ChatFile/${address}/${json.Hash}`
+    yield call(appendFile, file_path, json.Cursor, json.Content)
+    sql = `UPDATE CHAT_FILES SET chunk_cursor = ${json.Cursor} WHERE hash = "${json.Hash}"`
+    yield call([db, db.runSQL], sql)
+    if (file.chunk_length == json.Cursor) {
+      let result = yield call(verfifyFile, file_path, json.Hash)
+      if (!result) {
+        sql = `UPDATE CHAT_FILES SET chunk_cursor = 0 WHERE hash = "${json.Hash}"`
+        yield call([db, db.runSQL], sql)
+        file.chunk_cursor = 0
+        file.address = ""
+        yield put({ type: actionType.avatar.FetchChatFileChunk, file_json: file })
+      }
+    } else {
+      file.chunk_cursor = json.Cursor
+      file.address = ""
+      yield put({ type: actionType.avatar.FetchChatFileChunk, file_json: file })
     }
   }
 }

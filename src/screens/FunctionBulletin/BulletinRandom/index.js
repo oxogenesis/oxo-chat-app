@@ -16,6 +16,7 @@ import ViewEmpty from '../../../component/ViewEmpty'
 import TextTimestamp from '../../../component/TextTimestamp'
 import tw from '../../../lib/tailwind'
 import BulletinContent from '../../../component/BulletinContent'
+import { MessageObjectType } from '../../../lib/Const'
 
 //公告：随便看看
 const BulletinRandomScreen = (props) => {
@@ -221,7 +222,7 @@ const BulletinRandomScreen = (props) => {
                 <TouchableOpacity onPress={() => {
                   props.navigation.push('AddressSelect', {
                     content: {
-                      ObjectType: "Bulletin",
+                      ObjectType: MessageObjectType.Bulletin,
                       Address: random.Address,
                       Sequence: random.Sequence,
                       Hash: random.Hash

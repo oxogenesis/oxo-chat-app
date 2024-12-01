@@ -262,13 +262,22 @@ const AppStack = (props) => {
           ({ route, navigation }) => ({
             title: "发布公告",
             ...headerStyleOption,
+            headerLeft: (props) => (
+              <HeaderBackButton
+                {...props}
+                onPress={() => {
+                  navigation.replace('TabHome')
+                }}
+              />
+            ),
             headerRight: () => (
               <IconMaterial
                 name={'post-add'}
                 size={32}
                 color={headerIconColor}
-                onPress={() => navigation.replace('BulletinFileSelect',
-                  { dir: Dirs.SDCardDir })}
+                onPress={() => {
+                  navigation.push('BulletinFileSelect', { dir: Dirs.SDCardDir })
+                }}
               />)
           })
         }
@@ -333,7 +342,7 @@ const AppStack = (props) => {
               <HeaderBackButton
                 {...props}
                 onPress={() => {
-                  navigation.replace('BulletinPublish');
+                  navigation.push('BulletinPublish');
                 }}
               />
             )

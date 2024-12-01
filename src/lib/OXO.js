@@ -1,6 +1,6 @@
 import crypto from 'react-native-quick-crypto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Epoch, ObjectType } from './Const'
+import { Epoch, ActionCode, ObjectType } from './Const'
 import { ConsoleError, ConsoleWarn } from './Util'
 
 const oxoKeyPairs = require("oxo-keypairs")

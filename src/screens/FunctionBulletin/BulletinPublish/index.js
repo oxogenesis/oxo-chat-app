@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Text, TextInput, View, ScrollView } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
-import { ReadDraft } from '../../../lib/Util'
+import { ConsoleWarn, ReadDraft } from '../../../lib/Util'
 import ButtonPrimary from '../../../component/ButtonPrimary'
 import LinkPublishQuote from '../../../component/LinkPulishQuote'
 import LinkPublishFile from '../../../component/LinkPublishFile'
@@ -27,11 +27,14 @@ const BulletinPublishScreen = props => {
     })
     setDrfat('')
     setMsg('')
-    props.navigation.goBack()
+    props.navigation.replace('TabHome')
   }
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
+      ConsoleWarn(`publishBulletin`)
+      ConsoleWarn(props.avatar.get('QuoteList'))
+      ConsoleWarn(props.avatar.get('FileList'))
       ReadDraft(props.avatar.get('Address'))
         .then(saved_draft => {
           if (saved_draft) {
@@ -42,14 +45,6 @@ const BulletinPublishScreen = props => {
         })
 
       props.navigation.setOptions({ title: `发布第${props.avatar.get('NextBulletinSequence')}号公告` })
-
-      if (props.route.params && props.route.params.file_json) {
-        props.dispatch({
-          type: actionType.avatar.CacheLocalBulletinFile,
-          file_json: props.route.params.file_json
-        })
-      }
-
 
       if (props.master.get('Dark')) {
         setKeyboardAppearance('dark')

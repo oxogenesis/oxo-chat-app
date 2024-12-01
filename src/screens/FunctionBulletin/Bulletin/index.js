@@ -7,7 +7,7 @@ import IconFontisto from 'react-native-vector-icons/Fontisto'
 import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconAnt from 'react-native-vector-icons/AntDesign'
 import IconMaterial from 'react-native-vector-icons/MaterialIcons'
-import { GenesisHash } from '../../../lib/Const'
+import { GenesisHash, MessageObjectType } from '../../../lib/Const'
 import { AddressToName } from '../../../lib/Util'
 import Clipboard from '@react-native-clipboard/clipboard'
 import Avatar from '../../../component/Avatar'
@@ -208,7 +208,7 @@ const BulletinScreen = (props) => {
                 <TouchableOpacity onPress={() => {
                   props.navigation.push('AddressSelect', {
                     content: {
-                      ObjectType: "Bulletin",
+                      ObjectType: MessageObjectType.Bulletin,
                       Address: current.Address,
                       Sequence: current.Sequence,
                       Hash: current.Hash

@@ -778,13 +778,14 @@ let FileSchema = {
 //end client schema
 
 //local schema
-let ObjectSchema = {
+let ObjectBulletinSchema = {
   "type": "object",
   "required": ["ObjectType", "Address", "Sequence", "Hash"],
   "maxProperties": 4,
   "properties": {
     "ObjectType": {
-      "type": "string"
+      "type": "number",
+      "const": ObjectType.Bulletin
     },
     "Address": {
       "type": "string"
@@ -793,6 +794,30 @@ let ObjectSchema = {
       "type": "number"
     },
     "Hash": {
+      "type": "string"
+    }
+  }
+}
+
+let ObjectChatFileSchema = {
+  "type": "object",
+  "required": ["ObjectType", "Address", "Sequence", "Hash"],
+  "maxProperties": 4,
+  "properties": {
+    "ObjectType": {
+      "type": "number",
+      "const": ObjectType.ChatFile
+    },
+    "Name": {
+      "type": "string"
+    },
+    "Size": {
+      "type": "number"
+    },
+    "Hash": {
+      "type": "string"
+    },
+    "EHash": {
       "type": "string"
     }
   }
@@ -874,10 +899,10 @@ let vBulletinFileChunkSchema = ajv.compile(BulletinFileChunkSchema)
 function checkBulletinFileChunkSchema(json) {
   try {
     if (vBulletinFileChunkSchema(json)) {
-      ConsoleWarn(`File schema ok`)
+      ConsoleWarn(`BulletinFileChunk schema ok`)
       return true
     } else {
-      ConsoleWarn(`File schema invalid`)
+      ConsoleWarn(`BulletinFileChunk schema invalid`)
       return false
     }
   } catch (e) {
@@ -890,10 +915,10 @@ let vChatFileChunkSchema = ajv.compile(ChatFileChunkSchema)
 function checkChatFileChunkSchema(json) {
   try {
     if (vChatFileChunkSchema(json)) {
-      ConsoleWarn(`File schema ok`)
+      ConsoleWarn(`ChatFileChunk schema ok`)
       return true
     } else {
-      ConsoleWarn(`File schema invalid`)
+      ConsoleWarn(`ChatFileChunk schema invalid`)
       return false
     }
   } catch (e) {
@@ -947,11 +972,12 @@ function checkGroupRequestSchema(json) {
   }
 }
 
-let vObjectSchema = ajv.compile(ObjectSchema)
+let vObjectBulletinSchema = ajv.compile(ObjectBulletinSchema)
+let vObjectChatFileSchema = ajv.compile(ObjectChatFileSchema)
 
 function checkObjectSchema(json) {
   try {
-    if (vObjectSchema(json)) {
+    if (vObjectBulletinSchema(json) || vObjectChatFileSchema(json)) {
       ConsoleWarn(`Object schema ok`)
       return true
     } else {
@@ -983,5 +1009,6 @@ module.exports = {
   checkGroupMessageSchema,
   checkObjectSchema,
   checkBulletinAddressListResponseSchema,
-  checkBulletinReplyListResponseSchema
+  checkBulletinReplyListResponseSchema,
+  checkChatFileChunkSchema
 }

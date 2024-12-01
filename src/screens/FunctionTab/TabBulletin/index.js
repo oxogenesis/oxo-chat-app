@@ -23,6 +23,9 @@ const TabBulletinScreen = (props) => {
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
       if (props.avatar.get('TabBulletinList').length == 0) {
+        // ConsoleWarn(typeof list)
+        // ConsoleWarn(Array.isArray(list))
+        // list = JSON.parse(JSON.stringify(list))
         loadTabBulletinList(true)
       }
     })
@@ -75,7 +78,7 @@ const TabBulletinScreen = (props) => {
         </View>
       }
       {
-        props.avatar.get('TabBulletinList').length != 0 ?
+        props.avatar.get('TabBulletinList').length > 0 ?
           <FlatList
             style={tw``}
             data={props.avatar.get('TabBulletinList')}

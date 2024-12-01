@@ -14,7 +14,9 @@ const LinkBulletinFile = (props) => {
           props.dispatch({
             type: actionType.avatar.LoadCurrentBulletinFile,
             address: props.address,
-            hash: props.hash
+            hash: props.hash,
+            name: props.name,
+            ext: props.ext
           })
           props.navigation.push('FileView', {
             address: props.address,

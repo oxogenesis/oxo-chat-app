@@ -17,17 +17,23 @@ const ActionCode = {
   ObjectResponse: 101,
 
   BulletinRequest: 200,
+  // ObjectResponse
   BulletinRandomRequest: 201,
+  // ObjectResponse
   BulletinFileChunkRequest: 202,
+  // ObjectResponse
+
   BulletinAddressListRequest: 203,
   BulletinAddressListResponse: 204,
+
   BulletinReplyListRequest: 205,
   BulletinReplyListResponse: 206,
 
   ChatMessageSync: 301,
   ChatMessageSyncFromServer: 302,
   ChatFileRequest: 303,
-  ChatFileChunkRequest:304,
+  ChatFileChunkRequest: 304,
+  // ObjectResponse
 
   // GroupRequest: 401,
   // GroupManageSync: 402,
@@ -37,16 +43,24 @@ const ActionCode = {
 }
 
 const ObjectType = {
+  Nothing: 0,
+
   Bulletin: 101,
   BulletinFileChunk: 102,
 
   ChatDH: 201,
   ChatMessage: 202,
-  ChatFileChunk: 203,
+  ChatFile: 203,
+  ChatFileChunk: 204,
 
   // GroupManage: 301,
   // GroupMessage: 302,
   // GroupFileChunk: 303
+}
+
+const MessageObjectType = {
+  Bulletin: 1,
+  ChatFile: 2
 }
 
 const DefaultPartition = 90 * 24 * 3600
@@ -105,6 +119,7 @@ export {
   GroupManageActionCode,
   GroupMemberShip,
   ObjectType,
+  MessageObjectType,
   SessionType,
   BulletinPageSize,
   BulletinPreviewSize,

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { View, ScrollView } from 'react-native'
+import { View, FlatList } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
@@ -42,19 +42,20 @@ const BulletinListScreen = (props) => {
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 pt-5px px-5px`}>
       {props.avatar.get('BulletinList').length > 0 ?
-        <ScrollView
+        <FlatList
           style={tw``}
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}>
-          {
-            props.avatar.get('BulletinList').map((item, index) => (
-              <ItemBulletin item={item} key={index} />
-            ))
-          }
-        </ScrollView >
+          data={props.avatar.get('BulletinList')}
+          keyExtractor={item => item.Hash}
+          // onEndReached={loadMore}
+          // onEndReachedThreshold={0.05}
+          // refreshing={refreshFlag}
+          // onRefresh={refreshing}
+          renderItem={({ item }) => (
+            <ItemBulletin item={item} />
+          )}
+        />
         :
-        <ViewEmpty />
+        <ViewEmpty msg={`暂无公告...`} />
       }
     </View>
   )

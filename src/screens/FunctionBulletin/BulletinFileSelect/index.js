@@ -58,7 +58,6 @@ const BulletinFileSelectScreen = (props) => {
       file_hash = file_hash.toUpperCase()
 
       let file_json = { "Name": filename[0], "Ext": filename[1].toLowerCase(), "Size": stat.size, "Hash": file_hash }
-
       let bulletin_file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${file_hash}`
       result = await FileSystem.exists(bulletin_file_path)
       if (result) {
@@ -66,7 +65,18 @@ const BulletinFileSelectScreen = (props) => {
       }
       result = await FileSystem.cp(path, bulletin_file_path)
 
-      props.navigation.replace('BulletinPublish', { file_json: file_json })
+      props.dispatch({
+        type: actionType.avatar.addFileList,
+        file_json: file_json
+      })
+      props.dispatch({
+        type: actionType.avatar.CacheLocalBulletinFile,
+        file_json: file_json
+      })
+
+      // props.navigation.replace('BulletinPublish', { file_json: file_json })
+      props.navigation.push('BulletinPublish')
+      // props.navigation.goBack()
 
       // let fileChunk = Math.ceil(stat.size / FileChunkSize)
       // for (let i = 0; i < fileChunk; i++) {

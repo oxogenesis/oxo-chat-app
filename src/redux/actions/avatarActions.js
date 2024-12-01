@@ -5,9 +5,9 @@ import { eventChannel, END } from 'redux-saga'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { FileSystem, Dirs } from 'react-native-file-access'
 
-import { Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession, FileChunkSize } from '../../lib/Const'
+import { Epoch, GenesisAddress, GenesisHash, ActionCode, DefaultPartition, GroupRequestActionCode, GroupManageActionCode, GroupMemberShip, ObjectType, SessionType, BulletinPageSize, MessagePageSize, BulletinHistorySession, BulletinMarkSession, BulletinAddressSession, FileChunkSize, MessageObjectType } from '../../lib/Const'
 import { deriveJson, checkJsonSchema, checkBulletinSchema, checkBulletinFileChunkSchema, checkObjectSchema, checkBulletinAddressListResponseSchema, checkBulletinReplyListResponseSchema } from '../../lib/MessageSchemaVerifier'
-import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, HalfSHA512, QuarterSHA512, AvatarLoginTimeUpdate, VerifyBulletinJson } from '../../lib/OXO'
+import { DHSequence, AesEncrypt, AesDecrypt, DeriveKeypair, DeriveAddress, VerifyJsonSignature, VerifyObjectResponseJson, HalfSHA512, QuarterSHA512, AvatarLoginTimeUpdate, VerifyBulletinJson } from '../../lib/OXO'
 import Database from '../../lib/AvatarDB'
 import MessageGenerator from '../../lib/MessageGenerator'
 import { GBOB, ConsoleInfo, ConsoleWarn, ConsoleError, ConsoleDebug } from '../../lib/Util'
@@ -80,13 +80,13 @@ function createWebSocket(url) {
   return new Promise((resolve, reject) => {
     let ws = new WebSocket(url)
     ws.onopen = () => {
-      ConsoleDebug(`DEBUG======================================================createWebSocket-open`)
+      ConsoleDebug(`WebSocket onopen`)
       resolve(ws)
     }
     ws.onerror = (e) => {
       //{"isTrusted": false, "message": "Connection reset"}
       //TODO: catch this error
-      ConsoleDebug(`DEBUG======================================================createWebSocket-error`)
+      ConsoleDebug(`WebSocket onerror`)
       ConsoleError(e)
       reject(e)
     }
@@ -97,15 +97,13 @@ function createWebSocketChannel(ws) {
   return eventChannel(emit => {
     // Pass websocket messages straight though
     ws.onmessage = (event) => {
-      // ConsoleDebug(`DEBUG======================================================onmessage>>>`)
-      ConsoleDebug(event.data)
-      // ConsoleDebug(`DEBUG======================================================onmessage<<<`)
+      // ConsoleDebug(event.data)
       emit(event.data)
     }
 
     // Close the channel as appropriate
     ws.onclose = () => {
-      ConsoleDebug(`DEBUG======================================================onclose`)
+      ConsoleDebug(`WebSocket onclose`)
       emit(END)
     }
 
@@ -189,22 +187,21 @@ export function* Conn(action) {
           }
         }
 
+        //verify ObjectResponse message signature
+        else if (json.Action == ActionCode.ObjectResponse && VerifyObjectResponseJson(json)) {
+          let address = DeriveAddress(json.PublicKey)
+          let objectJson = json.Object
+          if (objectJson.ObjectType == ObjectType.Bulletin && checkBulletinSchema(objectJson)) {
+            yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
+          } else if (objectJson.ObjectType == ObjectType.BulletinFileChunk && checkBulletinFileChunkSchema(objectJson)) {
+            yield put({ type: actionType.avatar.SaveBulletinFileChunk, file_chunk_json: objectJson })
+          } else if (objectJson.ObjectType == ObjectType.ChatFileChunk && checkChatFileChunkSchema(objectJson)) {
+            yield put({ type: actionType.avatar.SaveChatFileChunk, file_chunk_json: objectJson })
+          }
+        }
         //verify message signature
         else if (VerifyJsonSignature(json) == true) {
           switch (json.Action) {
-            case ActionCode.ObjectResponse:
-              if (VerifyObjectResponseJson(json)) {
-                let address = DeriveAddress(json.PublicKey)
-                let objectJson = json.Object
-                if (objectJson.ObjectType == ObjectType.Bulletin && checkBulletinSchema(objectJson)) {
-                  yield put({ type: actionType.avatar.SaveBulletin, relay_address: address, bulletin_json: objectJson })
-                } else if (objectJson.ObjectType == ObjectType.BulletinFileChunk && checkBulletinFileChunkSchema(objectJson)) {
-                  yield put({ type: actionType.avatar.SaveBulletinFileChunk, file_chunk_json: objectJson })
-                } else if (objectJson.ObjectType == ObjectType.ChatFileChunk && checkChatFileChunkSchema(objectJson)) {
-                  yield put({ type: actionType.avatar.SaveChatFileChunk, file_chunk_json: objectJson })
-                }
-              }
-              break
             case ActionCode.ChatMessageSync:
               yield put({ type: actionType.avatar.HandleChatSyncFromFriend, json: json })
               break
@@ -295,7 +292,7 @@ export function* Conn(action) {
 }
 
 export function* SendMessage(action) {
-  // console.log(`DEBUG======================================================SendMessage`)
+  // console.log(`SendMessage`)
   // console.log(action.message)
   let ws = yield select(state => state.avatar.get('WebSocket'))
   if (ws != null && ws.readyState == WebSocket.OPEN) {
@@ -428,7 +425,6 @@ export function* loadFromDB(action) {
   items = yield call([db, db.getAll], sql)
   for (let index = 0; index < items.length; index++) {
     const file = items[index]
-    file.address = ""
     yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
   }
 
@@ -808,18 +804,20 @@ export function* ClearBulletinCache() {
 }
 
 export function* CacheLocalBulletinFile(action) {
+  ConsoleWarn(`CacheLocalBulletinFile`)
   let file_json = action.file_json
+  ConsoleWarn(file_json)
   let db = yield select(state => state.avatar.get('AvatarDB'))
   let sql = `SELECT * FROM BULLETIN_FILES WHERE hash = "${file_json.Hash}" LIMIT 1`
   let file = yield call([db, db.getOne], sql)
   if (file == null) {
     let chunk_length = Math.ceil(file_json.Size / FileChunkSize)
-    sql = `INSERT INTO BULLETIN_FILES (hash, name, ext, size, chunk_length, chunk_cursor)
-      VALUES ('${file_json.Hash}', '${file_json.Name}', '${file_json.Ext}', ${file_json.Size}, ${chunk_length}, ${chunk_length})`
+    sql = `INSERT INTO BULLETIN_FILES (hash, size, chunk_length, chunk_cursor)
+      VALUES ('${file_json.Hash}', ${file_json.Size}, ${chunk_length}, ${chunk_length})`
     yield call([db, db.runSQL], sql)
   }
 
-  yield put({ type: actionType.avatar.addFileList, file_json: file_json })
+  // yield put({ type: actionType.avatar.addFileList, file_json: file_json })
 }
 
 export function* FetchBulletinFileChunk(action) {
@@ -841,18 +839,26 @@ export function* SaveBulletinFileChunk(action) {
     yield call(appendFile, file_path, json.Cursor, json.Content)
     sql = `UPDATE BULLETIN_FILES SET chunk_cursor = ${json.Cursor} WHERE hash = "${json.Hash}"`
     yield call([db, db.runSQL], sql)
+
+    // update downloading process
+    let cbf = yield select(state => state.avatar.get('CurrentBulletinFile'))
+    if (cbf && cbf.hash == file.hash) {
+      cbf.chunk_cursor = json.Cursor
+      yield put({ type: actionType.avatar.setCurrentBulletinFile, file: cbf })
+      // TODO
+      // ？not update FileViewScreen
+    }
+
     if (file.chunk_length == json.Cursor) {
       let result = yield call(verfifyFile, file_path, json.Hash)
       if (!result) {
         sql = `UPDATE BULLETIN_FILES SET chunk_cursor = 0 WHERE hash = "${json.Hash}"`
         yield call([db, db.runSQL], sql)
         file.chunk_cursor = 0
-        file.address = ""
         yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
       }
     } else {
       file.chunk_cursor = json.Cursor
-      file.address = ""
       yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
     }
   }
@@ -867,6 +873,8 @@ export function* LoadCurrentBulletinFile(action) {
     file.address = action.address
     yield put({ type: actionType.avatar.FetchBulletinFileChunk, file_json: file })
   }
+  file.name = action.name
+  file.ext = action.ext
   yield put({ type: actionType.avatar.setCurrentBulletinFile, file: file })
 }
 
@@ -987,8 +995,8 @@ export function* SaveBulletinFile(action) {
     // console.log(tmp_file)
     if (!tmp_file) {
       let chunk_length = Math.ceil(file.Size / FileChunkSize)
-      sql = `INSERT INTO BULLETIN_FILES (hash, name, ext, size, chunk_length, chunk_cursor)
-        VALUES ('${file.Hash}', '${file.Name}', '${file.Ext}', ${file.Size}, ${chunk_length}, 0)`
+      sql = `INSERT INTO BULLETIN_FILES (hash, size, chunk_length, chunk_cursor)
+        VALUES ('${file.Hash}', ${file.Size}, ${chunk_length}, 0)`
       yield call([db, db.runSQL], sql)
     }
   }
@@ -1200,6 +1208,7 @@ export function* LoadTabBulletinList(action) {
     bulletin_list = yield select(state => state.avatar.get('TabBulletinList'))
   }
   let bulletin_list_size = bulletin_list.length
+  ConsoleWarn(bulletin_list)
 
   let follow_list = yield select(state => state.avatar.get('Follows'))
   let address_list = []
@@ -1223,6 +1232,7 @@ export function* LoadTabBulletinList(action) {
       "IsMark": bulletin.is_mark
     })
   })
+  ConsoleWarn(tmp)
   if (tmp.length != 0) {
     bulletin_list = bulletin_list.concat(tmp)
     yield put({ type: actionType.avatar.setTabBulletinList, tab_bulletin_list: bulletin_list })
@@ -1863,13 +1873,17 @@ export function* SendFriendMessage(action) {
 
   // Forward Bulletin
   let is_object = 'FALSE'
-  let object_type = ''
+  let object_type = MessageObjectType.Nothing
   let object_json = {}
+  let object_chat_file_ehash = ''
   try {
     object_json = JSON.parse(action.message)
     if (checkObjectSchema(object_json)) {
       is_object = 'TRUE'
       object_type = object_json.ObjectType
+      if (object_type == MessageObjectType.ChatFile) {
+        object_chat_file_ehash = object_json.EHash
+      }
     }
   } catch (e) {
   }
@@ -1879,6 +1893,15 @@ export function* SendFriendMessage(action) {
   reuslt = yield call([db, db.runSQL], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })
+
+    if (object_type == MessageObjectType.ChatFile) {
+      // TODO 2 send chat file push to server
+      let msg = {
+        Action: ActionCode.ChatFile,
+        EHash: object_chat_file_ehash,
+        Size: stat.size
+      }
+    }
 
     if (dest_address == current_session.Address) {
       //CurrentSession: show message
@@ -1959,12 +1982,10 @@ export function* SaveChatFileChunk(action) {
         sql = `UPDATE CHAT_FILES SET chunk_cursor = 0 WHERE hash = "${json.Hash}"`
         yield call([db, db.runSQL], sql)
         file.chunk_cursor = 0
-        file.address = ""
         yield put({ type: actionType.avatar.FetchChatFileChunk, file_json: file })
       }
     } else {
       file.chunk_cursor = json.Cursor
-      file.address = ""
       yield put({ type: actionType.avatar.FetchChatFileChunk, file_json: file })
     }
   }

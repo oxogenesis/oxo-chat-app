@@ -72,13 +72,17 @@ export default class Database {
         )`)
 
       // chat file
+      // just for trans control
       await this.createTable('CHAT_FILES', `CREATE TABLE IF NOT EXISTS CHAT_FILES(
-        hash VARCHAR(32) NOT NULL PRIMARY KEY,
-        name text NOT NULL,
-        ext VARCHAR(5) NOT NULL,
+        ehash VARCHAR(32) NOT NULL PRIMARY KEY,
+        hash VARCHAR(32) NOT NULL,
+        sour_address VARCHAR(35), 
+        dest_address VARCHAR(35),
         size INTEGER NOT NULL,
         chunk_length INTEGER NOT NULL,
-        chunk_cursor INTEGER NOT NULL
+        chunk_cursor INTEGER NOT NULL,
+        server_cursor INTEGER NOT NULL,
+        pair_cursor INTEGER NOT NULL
         )`)
 
       // bulletin
@@ -111,10 +115,9 @@ export default class Database {
         )`)
 
       // bulletin file
+      // just for trans control
       await this.createTable('BULLETIN_FILES', `CREATE TABLE IF NOT EXISTS BULLETIN_FILES(
         hash VARCHAR(32) NOT NULL PRIMARY KEY,
-        name text NOT NULL,
-        ext VARCHAR(5) NOT NULL,
         size INTEGER NOT NULL,
         chunk_length INTEGER NOT NULL,
         chunk_cursor INTEGER NOT NULL

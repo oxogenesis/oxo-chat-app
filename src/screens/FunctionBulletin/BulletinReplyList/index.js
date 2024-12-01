@@ -42,7 +42,7 @@ const BulletinReplyListScreen = props => {
             showsVerticalScrollIndicator={false}>
             {
               props.avatar.get('BulletinReplyList').map((reply, index) => (
-                <ItemReply itemIndex={index} address={reply.Address} sequence={reply.Sequence} hash={reply.Hash} content={reply.Content} timestamp={reply.Timestamp} />
+                <ItemReply key={reply.Hash} itemIndex={index} address={reply.Address} sequence={reply.Sequence} hash={reply.Hash} content={reply.Content} timestamp={reply.Timestamp} />
               ))
             }
           </ScrollView>

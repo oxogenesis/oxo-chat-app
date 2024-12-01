@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import { FileChunkSize } from '../../../lib/Const'
+import { FileChunkSize, MessageObjectType, ObjectType } from '../../../lib/Const'
 import ViewEmpty from '../../../component/ViewEmpty'
 import TextTimestamp from '../../../component/TextTimestamp'
 import TextFileSize from '../../../component/TextFileSize'
@@ -43,15 +43,19 @@ const ChatFileSelectScreen = (props) => {
       let file_hash = await FileSystem.hash(path, 'SHA-1')
       file_hash = file_hash.toUpperCase()
 
+      // TODO 1
+      let file_encrypt_hash
+
       let fileChunk = Math.ceil(stat.size / FileChunkSize)
       let filename = stat.filename.split('.')
       let content = {
-        ObjectType: "File",
+        ObjectType: MessageObjectType.ChatFile,
         Name: filename[0],
         Ext: filename[1],
         Size: stat.size,
         Chunk: fileChunk,
-        Hash: file_hash
+        Hash: file_hash,
+        EHash: file_encrypt_hash
       }
       ConsoleWarn(content)
       props.navigation.replace('Session', {

@@ -18,6 +18,11 @@ export default class Database {
         image TEXT NOT NULL DEFAULT ''
         )`)
 
+      await this.createTable('FILES', `CREATE TABLE IF NOT EXISTS FILES(
+        hash VARCHAR(32) PRIMARY KEY,
+        size INTEGER NOT NULL
+        )`)
+
       ConsoleInfo(`************db init done********************`)
     } catch (e) {
       ConsoleError(e)

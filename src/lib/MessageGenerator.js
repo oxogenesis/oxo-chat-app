@@ -229,10 +229,10 @@ export default class MessageGenerator {
   }
 
   // not a message
-  genChatFileChunkJson(hash, cursor, content) {
+  genChatFileChunkJson(ehash, cursor, content) {
     let json = {
       ObjectType: ObjectType.ChatFileChunk,
-      Hash: hash,
+      EHash: ehash,
       Cursor: cursor,
       Content: content
     }

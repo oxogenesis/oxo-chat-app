@@ -13,79 +13,72 @@ const FileViewScreen = (props) => {
   const [file_image, setFileImage] = useState(null)
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
-      loadFile()
-    })
-  })
+    ConsoleWarn(`FileViewScreen`)
+    if (props.avatar.get('CurrentBulletinFile') != null) {
+      let file_json = props.avatar.get('CurrentBulletinFile')
+      ConsoleWarn(file_json)
+      loadFile(file_json)
+    }
+  }, [props.avatar])
 
-  const loadFile = async () => {
-    let hash = props.route.params.hash
-
-    let file_json = props.avatar.get('CurrentBulletinFile')
-    ConsoleWarn(`--------------------------------------------------------------------------------------loadFile`)
-    ConsoleWarn(file_json)
+  const loadFile = async (file_json) => {
     setFile(file_json)
 
-    if (file_json && file_json.chunk_length == file_json.chunk_cursor) {
+    if (file_json.chunk_length == file_json.chunk_cursor) {
       // file exist
-      let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
+      let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${file_json.hash}`
       if (file_json.ext == 'txt') {
         // txt file
         file_json.content = await FileSystem.readFile(file_path, 'utf8')
       } else {
         // image file
-        let result = await FileSystem.readFile(file_path, 'base64')
-        setFileImage(`data:image/png;base64,${result}`)
-        // Image.getSize(file_json.image, (w, h) => {
-        //   file_json.image_width = w
-        //   file_json.image_height = h
-        // })
-        // ConsoleWarn(`fileview--------------------------------------------------`)
+        setFileImage('file://' + file_path)
+        // let result = await FileSystem.readFile(file_path, 'base64')
+        // setFileImage(`data:image/png;base64,${result}`)
       }
-    } else {
-
     }
 
     // let file_path = `${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${hash}`
-    // ConsoleWarn(file_path)
 
     // let result = await FileSystem.stat(file_path)
-    // ConsoleWarn(result)
     // result = await FileSystem.readFile(file_path, 'utf8')
-    // ConsoleWarn(result)
   }
 
   const saveFile = async () => {
-    let dest_file_path = `${Dirs.SDCardDir}/Download/oxo.${file.name}.${file.ext}`
-    await FileSystem.cp(`${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${file.hash}`, dest_file_path)
-    ToastAndroid.show(`文件已复制到${dest_file_path}`,
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER)
+    let dest_file_dir = `${Dirs.SDCardDir}/Download/oxo`
+    result = await FileSystem.mkdir(dest_file_dir)
+    if (result) {
+      let dest_file_path = `${dest_file_dir}/${file.name}.${file.ext}`
+      await FileSystem.cp(`${Dirs.DocumentDir}/BulletinFile/${props.avatar.get('Address')}/${file.hash}`, dest_file_path)
+      ToastAndroid.show(`文件已复制到${dest_file_path}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER)
+    }
   }
 
   return (
     <View style={tw`h-full bg-neutral-200 dark:bg-neutral-800 p-5px`}>
       {
-        props.avatar.get('CurrentBulletinFile') != null &&
+        file != null &&
         <View>
           {
-            props.avatar.get('CurrentBulletinFile').chunk_length == props.avatar.get('CurrentBulletinFile').chunk_cursor ?
+            file.chunk_length == file.chunk_cursor ?
               <TouchableOpacity onPress={saveFile} >
                 {
-                  props.avatar.get('CurrentBulletinFile').ext == 'txt' ?
-                    <BulletinContent content={props.avatar.get('CurrentBulletinFile').content} />
+                  file.ext == 'txt' ?
+                    <BulletinContent content={file.content} />
                     :
                     // TODO:better display
                     file_image != null &&
                     <Image
                       style={tw`h-full w-full border-2 border-gray-300 dark:border-gray-700`}
                       source={{ uri: file_image }}
-                      resizeMode='stretch'>
+                      resizeMode='repeat'>
                     </Image>
                 }
               </TouchableOpacity>
               :
-              <ViewEmpty msg={`获取中:${props.avatar.get('CurrentBulletinFile').chunk_cursor}/${props.avatar.get('CurrentBulletinFile').chunk_length}`} />
+              <ViewEmpty msg={`获取中:${file.chunk_cursor}/${file.chunk_length}`} />
           }
         </View>
       }

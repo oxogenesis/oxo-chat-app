@@ -40,12 +40,14 @@ const UnlockScreen = (props) => {
   }
 
   const mkdir_for_avatar = async (address) => {
+    // tmp bulletin file
     let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}`
     result = await FileSystem.exists(file_path)
     if (!result) {
       result = await FileSystem.mkdir(file_path)
     }
 
+    // tmp chat file
     file_path = `${Dirs.DocumentDir}/ChatFile/${address}`
     result = await FileSystem.exists(file_path)
     if (!result) {
@@ -104,13 +106,8 @@ const UnlockScreen = (props) => {
       result = await FileSystem.mkdir(file_path)
     }
 
-    file_path = `${Dirs.DocumentDir}/BulletinFile`
-    result = await FileSystem.exists(file_path)
-    if (!result) {
-      result = await FileSystem.mkdir(file_path)
-    }
-
-    file_path = `${Dirs.DocumentDir}/ChatFile`
+    // all files save here
+    file_path = `${Dirs.DocumentDir}/File`
     result = await FileSystem.exists(file_path)
     if (!result) {
       result = await FileSystem.mkdir(file_path)

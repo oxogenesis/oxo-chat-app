@@ -81,7 +81,6 @@ const BulletinFileSelectScreen = (props) => {
       // let fileChunk = Math.ceil(stat.size / FileChunkSize)
       // for (let i = 0; i < fileChunk; i++) {
       //   result = await FileSystem.readFileChunk(path, i * FileChunkSize, FileChunkSize, 'utf8')
-      //   console.log(result)
       //   // if (i == 0) {
       //   //   await FileSystem.writeFile(bulletin_file_path, result, 'utf8')
       //   // } else {
@@ -89,7 +88,6 @@ const BulletinFileSelectScreen = (props) => {
       //   // }
       // }
       // file_hash = await FileSystem.hash(bulletin_file_path, 'SHA-1')
-      // console.log(file_hash)
     }
   }
 

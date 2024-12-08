@@ -10,6 +10,7 @@ import LinkSetting from '../../../component/LinkSetting'
 import ViewModal from '../../../component/ViewModal'
 import QRCode from 'react-native-qrcode-svg'
 import tw from '../../../lib/tailwind'
+import { ConsoleWarn } from '../../../lib/Util'
 
 //设置
 const SettingMeScreen = (props) => {
@@ -47,6 +48,9 @@ const SettingMeScreen = (props) => {
       height: 50,
       cropping: true,
       includeBase64: true
+    }).catch(e => {
+      ConsoleWarn(e)
+      ConsoleWarn(e.code)
     })
     if (image) {
       if (image.mime != 'image/png') {

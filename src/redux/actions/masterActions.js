@@ -41,6 +41,5 @@ export function* updateAvatarImage(action) {
       avatar_image[item.address] = item.image
     }
   })
-  console.log(avatar_image)
   yield put({ type: actionType.master.setAvatarImage, avatar_image: avatar_image })
 }

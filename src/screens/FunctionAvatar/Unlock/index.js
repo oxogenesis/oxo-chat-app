@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Platform } from 'react-native'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { actionType } from '../../../redux/actions/actionType'
 import { MasterKeyDerive, AvatarDerive } from '../../../lib/OXO'
@@ -11,7 +11,6 @@ import LoadingView from '../../../component/LoadingView'
 import tw from '../../../lib/tailwind'
 import { Dirs, FileSystem } from 'react-native-file-access'
 import { ConsoleWarn } from '../../../lib/Util'
-import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions'
 
 //解锁界面
 const UnlockScreen = (props) => {
@@ -134,7 +133,6 @@ const UnlockScreen = (props) => {
       setErrorMsg('')
 
       mkdir()
-      // requestPermission()
     })
   })
 
@@ -143,44 +141,6 @@ const UnlockScreen = (props) => {
       props.navigation.replace('TabHome')
     }
   }, [props.avatar])
-
-  // const requestPermission = async () => {
-  //   const platform = Platform.OS === 'ios' ? PERMISSIONS.IOS.PHOTO_LIBRARY : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE
-  //   console.log(Platform.OS)
-  //   console.log(platform)
-  //   const result = await check(platform)
-  //   console.log(result)
-  //   if (result === RESULTS.DENIED) {
-  //     const granted = await request(platform)
-  //     console.log(granted)
-  //     openSettings()
-  //     return granted
-  //   }
-  //   return result
-  // }
-
-  // const requestStoragePermission = async () => {
-  //   try {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  //       {
-  //         title: 'Storage Permission',
-  //         message: 'App needs access to your storage to read files',
-  //         buttonNeutral: 'Ask Me Later',
-  //         buttonNegative: 'Cancel',
-  //         buttonPositive: 'OK',
-  //       }
-  //     )
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       console.log('You can use the storage')
-  //     } else {
-  //       console.log('Storage permission denied')
-  //     }
-  //   } catch (err) {
-  //     console.warn(err)
-  //     return false
-  //   }
-  // }
 
   const showTutorial = () => {
     props.navigation.push('Tutorial', { key: 'App' })

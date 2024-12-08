@@ -9,8 +9,8 @@ const TutorialScreen = (props) => {
 
   const Tutorial = {
     Home: `
-# [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+# **[首页](oxo://Home)**
+## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service) [问题](oxo://FAQ)
 ---
 ---
 ---
@@ -46,7 +46,7 @@ const TutorialScreen = (props) => {
 `,
     App: `
 # [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+## **[应用](oxo://App)** [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service) [问题](oxo://FAQ)
 ---
 ---
 ---
@@ -107,7 +107,7 @@ abcdefghijk mnopqrstuvwxyz
 `,
     Bulletin: `
 # [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+## [应用](oxo://App) **[公告](oxo://Bulletin)** [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service) [问题](oxo://FAQ)
 ---
 ---
 ---
@@ -213,7 +213,7 @@ abcdefghijk mnopqrstuvwxyz
 `,
     Chat: `
 # [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+## [应用](oxo://App) [公告](oxo://Bulletin) **[私聊](oxo://Chat)** [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service) [问题](oxo://FAQ)
 ---
 ---
 ---
@@ -352,19 +352,19 @@ abcdefghijk mnopqrstuvwxyz
 `,
     Channel: `
 # [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) **[频道](oxo://Channel)** [群组](oxo://Group) [服务](oxo://Service) [问题](oxo://FAQ)
 
 TODO...
 `,
     Group: `
 # [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) **[群组](oxo://Group)** [服务](oxo://Service) [问题](oxo://FAQ)
 
 TODO...
 `,
     Service: `
 # [首页](oxo://Home)
-## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service)
+## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) **[服务](oxo://Service)** [问题](oxo://FAQ)
 ---
 ---
 ---
@@ -396,7 +396,24 @@ TODO...
 ### 群组服务
 校验、转发个人发送的群组消息，通过群组内成员个人之间两两协商密钥，对群组消息进行加密，实现聊天内容对服务器保密；但每次消息转发都需要进行加密，同一条群组消息内容需要多次转发来通知群组成员
 
-`
+`,
+    FAQ: `
+# [首页](oxo://Home)
+## [应用](oxo://App) [公告](oxo://Bulletin) [私聊](oxo://Chat) [频道](oxo://Channel) [群组](oxo://Group) [服务](oxo://Service) **[问题](oxo://FAQ)**
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+### 权限
+进行文件操作，需要用户授予应用“所有文件访问权限”；否则，浏览文件界面只能看见文件夹，看不见文件`
   }
 
   const onLinkPress = (url) => {

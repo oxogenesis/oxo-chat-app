@@ -42,14 +42,21 @@ const UnlockScreen = (props) => {
 
   const mkdir_for_avatar = async (address) => {
     // tmp bulletin file
-    let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}`
+    // let file_path = `${Dirs.DocumentDir}/BulletinFile/${address}`
+    // result = await FileSystem.exists(file_path)
+    // if (!result) {
+    //   result = await FileSystem.mkdir(file_path)
+    // }
+
+    // tmp chat file
+    file_path = `${Dirs.DocumentDir}/TmpChatFile/${address}`
     result = await FileSystem.exists(file_path)
     if (!result) {
       result = await FileSystem.mkdir(file_path)
     }
 
-    // tmp chat file
-    file_path = `${Dirs.DocumentDir}/ChatFile/${address}`
+    // cache file
+    file_path = `${Dirs.DocumentDir}/CacheFile/${address}`
     result = await FileSystem.exists(file_path)
     if (!result) {
       result = await FileSystem.mkdir(file_path)

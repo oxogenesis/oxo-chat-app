@@ -9,6 +9,7 @@ import TextFileSize from '../../../component/TextFileSize'
 import TextName from '../../../component/TextName'
 import tw from '../../../lib/tailwind'
 import { Dirs, FileSystem } from 'react-native-file-access'
+import DirUpLevel from '../../../component/DirUpLevel'
 
 //文件浏览界面
 const BulletinFileSelectScreen = (props) => {
@@ -97,15 +98,7 @@ const BulletinFileSelectScreen = (props) => {
         <View style={tw`h-full`}>
           {
             Dirs.SDCardDir != props.route.params.dir &&
-            <TouchableOpacity onPress={() => props.navigation.replace('BulletinFileSelect', { dir: parentDir })} >
-              <View style={tw`flex flex-row bg-stone-500 dark:bg-stone-300 p-5px mb-1px`}>
-                <View>
-                  <Text>
-                    <TextName name={`返回上一级目录`} />
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+            <DirUpLevel onPress={() => props.navigation.replace('BulletinFileSelect', { dir: parentDir })} />
           }
           {
             fileList.length > 0 ?

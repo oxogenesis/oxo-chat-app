@@ -131,10 +131,10 @@ export default class MessageGenerator {
       Timestamp: timestamp,
       PublicKey: this.PublicKey
     }
-    if (quote && quote.length == 0) {
+    if (quote == null || quote.length == 0) {
       delete tmp_json["Quote"]
     }
-    if (file && file.length == 0) {
+    if (file == null || file.length == 0) {
       delete tmp_json["File"]
     }
     let sig = this.sign(JSON.stringify(tmp_json))
@@ -150,10 +150,10 @@ export default class MessageGenerator {
       PublicKey: this.PublicKey,
       Signature: sig
     }
-    if (quote && quote.length == 0) {
+    if (quote == null || quote.length == 0) {
       delete json["Quote"]
     }
-    if (file && file.length == 0) {
+    if (file == null || file.length == 0) {
       delete json["File"]
     }
 

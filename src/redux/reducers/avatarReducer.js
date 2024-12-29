@@ -1,6 +1,8 @@
 import { actionType } from '../actions/actionType'
 import { fromJS, set } from 'immutable'
 import { DefaultBulletinCacheSize } from '../../lib/Const'
+import { ConsoleWarn } from '../../lib/Util'
+import { SlideFromRightIOS } from '@react-navigation/stack/lib/typescript/src/TransitionConfigs/TransitionPresets'
 
 function initialState() {
   return fromJS(
@@ -367,7 +369,7 @@ reducer.prototype[actionType.avatar.setCurrentBBSession] = (state, action) => {
 ///////////////////////////////////////////////////////////////////////////////
 reducer.prototype[actionType.avatar.setSessionMap] = (state, action) => {
   let session_list = Object.values(action.session_map)
-
+  ConsoleWarn(session_list)
   session_list.sort(function (m, n) {
     if (m.Timestamp < n.Timestamp) return 1
     else if (m.Timestamp > n.Timestamp) return -1

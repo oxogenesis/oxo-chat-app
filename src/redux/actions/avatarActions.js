@@ -359,24 +359,49 @@ export function* loadFromDB(action) {
   let recent_message_receive = []
   items = yield call([db, db.getAll], sql)
   items.forEach(message => {
-    recent_message_receive.push({
-      Address: message.sour_address,
-      Timestamp: message.timestamp,
-      Content: message.content
-    })
+    if (message.is_object == "TRUE") {
+      let object = JSON.parse(message.content)
+      recent_message_receive.push({
+        Address: message.sour_address,
+        Timestamp: message.timestamp,
+        Content: message.content,
+        IsObject: message.is_object,
+        ObjectType: object.ObjectType
+      })
+    } else {
+      recent_message_receive.push({
+        Address: message.sour_address,
+        Timestamp: message.timestamp,
+        Content: message.content,
+        IsObject: message.is_object
+      })
+    }
   })
 
   sql = `SELECT *, MAX(Timestamp) FROM MESSAGES GROUP BY dest_address ORDER BY MAX(Timestamp)`
   let recent_message_send = []
   items = yield call([db, db.getAll], sql)
   items.forEach(message => {
-    recent_message_send.push({
-      Address: message.dest_address,
-      Timestamp: message.timestamp,
-      Content: message.content
-    })
+    if (message.is_object == "TRUE") {
+      let object = JSON.parse(message.content)
+      recent_message_send.push({
+        Address: message.sour_address,
+        Timestamp: message.timestamp,
+        Content: message.content,
+        IsObject: message.is_object,
+        ObjectType: object.ObjectType
+      })
+    } else {
+      recent_message_send.push({
+        Address: message.sour_address,
+        Timestamp: message.timestamp,
+        Content: message.content,
+        IsObject: message.is_object
+      })
+    }
   })
 
+  // SessionMap
   let session_map = {}
   friend_list.forEach(friend => {
     session_map[friend] = { Address: friend, Timestamp: Epoch, Content: '', CountUnread: 0 }
@@ -920,8 +945,8 @@ export function* PublishBulletin(action) {
   let str_bulletin = JSON.stringify(bulletin_json)
   let hash = QuarterSHA512(str_bulletin)
   // INSERT ' into sqlite
-  let content = bulletin_json.Content.replace(/'/, "''")
-  str_bulletin = str_bulletin.replace(/'/, "''")
+  let content = bulletin_json.Content.replaceAll(/'/g, "''")
+  str_bulletin = str_bulletin.replaceAll(/'/g, "''")
   let quote_count = 0
   if (bulletin_json.Quote) {
     quote_count = bulletin_json.Quote.length
@@ -1023,8 +1048,6 @@ export function* SaveBulletin(action) {
     let random_bulletin_flag = yield select(state => state.avatar.get('RandomBulletinFlag'))
 
     // console.log(quote_white_list)
-
-    //WTF:is_file = 'false', not is_file = false
 
     let sql = `SELECT * FROM BULLETINS WHERE address = "${object_address}" AND sequence = ${bulletin_json.Sequence} LIMIT 1`
     let bulletin = yield call([db, db.getOne], sql)
@@ -1696,12 +1719,6 @@ export function* SaveFriendMessage(action) {
       readed = 'TRUE'
     }
 
-    //check is_file?
-    let is_file = 'FALSE'
-    let file_saved = 'FALSE'
-    let fileJson = null
-    let file_hash = null
-
     // Parse Object Json
     let is_object = 'FALSE'
     let object_type = ''
@@ -1716,8 +1733,8 @@ export function* SaveFriendMessage(action) {
     }
 
     //save message
-    let sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, confirmed, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
-      VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', 'FALSE', '${hash}', '${created_at}', '${readed}', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+    let sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, confirmed, hash, created_at, readed, is_object, object_type)
+      VALUES('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', 'FALSE', '${hash}', '${created_at}', '${readed}', '${is_object}', '${object_type}')`
     ConsoleWarn(sql)
 
     let reuslt = yield call([db, db.runSQL], sql)
@@ -1765,32 +1782,6 @@ export function* SaveFriendMessage(action) {
         }
       }
     }
-
-
-    // try {
-    //   fileJson = JSON.parse(content)
-    //   //is a json
-    //   if (checkFileSchema(fileJson)) {
-    //     //is a file json
-    //     is_file = true
-    //     file_hash = fileJson["Hash"]
-    //     let filesql = `SELECT * FROM FILES WHERE hash = "${fileJson.Hash}" AND saved = true`
-    //     state.DB.get(filesql, (err, item) => {
-    //       if (err) {
-    //         console.log(err)
-    //       } else {
-    //         if (item != null) {
-    //           file_saved = true
-    //         }
-    //         //update sql
-    //         sql = `INSERT INTO MESSAGES(sour_address, sequence, pre_hash, content, timestamp, json, hash, created_at, readed, is_file, file_saved, file_hash)
-    //           VALUES ('${sour_address}', ${json.Sequence}, '${json.PreHash}', '${content}', '${json.Timestamp}', '${strJson}', '${hash}', '${created_at}', ${readed}, ${is_file}, ${file_saved}, '${file_hash}')`
-    //       }
-    //     })
-    //   }
-    // } catch (e) {
-    //   ConsoleError(e)
-    // }
   }
 }
 
@@ -1867,9 +1858,6 @@ export function* SendFriendMessage(action) {
   let MessageGenerator = yield select(state => state.avatar.get('MessageGenerator'))
   let msg = MessageGenerator.genFriendMessage(sequence, current_session.Hash, ack, content, dest_address, timestamp)
   let hash = QuarterSHA512(msg)
-  let is_file = 'FALSE'
-  let file_saved = 'FALSE'
-  let file_hash = null
 
   // Forward Bulletin
   let is_object = 'FALSE'
@@ -1888,8 +1876,8 @@ export function* SendFriendMessage(action) {
   } catch (e) {
   }
 
-  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, confirmed, hash, created_at, readed, is_file, file_saved, file_hash, is_object, object_type)
-    VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', 'FALSE', '${hash}', '${timestamp}', 'TRUE', '${is_file}', '${file_saved}', '${file_hash}', '${is_object}', '${object_type}')`
+  sql = `INSERT INTO MESSAGES (dest_address, sequence, pre_hash, content, timestamp, json, confirmed, hash, created_at, readed, is_object, object_type)
+    VALUES ('${dest_address}', ${sequence}, '${current_session.Hash}', '${action.message}', '${timestamp}', '${msg}', 'FALSE', '${hash}', '${timestamp}', 'TRUE', '${is_object}', '${object_type}')`
   reuslt = yield call([db, db.runSQL], sql)
   if (reuslt.code != 0) {
     yield put({ type: actionType.avatar.SendMessage, message: msg })

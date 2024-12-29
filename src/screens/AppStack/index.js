@@ -56,6 +56,7 @@ import AddressSelectScreen from '../FunctionTab/AddressSelect'
 import FileViewScreen from '../FunctionTab/FileView'
 import MarkdownDisplayScreen from '../FunctionTab/MarkdownDisplay'
 import TutorialScreen from '../FunctionTab/Tutorial'
+import ZZZScreen from '../ZZZ'
 
 import { HeaderBackButton } from '@react-navigation/elements'
 import { Dirs } from 'react-native-file-access'
@@ -102,6 +103,11 @@ const AppStack = (props) => {
 
   return (
     <Stack.Navigator initialRouteName="MasterKey">
+      <Stack.Screen
+        name="ZZZ"
+        component={ZZZScreen}
+        options={{ headerShown: false }}
+      />
       {/* main */}
       <Stack.Screen
         name="MasterKey"
@@ -246,8 +252,8 @@ const AppStack = (props) => {
           ({ route, navigation }) => ({
             ...headerStyleOption,
             headerRight: () => (
-              <IconMaterial
-                name={'post-add'}
+              <IconAnt
+                name={'addfile'}
                 size={32}
                 color={headerIconColor}
                 onPress={() => navigation.navigate('BulletinPublish')}
@@ -276,7 +282,7 @@ const AppStack = (props) => {
                 size={32}
                 color={headerIconColor}
                 onPress={() => {
-                  navigation.push('BulletinFileSelect', { dir: Dirs.SDCardDir })
+                  navigation.navigate('BulletinFileSelect', { dir: Dirs.SDCardDir })
                 }}
               />)
           })
@@ -342,7 +348,7 @@ const AppStack = (props) => {
               <HeaderBackButton
                 {...props}
                 onPress={() => {
-                  navigation.push('BulletinPublish');
+                  navigation.navigate('BulletinPublish');
                 }}
               />
             )
@@ -380,13 +386,16 @@ const AppStack = (props) => {
             title: "会话",
             ...headerStyleOption,
             headerRight: () => (
-              <IconFeather
-                name={'more-horizontal'}
+              <IconMaterial
+                name={'post-add'}
                 size={32}
                 color={headerIconColor}
-                onPress={() => navigation.push('AddressMark', {
-                  address: route.params.address
-                })}
+                onPress={() => {
+                  navigation.navigate('ChatFileSelect', {
+                    dir: Dirs.SDCardDir,
+                    address: route.params.address
+                  })
+                }}
               />)
           })
         }

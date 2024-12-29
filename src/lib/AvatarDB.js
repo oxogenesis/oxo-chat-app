@@ -65,10 +65,7 @@ export default class Database {
         confirmed BOOLEAN DEFAULT FALSE,
         readed BOOLEAN DEFAULT FALSE,
         is_object BOOLEAN DEFAULT FALSE,
-        object_type TEXT,
-        is_file BOOLEAN DEFAULT FALSE,
-        file_saved BOOLEAN DEFAULT FALSE,
-        file_hash VARCHAR(40)
+        object_type INTEGER
         )`)
 
       // chat file
@@ -178,9 +175,8 @@ export default class Database {
         created_at INTEGER,
         json TEXT,
         readed BOOLEAN DEFAULT FALSE,
-        is_file BOOLEAN DEFAULT FALSE,
-        file_saved BOOLEAN DEFAULT FALSE,
-        file_hash VARCHAR(40)
+        is_object BOOLEAN DEFAULT FALSE,
+        object_type INTEGER
         )`)
 
       await this.createTable('FILES', `CREATE TABLE IF NOT EXISTS FILES(
